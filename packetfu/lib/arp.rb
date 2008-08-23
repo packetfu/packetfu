@@ -1,12 +1,6 @@
 
 module PacketFu
 
-	class FakeArp
-		def self.fakey
-			puts "fakey fake!"
-		end
-	end
-
 	# ARPHeader is a complete ARP struct, used in ARPPacket. 
 	#
 	# ARP is used to discover the machine address of nearby devices.
