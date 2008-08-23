@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: PacketFu::TcpOpts</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">PacketFu::TcpOpts</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/tcpopts_rb.html">
+                lib/tcpopts.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="TcpOpts.html">TcpOpts</a> handles the translation of TCP option
+strings to human-readable form, and vice versa. It is nearly certain to be
+completely rewritten, though the syntax will remain the same.
+</p>
+<h2>Example</h2>
+<pre>
+  tcp_pkt = PacketFu::TCPPacket.new
+  tcp_pkt.tcp_options=&quot;nop,nop,sack.ok,ws:7,eol&quot;
+</pre>
+<p>
+It&#8216;s usable now, but you should not trust attacker data, since
+certain combinations of malformed options will raise execeptions.
+</p>
+<p>
+See <a
+href="http://www.iana.org/assignments/tcp-parameters">www.iana.org/assignments/tcp-parameters</a>/
+for the rules on sizes and such.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000024">decode</a>&nbsp;&nbsp;
+      <a href="#M000019">encode</a>&nbsp;&nbsp;
+      <a href="#M000026">option_to_s</a>&nbsp;&nbsp;
+      <a href="#M000021">tcp_opts_char</a>&nbsp;&nbsp;
+      <a href="#M000023">tcp_opts_long</a>&nbsp;&nbsp;
+      <a href="#M000022">tcp_opts_short</a>&nbsp;&nbsp;
+      <a href="#M000020">tcp_opts_variable</a>&nbsp;&nbsp;
+      <a href="#M000025">translate</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name">Singleton</span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000024" class="method-detail">
+        <a name="M000024"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000024.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000024.html');return false;">
+          <span class="method-name">decode</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+XXX: Here be dragons!
+</p>
+<p>
+There are a few opportunities for attackers get get bad data passed from <a
+href="TcpOpts.html#M000024">decode</a> over to <a
+href="TcpOpts.html#M000019">encode</a> to produce unexpected results (SACK
+and timestamp manipulation seeming to be the most disasterous). So
+don&#8216;t make any life-critical decisions based on these options
+remaining the same between the <a href="TcpOpts.html#M000024">decode</a>
+and <a href="TcpOpts.html#M000019">encode</a> functions.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000019.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000019.html');return false;">
+          <span class="method-name">encode</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+XXX: Here be dragons!
+</p>
+<p>
+Like <a href="TcpOpts.html#M000024">decode</a>, <a
+href="TcpOpts.html#M000019">encode</a> requires fairly strict adherance to
+the various RFCs when it comes to lengths and expected data types. If
+you&#8216;re trying to enter well-formed data, it should all work fine. If
+you&#8216;re trying to something like fuzzing, then you&#8216;ll probably
+have better luck using tcp_opts= instead.
+</p>
+<p>
+There are a few opportunities for attackers get get bad data passed from <a
+href="TcpOpts.html#M000024">decode</a> over to <a
+href="TcpOpts.html#M000019">encode</a> to produce unexpected results (SACK
+and timestamp manipulation seeming to be the most disasterous). So
+don&#8216;t make any life-critical decisions based on these options
+remaining the same between the <a href="TcpOpts.html#M000024">decode</a>
+and <a href="TcpOpts.html#M000019">encode</a> functions.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000026" class="method-detail">
+        <a name="M000026"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000026.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000026.html');return false;">
+          <span class="method-name">option_to_s</span><span class="method-args">(optnum,value)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Option_to_s translates TCP option strings into a human-readable form
+(really, a nerd-readable form, and only if that nerd has a copy of the
+various RFC&#8216;s handy). It makes big assumptions that the sizes are RFC
+correct by this point, what with the unpacks and other presentations; for
+example, SACK-OK options are always two bytes, and no payload, so if you
+get a SACK-OK with a payload, it will be invisible when you process it with
+<a href="TcpOpts.html#M000026">option_to_s</a>.
+</p>
+<p>
+Underruns and other argument errors /should/ be impossible. If you find
+one, please file a bug!
+</p>
+<p>
+If you require more precision than this (eg, to account for malformed
+options), you should probably do your own opts processing using the bare
+tcp_opts values.
+</p>
+<p>
+Eventually, <a href="TcpOpts.html#M000026">option_to_s</a> should get a lot
+smarter about weirdly-formed options. And it at least shouldn&#8216;t raise
+exceptions.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000021.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000021.html');return false;">
+          <span class="method-name">tcp_opts_char</span><span class="method-args">(optnum,optstr)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000023.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000023.html');return false;">
+          <span class="method-name">tcp_opts_long</span><span class="method-args">(optnum,optstr)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000022.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000022.html');return false;">
+          <span class="method-name">tcp_opts_short</span><span class="method-args">(optnum,optstr)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000020.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000020.html');return false;">
+          <span class="method-name">tcp_opts_variable</span><span class="method-args">(optnum,optstr)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000025" class="method-detail">
+        <a name="M000025"></a>
+
+        <div class="method-heading">
+          <a href="TcpOpts.src/M000025.html" target="Code" class="method-signature"
+            onclick="popupCode('TcpOpts.src/M000025.html');return false;">
+          <span class="method-name">translate</span><span class="method-args">(arr)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get an array of TCP options as produced by <a
+href="TcpOpts.html#M000024">decode</a>() and <a
+href="TcpOpts.html#M000025">translate</a> it into something passing for
+human readable.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

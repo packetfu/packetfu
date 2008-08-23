@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: PacketFu::ARPPacket</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">PacketFu::ARPPacket</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/arp_rb.html">
+                lib/arp.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="Packet.html">
+                Packet
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="ARPPacket.html">ARPPacket</a> is used to construct ARP packets.
+They contain an <a href="EthHeader.html">EthHeader</a> and an <a
+href="ARPHeader.html">ARPHeader</a>.
+</p>
+<h2>Example</h2>
+<pre>
+ require 'packetfu'
+ arp_pkt = PacketFu::ARPPacket.new(:flavor =&gt; &quot;Windows&quot;)
+ arp_pkt.arp_saddr_mac=&quot;00:1c:23:44:55:66&quot;  # Your hardware address
+ arp_pkt.arp_saddr_ip=&quot;10.10.10.17&quot;  # Your IP address
+ arp_pkt.arp_daddr_ip=&quot;10.10.10.1&quot;  # Target IP address
+ arp_pkt.arp_opcode=1  # Request
+
+ arp_pkt.to_w('eth0')        # Inject on the wire. (requires root)
+ arp_pkt.to_f('/tmp/arp.pcap') # Write to a file.
+</pre>
+<h2>Parameters</h2>
+<pre>
+ :flavor
+  Sets the &quot;flavor&quot; of the ARP packet. Choices are currently:
+    :windows, :linux, :hp_deskjet
+ :eth
+  A pre-generated EthHeader object. If not specified, a new one will be created.
+ :arp
+  A pre-generated ARPHeader object. If not specificed, a new one will be created.
+</pre>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000005">new</a>&nbsp;&nbsp;
+      <a href="#M000006">peek</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">arp_header</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">eth_header</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
+
+        <div class="method-heading">
+          <a href="ARPPacket.src/M000005.html" target="Code" class="method-signature"
+            onclick="popupCode('ARPPacket.src/M000005.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(args={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
+
+        <div class="method-heading">
+          <a href="ARPPacket.src/M000006.html" target="Code" class="method-signature"
+            onclick="popupCode('ARPPacket.src/M000006.html');return false;">
+          <span class="method-name">peek</span><span class="method-args">(args={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Used to generate summary data for ARP packets.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

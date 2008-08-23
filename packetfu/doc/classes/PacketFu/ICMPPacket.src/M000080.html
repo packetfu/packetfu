@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>peek (PacketFu::ICMPPacket)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/icmp.rb, line 76</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">peek</span>(<span class="ruby-identifier">args</span>={})
+                        <span class="ruby-identifier">peek_data</span> = [<span class="ruby-value str">&quot;C &quot;</span>] <span class="ruby-comment cmt"># I is taken by IP</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;%-5d&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">size</span>
+                        <span class="ruby-identifier">type</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">icmp_type</span>
+                                                 <span class="ruby-keyword kw">when</span> <span class="ruby-value">8</span>
+                                                         <span class="ruby-value str">&quot;ping&quot;</span>
+                                                 <span class="ruby-keyword kw">when</span> <span class="ruby-value">0</span>
+                                                         <span class="ruby-value str">&quot;pong&quot;</span>
+                                                 <span class="ruby-keyword kw">else</span>
+                                                         <span class="ruby-value str">&quot;%02x-%02x&quot;</span> <span class="ruby-operator">%</span> [<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">icmp_type</span>, <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">icmp_code</span>]
+                                                 <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;%-21s&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-node">&quot;#{self.ip_saddr}:#{type}&quot;</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;-&gt;&quot;</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;%21s&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-node">&quot;#{self.ip_daddr}&quot;</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;%23s&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-value str">&quot;I:&quot;</span>
+                        <span class="ruby-identifier">peek_data</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;%04x&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">ip_id</span>
+                        <span class="ruby-identifier">peek_data</span>.<span class="ruby-identifier">join</span>
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

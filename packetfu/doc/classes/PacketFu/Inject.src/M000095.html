@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (PacketFu::Inject)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/inject.rb, line 8</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">args</span>={})
+                        <span class="ruby-ivar">@array</span> = [] <span class="ruby-comment cmt"># Where the packet array goes.</span>
+                        <span class="ruby-ivar">@stream</span> = [] <span class="ruby-comment cmt"># Where the stream goes.</span>
+                        <span class="ruby-ivar">@iface</span> = <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:iface</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'eth0'</span> <span class="ruby-comment cmt"># Sometimes should be wlan0 or eth1  </span>
+                        <span class="ruby-ivar">@snaplen</span> = <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:snaplen</span>] <span class="ruby-operator">||</span> <span class="ruby-value">0xffff</span>
+                        <span class="ruby-ivar">@promisc</span> = <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:promisc</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword kw">false</span> <span class="ruby-comment cmt"># Sensible for some Intel wifi cards</span>
+                        <span class="ruby-ivar">@timeout</span> = <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">1</span>
+                        <span class="ruby-ivar">@show_live</span> = <span class="ruby-keyword kw">nil</span>
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

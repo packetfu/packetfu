@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>option_to_s (PacketFu::TcpOpts)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/tcpopts.rb, line 169</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">option_to_s</span>(<span class="ruby-identifier">optnum</span>,<span class="ruby-identifier">value</span>)
+
+                        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">optnum</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">2</span>; <span class="ruby-node">&quot;MSS:#{value.unpack(&quot;n&quot;)}&quot;</span> <span class="ruby-comment cmt"># Max Segment Size</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">3</span>; <span class="ruby-node">&quot;WS:#{value.unpack(&quot;C&quot;)}&quot;</span> <span class="ruby-comment cmt"># Window Scale</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">4</span>; <span class="ruby-value str">&quot;SACK.OK&quot;</span> <span class="ruby-comment cmt"># SACK Permitted</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">5</span>; <span class="ruby-identifier">sack_opt</span> = <span class="ruby-value str">&quot;SACK:&quot;</span> <span class="ruby-comment cmt"># SACK values</span>
+                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">%</span> <span class="ruby-value">4</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-comment cmt"># Well formed or not.</span>
+                                        <span class="ruby-identifier">edges</span> = <span class="ruby-identifier">value</span>.<span class="ruby-identifier">scan</span>(<span class="ruby-regexp re">/[\x00-\xff]{4}/</span>).<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>.<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;N&quot;</span>)}.<span class="ruby-identifier">join</span>(<span class="ruby-value str">';'</span>)
+                                <span class="ruby-keyword kw">else</span>
+                                        <span class="ruby-identifier">edges</span> = <span class="ruby-identifier">value</span>.<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;H*&quot;</span>)[<span class="ruby-value">0</span>]
+                                <span class="ruby-keyword kw">end</span>
+                                <span class="ruby-identifier">sack_opt</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">edges</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">6</span>; <span class="ruby-node">&quot;ECHO:#{value.unpack(&quot;N&quot;)}&quot;</span> <span class="ruby-comment cmt"># Echo</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">7</span>; <span class="ruby-node">&quot;ECHO.REPLY:#{value.unpack(&quot;N&quot;)}&quot;</span> <span class="ruby-comment cmt"># Echo Reply</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">8</span>; <span class="ruby-identifier">ts_opt</span> = <span class="ruby-value str">&quot;TS:&quot;</span> <span class="ruby-comment cmt"># Timestamp and TS-echo reply</span>
+                                <span class="ruby-identifier">ts_opt</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">value</span>[<span class="ruby-value">0</span>,<span class="ruby-value">4</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;N&quot;</span>)[<span class="ruby-value">0</span>].<span class="ruby-identifier">to_s</span>
+                                <span class="ruby-identifier">ts_opt</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;;&quot;</span>
+                                <span class="ruby-identifier">ts_opt</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">value</span>[<span class="ruby-value">4</span>,<span class="ruby-value">4</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;N&quot;</span>)[<span class="ruby-value">0</span>].<span class="ruby-identifier">to_s</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">9</span>; <span class="ruby-value str">&quot;POCP&quot;</span> <span class="ruby-comment cmt"># Partial Order Connection Permitted</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">10</span>; <span class="ruby-value str">&quot;POSP:&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-comment cmt"># Partial Order Service Profile</span>
+                                <span class="ruby-value str">&quot;%02d&quot;</span> <span class="ruby-operator">%</span> ((<span class="ruby-identifier">value</span>.<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-operator">&gt;&gt;</span> <span class="ruby-value">6</span>).<span class="ruby-identifier">to_s</span>(<span class="ruby-value">2</span>)) <span class="ruby-comment cmt"># Partial Order bits</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">11</span>; <span class="ruby-node">&quot;CC:#{value.unpack(&quot;N&quot;)}&quot;</span> <span class="ruby-comment cmt"># Connection Count. RFC 1644 is hi-larious, btw.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">12</span>; <span class="ruby-node">&quot;CC.NEW:#{value.unpack(&quot;N&quot;)}&quot;</span> <span class="ruby-comment cmt"># Connection Count New.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">13</span>; <span class="ruby-node">&quot;CC.EHCO:#{value.unpack(&quot;N&quot;)}&quot;</span> <span class="ruby-comment cmt"># Conn. Count Echo.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">14</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;ALT.CRC:#{value.unpack(&quot;C&quot;)}&quot;</span> <span class="ruby-comment cmt"># Alt Checksum request</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">15</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;ALT.DATA:#{value.unpack(&quot;H*&quot;)}&quot;</span> <span class="ruby-comment cmt"># Alt checksum data. I'm too dumb for this.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">16</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;Skeeter:#{value.unpack(&quot;H*&quot;)}&quot;</span> <span class="ruby-comment cmt"># Skeeter crypto.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">17</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;Bubba:#{value.unpack(&quot;H*&quot;)}&quot;</span> <span class="ruby-comment cmt"># Bubba crypto.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">18</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;TCO:#{value.unpack(&quot;C&quot;)}&quot;</span> <span class="ruby-comment cmt"># Trailer Checksum Option. Nobody knows what this is.</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">19</span><span class="ruby-operator">:</span> <span class="ruby-node">&quot;MD5:#{value.unpack(&quot;H*&quot;)}&quot;</span> <span class="ruby-comment cmt"># MD5 Signature Option. Hash-signed TCP? Outrageous!</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-value">27</span><span class="ruby-operator">:</span> <span class="ruby-identifier">qsr_opt</span> = <span class="ruby-value str">&quot;QSR:&quot;</span> <span class="ruby-comment cmt"># Quick-Start Request. Experimental in Jan 2007.</span>
+                                <span class="ruby-identifier">qsr_val</span> = []
+                                <span class="ruby-identifier">qsr_val</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">value</span>[<span class="ruby-value">0</span>,<span class="ruby-value">1</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-operator">&gt;&gt;</span> <span class="ruby-value">4</span>)
+                                <span class="ruby-identifier">qsr_val</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">value</span>[<span class="ruby-value">0</span>,<span class="ruby-value">1</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-operator">&amp;</span> <span class="ruby-value">0x0f</span>)
+                                <span class="ruby-identifier">qsr_val</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">value</span>[<span class="ruby-value">1</span>,<span class="ruby-value">1</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>]
+                                <span class="ruby-identifier">qsr_val</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">value</span>[<span class="ruby-value">2</span>,<span class="ruby-value">4</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;N&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-comment cmt"># Note bits 30,31 RFC-SHOULD be zero.</span>
+                                <span class="ruby-identifier">qsr_opt</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">qsr_val</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">';'</span>)
+                                <span class="ruby-comment cmt"># Pretty much everything else is obsolete, experiemental, unused, or undoc'ed.</span>
+                        <span class="ruby-keyword kw">else</span>; <span class="ruby-node">&quot;0x#{[optnum].pack(&quot;C&quot;).unpack(&quot;H*&quot;)[0].upcase}:#{value.unpack(&quot;H*&quot;)}&quot;</span>
+                        <span class="ruby-keyword kw">end</span>
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

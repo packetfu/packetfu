@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>encode (PacketFu::TcpOpts)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/tcpopts.rb, line 33</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">encode</span>(<span class="ruby-identifier">str</span>)
+                        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">str</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*,\s*/</span>)
+                        <span class="ruby-identifier">binary_opts</span> = <span class="ruby-value str">''</span>
+                        <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opt</span><span class="ruby-operator">|</span>
+                                <span class="ruby-identifier">binary_opts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">opt</span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^EOL$/i</span>; <span class="ruby-value str">&quot;\x00&quot;</span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^NOP$/i</span>; <span class="ruby-value str">&quot;\x01&quot;</span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^MSS\s*:/i</span>; <span class="ruby-identifier">tcp_opts_short</span>(<span class="ruby-value">2</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^WS\s*:/i</span>; <span class="ruby-identifier">tcp_opts_char</span>(<span class="ruby-value">3</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^SACK\.OK$/i</span>; <span class="ruby-value str">&quot;\x04\x02&quot;</span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^SACK\s*:/i</span>
+                                        <span class="ruby-identifier">sack_opts</span> = <span class="ruby-identifier">opt</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*:\s*/</span>)[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*;\s*/</span>).<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_i</span>}.<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;N*&quot;</span>)
+                                        [<span class="ruby-value">0x05</span>,<span class="ruby-identifier">sack_opts</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">+</span><span class="ruby-value">2</span>,<span class="ruby-identifier">sack_opts</span>].<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;CCa*&quot;</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^ECHO\s*:/i</span>; <span class="ruby-identifier">tcp_opts_long</span>(<span class="ruby-value">6</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^ECHO.REPLY\s*:/i</span>; <span class="ruby-identifier">tcp_opts_long</span>(<span class="ruby-value">7</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^TS\s*:/i</span>
+                                        <span class="ruby-identifier">ts_opts</span> = <span class="ruby-identifier">opt</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*:\s*/</span>)[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*;\s*/</span>).<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_i</span>}.<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;N*&quot;</span>)
+                                        [<span class="ruby-value">0x08</span>,<span class="ruby-identifier">ts_opts</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">+</span><span class="ruby-value">2</span>,<span class="ruby-identifier">ts_opts</span>].<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;CCa*&quot;</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^POCP$/i</span>; <span class="ruby-value str">&quot;\x09\x02&quot;</span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^POSP\s*:/i</span>
+                                        <span class="ruby-identifier">posp</span> = [<span class="ruby-value">10</span>,<span class="ruby-value">3</span>,(<span class="ruby-identifier">opt</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*:\s*/</span>)[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">6</span>)].<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;C3&quot;</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^CC\s*:/i</span>; <span class="ruby-identifier">tcp_opts_long</span>(<span class="ruby-value">11</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^CC.NEW\s*:/i</span>; <span class="ruby-identifier">tcp_opts_long</span>(<span class="ruby-value">12</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^CC.ECHO\s*:/i</span>; <span class="ruby-identifier">tcp_opts_long</span>(<span class="ruby-value">13</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^ALT.CRC\s*:/i</span>; <span class="ruby-identifier">tcp_opts_char</span>(<span class="ruby-value">14</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^ALT.DATA\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-value">15</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^Skeeter\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-value">16</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^Bubba\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-value">17</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^TCO\s*:/i</span>; <span class="ruby-identifier">tcp_opts_char</span>(<span class="ruby-value">18</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^MD5\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-value">19</span>,<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^QSR\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-value">27</span>,<span class="ruby-identifier">opt</span>) <span class="ruby-comment cmt"># TODO: Do the bitwise math to match the decode. </span>
+                                <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^0x[0-9a-f][0-9a-f]\s*:/i</span>; <span class="ruby-identifier">tcp_opts_variable</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-value">0</span>,<span class="ruby-value">4</span>].<span class="ruby-identifier">to_i</span>(<span class="ruby-value">16</span>),<span class="ruby-identifier">opt</span>)
+                                <span class="ruby-keyword kw">else</span>
+                                        <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Invalid tcp_options format or entry. Perhaps you want tcp_opts?&quot;</span>
+                                <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-identifier">binary_opts</span>
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

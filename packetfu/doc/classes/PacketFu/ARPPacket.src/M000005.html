@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (PacketFu::ARPPacket)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/arp.rb, line 102</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">args</span>={})
+                        <span class="ruby-ivar">@eth_header</span> = (<span class="ruby-identifier">args</span>[<span class="ruby-identifier">:eth</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">EthHeader</span>.<span class="ruby-identifier">new</span>)
+                        <span class="ruby-ivar">@arp_header</span> = (<span class="ruby-identifier">args</span>[<span class="ruby-identifier">:arp</span>]    <span class="ruby-operator">||</span> <span class="ruby-constant">ARPHeader</span>.<span class="ruby-identifier">new</span>)
+                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">eth_proto</span> = <span class="ruby-value">0x806</span>
+                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span>=<span class="ruby-ivar">@arp_header</span>
+
+                        <span class="ruby-comment cmt"># Please send more flavors to todb-packetfu@planb-security.net.</span>
+                        <span class="ruby-comment cmt"># Most of these initial fingerprints come from one (1) sample.</span>
+                        <span class="ruby-keyword kw">case</span> (<span class="ruby-identifier">args</span>[<span class="ruby-identifier">:flavor</span>].<span class="ruby-identifier">nil?</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">:nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:flavor</span>].<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">intern</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:windows</span>; <span class="ruby-ivar">@arp_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-value str">&quot;\x00&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">64</span>                                <span class="ruby-comment cmt"># 64 bytes of padding </span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:linux</span>; <span class="ruby-ivar">@arp_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-value str">&quot;\x00&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">4</span> <span class="ruby-operator">+</span>                         <span class="ruby-comment cmt"># 32 bytes of padding </span>
+                                <span class="ruby-value str">&quot;\x00\x07\x5c\x14&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\x00&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">4</span> <span class="ruby-operator">+</span>
+                                <span class="ruby-value str">&quot;\x00\x0f\x83\x34&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\x00\x0f\x83\x74&quot;</span> <span class="ruby-operator">+</span>
+                                <span class="ruby-value str">&quot;\x01\x11\x83\x78&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\x00\x00\x00\x0c&quot;</span> <span class="ruby-operator">+</span> 
+                                <span class="ruby-value str">&quot;\x00\x00\x00\x00&quot;</span>
+                        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:hp_deskjet</span>;                                                                                                                                    <span class="ruby-comment cmt"># Pads up to 60 bytes.</span>
+                                <span class="ruby-ivar">@arp_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-value str">&quot;\xe0\x90\x0d\x6c&quot;</span> <span class="ruby-operator">+</span> 
+                                <span class="ruby-value str">&quot;\xff\xff\xee\xee&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;\x00&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">4</span> <span class="ruby-operator">+</span> 
+                                <span class="ruby-value str">&quot;\xe0\x8f\xfa\x18\x00\x20&quot;</span>  
+                        <span class="ruby-keyword kw">else</span>; <span class="ruby-ivar">@arp_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-value str">&quot;\x00&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">18</span>                                                         <span class="ruby-comment cmt"># Pads up to 60 bytes.</span>
+                        <span class="ruby-keyword kw">end</span>
+
+                        <span class="ruby-ivar">@headers</span> = [<span class="ruby-ivar">@eth_header</span>, <span class="ruby-ivar">@arp_header</span>]
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

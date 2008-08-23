@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>read (PacketFu::Packet)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/packet.rb, line 164</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>,<span class="ruby-identifier">args</span>={})
+                        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">io</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">14</span>
+                                <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-value">0</span>,<span class="ruby-value">14</span>])
+                                <span class="ruby-identifier">eth_proto_num</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">12</span>,<span class="ruby-value">2</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;n&quot;</span>)[<span class="ruby-value">0</span>]
+                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">eth_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">0x0800</span> <span class="ruby-comment cmt"># It's IP.</span>
+                                        <span class="ruby-identifier">ip_hlen</span>=(<span class="ruby-identifier">io</span>[<span class="ruby-value">14</span>] <span class="ruby-operator">&amp;</span> <span class="ruby-value">0x0f</span>) <span class="ruby-operator">*</span> <span class="ruby-value">4</span>
+                                        <span class="ruby-identifier">ip_proto_num</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">23</span>,<span class="ruby-value">1</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>]
+                                        <span class="ruby-ivar">@ip_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-value">14</span>,<span class="ruby-identifier">ip_hlen</span>])
+                                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-ivar">@ip_header</span>
+                                        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">ip_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">0x06</span> <span class="ruby-comment cmt"># It's TCP.</span>
+                                                <span class="ruby-identifier">tcp_len</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">16</span>,<span class="ruby-value">2</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;n&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-operator">-</span> <span class="ruby-value">20</span>
+                                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:strip</span>] <span class="ruby-comment cmt"># Drops trailers like frame check sequence (FCS). Often desired for cleaner packets.</span>
+                                                        <span class="ruby-identifier">tcp_all</span> = <span class="ruby-identifier">io</span>[<span class="ruby-identifier">ip_hlen</span><span class="ruby-operator">+</span><span class="ruby-value">14</span>,<span class="ruby-identifier">tcp_len</span>] <span class="ruby-comment cmt"># Believe the tcp_len value; chop off anything that's not in range.</span>
+                                                <span class="ruby-keyword kw">else</span>
+                                                        <span class="ruby-identifier">tcp_all</span> = <span class="ruby-identifier">io</span>[<span class="ruby-identifier">ip_hlen</span><span class="ruby-operator">+</span><span class="ruby-value">14</span>,<span class="ruby-value">0xffff</span>] <span class="ruby-comment cmt"># Don't believe the tcp_len value; suck everything up.</span>
+                                                <span class="ruby-keyword kw">end</span>
+                                                <span class="ruby-identifier">tcp_hlen</span> = ((<span class="ruby-identifier">tcp_all</span>[<span class="ruby-value">12</span>,<span class="ruby-value">1</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;C&quot;</span>)[<span class="ruby-value">0</span>]) <span class="ruby-operator">&gt;&gt;</span> <span class="ruby-value">4</span>) <span class="ruby-operator">*</span> <span class="ruby-value">4</span>
+                                                <span class="ruby-identifier">tcp_opts</span> = <span class="ruby-identifier">tcp_all</span>[<span class="ruby-value">20</span>,<span class="ruby-identifier">tcp_hlen</span><span class="ruby-operator">-</span><span class="ruby-value">20</span>]
+                                                <span class="ruby-identifier">tcp_body</span> = <span class="ruby-identifier">tcp_all</span>[<span class="ruby-identifier">tcp_hlen</span>,<span class="ruby-value">0xffff</span>]
+                                                <span class="ruby-ivar">@tcp_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">tcp_all</span>[<span class="ruby-value">0</span>,<span class="ruby-value">20</span>])
+                                                <span class="ruby-ivar">@tcp_header</span>.<span class="ruby-identifier">tcp_opts</span>=<span class="ruby-identifier">tcp_opts</span>
+                                                <span class="ruby-ivar">@tcp_header</span>.<span class="ruby-identifier">body</span>=<span class="ruby-identifier">tcp_body</span>
+                                                <span class="ruby-ivar">@ip_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-ivar">@tcp_header</span>
+                                        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">ip_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">0x11</span> <span class="ruby-comment cmt"># It's UDP.</span>
+                                                <span class="ruby-identifier">udp_len</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">16</span>,<span class="ruby-value">2</span>].<span class="ruby-identifier">unpack</span>(<span class="ruby-value str">&quot;n&quot;</span>)[<span class="ruby-value">0</span>] <span class="ruby-operator">-</span> <span class="ruby-value">20</span>
+                                                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:strip</span>] <span class="ruby-comment cmt"># Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.</span>
+                                                        <span class="ruby-ivar">@udp_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-identifier">ip_hlen</span><span class="ruby-operator">+</span><span class="ruby-value">14</span>,<span class="ruby-identifier">udp_len</span>]) 
+                                                <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># ... Suck it all up. BTW, this will change the lengths if they are ever recalc'ed. Bummer.</span>
+                                                        <span class="ruby-ivar">@udp_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-identifier">ip_hlen</span><span class="ruby-operator">+</span><span class="ruby-value">14</span>,<span class="ruby-value">0xffff</span>])
+                                                <span class="ruby-keyword kw">end</span>
+                                                <span class="ruby-ivar">@ip_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-ivar">@udp_header</span>
+                                        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">ip_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-comment cmt"># It's ICMP</span>
+                                                <span class="ruby-ivar">@icmp_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-identifier">ip_hlen</span><span class="ruby-operator">+</span><span class="ruby-value">14</span>,<span class="ruby-value">0xffff</span>])
+                                                <span class="ruby-ivar">@ip_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-ivar">@icmp_header</span>
+                                        <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># It's an IP packet for a protocol we don't have a decoder for.</span>
+                                                <span class="ruby-ivar">@ip_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">16</span>,<span class="ruby-identifier">io</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">16</span>] 
+                                        <span class="ruby-keyword kw">end</span>
+                                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-ivar">@ip_header</span>
+                                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">eth_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">0x0806</span> <span class="ruby-comment cmt"># It's ARP</span>
+                                        <span class="ruby-ivar">@arp_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-value">14</span>,<span class="ruby-value">0xffff</span>]) <span class="ruby-comment cmt"># You'll nearly have a trailer and you'll never know what size.</span>
+                                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span>=<span class="ruby-ivar">@arp_header</span>
+                                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">eth_proto_num</span> <span class="ruby-operator">==</span> <span class="ruby-value">0x86dd</span> <span class="ruby-comment cmt"># It's IPv6</span>
+                                        <span class="ruby-ivar">@ipv6_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>[<span class="ruby-value">14</span>,<span class="ruby-value">0xffff</span>])
+                                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span>=<span class="ruby-ivar">@ipv6_header</span>
+                                <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># It's an Ethernet packet for a protocol we don't have a decoder for</span>
+                                        <span class="ruby-ivar">@eth_header</span>.<span class="ruby-identifier">body</span> = <span class="ruby-identifier">io</span>[<span class="ruby-value">14</span>,<span class="ruby-identifier">io</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">14</span>]
+                                <span class="ruby-keyword kw">end</span>
+                                <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">args</span>[<span class="ruby-identifier">:fix</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">:recalc</span>])
+                                        <span class="ruby-comment cmt"># Unfortunately, we cannot simply recalc with abandon, since</span>
+                                        <span class="ruby-comment cmt"># we may have unaccounted trailers that will sneak into the checksum.</span>
+                                        <span class="ruby-comment cmt"># The better way to handle this is to put trailers in their own</span>
+                                        <span class="ruby-comment cmt"># BinData field, but I'm not a-gonna right now. :/</span>
+                                        <span class="ruby-identifier">ip_recalc</span>(<span class="ruby-identifier">:ip_sum</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:ip_header</span>
+                                        <span class="ruby-identifier">recalc</span>(<span class="ruby-identifier">:tcp</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:tcp_header</span>
+                                        <span class="ruby-identifier">recalc</span>(<span class="ruby-identifier">:udp</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:udp_header</span>
+                                <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># You're not big enough for Ethernet. </span>
+                                <span class="ruby-ivar">@invalid_header</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">io</span>)
+                        <span class="ruby-keyword kw">end</span>  
+                        <span class="ruby-ivar">@headers</span>[<span class="ruby-value">0</span>]
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

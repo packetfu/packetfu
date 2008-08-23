@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>mac2str (PacketFu::EthHeader)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/eth.rb, line 72</span>
+                <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">mac2str</span>(<span class="ruby-identifier">mac</span>)
+                        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">mac</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/[:\x2d\x2e\x5f]/</span>).<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">6</span>
+                                <span class="ruby-identifier">ret</span> =       <span class="ruby-identifier">mac</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/[:\x2d\x2e\x20\x5f]/</span>).<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">to_i</span>(<span class="ruby-value">16</span>)}.<span class="ruby-identifier">pack</span>(<span class="ruby-value str">&quot;C6&quot;</span>)
+                        <span class="ruby-keyword kw">else</span>
+                                <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Unkown format for mac address.&quot;</span>
+                        <span class="ruby-keyword kw">end</span>
+                        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">ret</span>
+                <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
