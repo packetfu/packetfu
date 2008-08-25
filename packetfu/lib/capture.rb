@@ -30,7 +30,7 @@ module PacketFu
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
 			@stream = [] # Where the stream goes.
-			@iface = args[:iface] || 'eth0' # Sometimes should be wlan0 or eth1	
+			@iface = args[:iface] || $packetfu_iface || 'eth0' # Sometimes should be wlan0 or eth1	
 			@snaplen = args[:snaplen] || 0xffff
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1
@@ -49,20 +49,24 @@ module PacketFu
 		#   :start
 		#     When true, start capturing packets to the @stream variable. Defaults to true
 		def capture(args={})
-			filter = args[:filter]
-			start = args[:start] || true
-			if start
-				begin
-					@stream = Pcap.open_live(@iface,@snaplen,@promisc,@timeout)
-				rescue RuntimeError
-					$stderr.print "Are you root? Error: "
-					raise
+			if Process.euid.zero?
+				filter = args[:filter]
+				start = args[:start] || true
+				if start
+					begin
+						@stream = Pcap.open_live(@iface,@snaplen,@promisc,@timeout)
+					rescue RuntimeError
+						$stderr.print "Are you sure you're root? Error: "
+						raise
+					end
+					bpf(:filter=>filter) if filter
+				else
+					@stream = []
 				end
-				bpf(:filter=>filter) if filter
+				@stream
 			else
-				@stream = []
+				raise RuntimeError,"Not root, so can't capture packets. Error: "
 			end
-			@stream
 		end
 
 		# start() is equivalent to capture().
@@ -149,5 +153,49 @@ module PacketFu
 				end
 			end
 		end
-	end
-end
+
+		# Discovers the local IP and Ethernet address, which is useful for writing
+		# packets you expect to get a response to. Note, this is a noisy
+		# operation; a UDP packet is generated and dropped on to $packetfu_iface,
+		# and then captured (which means you need to be root to do this).
+		#
+		# === Parameters
+		#   :save => true|false
+		#    If true, the information is written to $packetfu_iam
+		#
+		def self.whoami?(args={})
+
+			if $packetfu_iface =~ /lo/ # Linux loopback
+				dst_host = "127.0.0.1"
+			else
+				dst_host = "10.1.#{rand(0xff)+1}.#{rand(0xff)+1}"
+			end
+			dst_port = rand(0xffff-1024)+1024
+			msg = "PacketFu::whoami? #{(Time.now.to_i + rand(0xffffff)+1)}"
+			cap = Capture.new(:start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
+			UDPSocket.open.send(msg,0,dst_host,dst_port)
+			cap.save
+			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
+			cap = nil
+			if pkt 
+				if pkt.payload == msg
+				my_data =	{
+					:eth_saddr => pkt.eth_saddr,
+					:eth_src => pkt.eth_src.to_s,
+					:ip_saddr => pkt.ip_saddr,
+					:ip_src => pkt.ip_src.to_s
+				}
+				else raise SecurityError, 
+					"whoami() packet doesn't match sent data. Something fishy's going on."
+				end
+			else
+				raise SocketError, "Didn't recieve the whomi() packet."
+			end
+			$packetfu_iam = my_data if args[:save]
+			my_data
+		end
+
+
+	end # class Capture
+end # module PacketFu
+

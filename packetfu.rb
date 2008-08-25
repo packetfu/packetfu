@@ -42,6 +42,9 @@ require 'packetfu/lib/ipv6'
 $packetfu_pcapfile = '/tmp/out.pcap'	# Default file to write to.
 $packetfu_iface = 'eth0'							# Default interface to capture/inject from/to
 
+$packetfu_do_whoami = true # Set to false if you don't want to start your sessions by identifying yourself.
+$packetfu_iam = {} # Where your native eth_src and ip_src go for your default interface
+
 # = PacketFu
 #
 # A library for reading a writing packets to an interface or to a libpcap-formatted file.
@@ -67,4 +70,21 @@ module PacketFu
 	def self.version
 		"0.0.1-dev" # August 22, 2008
 	end
+
+	# Find the local default Ethernet and IP address, and set the 
+	# global <b>$packetfu_iam</b> variable accordingly. This is accomplished
+	# by listening for, then generating, a random UDP packet. This packet
+	# will fire off on load unless <b>$packetfu_do_whoami == false</b>
+	#
+	# === Example
+	#
+	#   PacketFu::whoami? # => {:ip_src=>"\n\n\n\003", :eth_saddr=>"00:03:47:bf:55:3c", :eth_src=>"\000\003G\277U<", :ip_saddr=>"10.10.10.3"}
+	#
+	#
+	def self.whoami?
+		Capture.whoami?(:save => true)
+	end
+
+	whoami? if $packetfu_do_whoami and Process.euid.zero?
+
 end

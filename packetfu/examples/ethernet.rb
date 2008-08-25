@@ -1,4 +1,5 @@
 
+require 'examples' # For path setting slight-of-hand
 require 'packetfu'
 
 eth_pkt = PacketFu::EthPacket.new
