@@ -33,6 +33,9 @@ require 'packetfu/lib/udp'
 require 'packetfu/lib/tcp'
 require 'packetfu/lib/ipv6'
 
+# Various often-used utilities.
+require 'packetfu/lib/utils'
+
 # Change these to taste. None of these globals are required, 
 # for normal functionality, so nuke them in the event of a 
 # name conflict. They are likely to be removed anyway in
