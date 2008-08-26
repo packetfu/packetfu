@@ -73,6 +73,17 @@ module PacketFu
 	# the distant, unknowable future, will take interesting IPv6ish payloads.
 	#
 	# This mostly complete, but not very useful. It's intended primarily as an example protocol.
+	#
+	# == Parameters
+	#
+	#   :eth
+	#     A pre-generated EthHeader object.
+	#   :ip
+	#     A pre-generated IPHeader object.
+	#   :flavor
+	#     TODO: Sets the "flavor" of the IPv6 packet. No idea what this will look like, haven't done much IPv6 fingerprinting.
+	#   :config
+	#     A hash of return address details, often the output of Utils.whoami?
 	class IPv6Packet < Packet
 
 		attr_accessor :eth_header, :ipv6_header
@@ -84,6 +95,7 @@ module PacketFu
 			@eth_header.body=@ipv6_header
 
 			@headers = [@eth_header, @arp_header]
+			super
 		end
 
 		# Peek provides summary data on packet contents.

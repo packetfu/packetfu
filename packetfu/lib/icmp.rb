@@ -57,6 +57,8 @@ module PacketFu
 	#  :flavor
 	#   TODO: Sets the "flavor" of the ICMP packet. Pings, in particular, often betray their true
 	#   OS.
+	#  :config
+	#   A hash of return address details, often the output of Utils.whoami?
 	class ICMPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header, :icmp_header
@@ -70,6 +72,7 @@ module PacketFu
 			@eth_header.body = @ip_header
 
 			@headers = [@eth_header, @ip_header, @icmp_header]
+			super
 		end
 
 		# Peek provides summary data on packet contents.

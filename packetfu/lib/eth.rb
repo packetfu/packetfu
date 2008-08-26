@@ -109,6 +109,8 @@ module PacketFu
 	#   A pre-generated EthHeader object. If not specified, a new one will be created.
 	#  :flavor
 	#   TODO: not implemented. Will generate EthPacket objects based on the OUI list.
+	#  :config
+	#   A hash of return address details, often the output of Utils.whoami?
 	class	EthPacket < Packet
 		attr_accessor :eth_header
 		
@@ -116,6 +118,7 @@ module PacketFu
 			@eth_header = 	(args[:eth] || EthHeader.new)
 
 			@headers = [@eth_header]
+			super
 
 		end
 

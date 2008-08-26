@@ -170,6 +170,8 @@ module PacketFu
 	#   :flavor
 	#     TODO: Sets the "flavor" of the IP packet. This might include known sets of IP options, and
 	#     certainly known starting TTLs.
+	#   :config
+	#     A hash of return address details, often the output of Utils.whoami?
 	class IPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header
@@ -181,6 +183,7 @@ module PacketFu
 			@eth_header.body=@ip_header
 
 			@headers = [@eth_header, @ip_header]
+			super
 
 		end
 

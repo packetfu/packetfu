@@ -127,7 +127,8 @@ module PacketFu
 	#    TODO: Sets the "flavor" of the TCP packet. This will include TCP options and the initial window
 	#    size, per stack. There is a lot of variety here, and it's one of the most useful methods to
 	#    remotely fingerprint devices. :flavor will span both ip and tcp for consistency.
-	
+	#  :config
+	#   A hash of return address details, often the output of Utils.whoami?
 	class TCPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header, :tcp_header, :headers
@@ -143,6 +144,7 @@ module PacketFu
 			@headers = [@eth_header, @ip_header, @tcp_header]
 
 			@ip_header.ip_proto=0x06
+			super
 			tcp_calc_sum
 		end
 

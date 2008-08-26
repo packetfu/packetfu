@@ -95,6 +95,8 @@ module PacketFu
 	#   A pre-generated EthHeader object. If not specified, a new one will be created.
 	#  :arp
 	#   A pre-generated ARPHeader object. If not specificed, a new one will be created.
+	#  :config
+	#   A hash of return address details, often the output of Utils.whoami?
 	class ARPPacket < Packet
 
 		attr_accessor :eth_header, :arp_header
@@ -122,6 +124,8 @@ module PacketFu
 			end
 
 			@headers = [@eth_header, @arp_header]
+			super
+
 		end
 
 		# Used to generate summary data for ARP packets.

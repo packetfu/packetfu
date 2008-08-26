@@ -54,6 +54,8 @@ module PacketFu
 	#  :flavor
 	#    TODO: Sets the "flavor" of the UDP packet. UDP packets don't tend have a lot of
 	#    flavor, but their underlying ip headers do.
+	#  :config
+	#   A hash of return address details, often the output of Utils.whoami?
 	class UDPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header, :udp_header
@@ -69,6 +71,7 @@ module PacketFu
 			@headers = [@eth_header, @ip_header, @udp_header]
 
 			@ip_header.ip_proto=0x11
+			super
 			udp_calc_sum
 		end
 

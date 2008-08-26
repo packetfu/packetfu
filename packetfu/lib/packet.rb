@@ -233,6 +233,18 @@ module PacketFu
 			peek_data.join
 		end
 
+		def initialize(args={})
+			if args[:config]
+				args[:config].each_pair do |k,v|
+					case k
+					when :eth_daddr; @eth_header.eth_daddr=v if @eth_header
+					when :eth_saddr; @eth_header.eth_saddr=v if @eth_header
+					when :ip_saddr; @ip_header.ip_saddr=v		 if @ip_header
+					end
+				end
+			end
+		end
+
 	end # class Packet
 
 end # module PacketFu
