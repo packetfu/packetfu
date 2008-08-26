@@ -11,7 +11,7 @@ module PacketFu
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
 			@stream = [] # Where the stream goes.
-			@iface = args[:iface] || $packetfu_iface || 'eth0' # Sometimes should be wlan0 or eth1	
+			@iface = args[:iface] || Pcap.lookupdev || 'lo' 
 			@snaplen = args[:snaplen] || 0xffff
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1
@@ -61,22 +61,6 @@ module PacketFu
 		def inject(args={})
 			array_to_wire(args)
 		end
-
-		# IRB tab-completion hack.
-		#--
-		# This silliness is so IRB's tab-completion works for my class methods
-		# when those methods are called without first instantiating. (I like
-		# tab completion a lot). The alias_methods make sure they show up
-		# as instance methods, but but when you call them, you're really 
-		# calling the class methods. Tricksy!
-		def truth
-			"You can't handle the truth" ; true
-		end
-		
-		#:stopdoc:
-		alias_method :inject, :truth
-		alias_method :a2w, :truth
-		#:startdoc:
 
 	end
 end

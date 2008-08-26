@@ -36,17 +36,8 @@ require 'packetfu/lib/ipv6'
 # Various often-used utilities.
 require 'packetfu/lib/utils'
 
-# Change these to taste. None of these globals are required, 
-# for normal functionality, so nuke them in the event of a 
-# name conflict. They are likely to be removed anyway in
-# future stable versions, since libraries that declare globals
-# are kind of lame.
-
-$packetfu_pcapfile = '/tmp/out.pcap'	# Default file to write to.
-$packetfu_iface = 'eth0'							# Default interface to capture/inject from/to
-
-$packetfu_do_whoami = true # Set to false if you don't want to start your sessions by identifying yourself.
-$packetfu_iam = {} # Where your native eth_src and ip_src go for your default interface
+# A place to keep defaults.
+require 'packetfu/lib/config'
 
 # = PacketFu
 #
@@ -74,20 +65,9 @@ module PacketFu
 		"0.0.1-dev" # August 22, 2008
 	end
 
-	# Find the local default Ethernet and IP address, and set the 
-	# global <b>$packetfu_iam</b> variable accordingly. This is accomplished
-	# by listening for, then generating, a random UDP packet. This packet
-	# will fire off on load unless <b>$packetfu_do_whoami == false</b>
-	#
-	# === Example
-	#
-	#   PacketFu::whoami? # => {:ip_src=>"\n\n\n\003", :eth_saddr=>"00:03:47:bf:55:3c", :eth_src=>"\000\003G\277U<", :ip_saddr=>"10.10.10.3"}
-	#
-	#
+	# A toplevel delegator for Utils.whoami?
 	def self.whoami?
-		Utils.whoami?(:save => true)
+		Utils.whoami?
 	end
-
-	whoami? if $packetfu_do_whoami and Process.euid.zero?
 
 end

@@ -100,15 +100,15 @@ module PacketFu
 		end
 
 		# Put the entire packet into a libpcap file.
-		# TODO: Do something with auto-checksumming? 
-		def to_f(filename=$packetfu_pcapfile)
-			PacketFu::Write.a2f(:file=> filename, :arr=>[@headers[0].to_s])
+		def to_f(filename=nil)
+			PacketFu::Write.a2f(:file=> filename || Config.new.config[:pcapfile],
+													:arr=>[@headers[0].to_s])
 		end
 
-		# Put the entire packet on the wire.
+		# Put the entire packet on the wire by creating a temporary PacketFu::Inject object.
 		# TODO: Do something with auto-checksumming?
-		def to_w(iface=$packetfu_iface)
-			inj = PacketFu::Inject.new
+		def to_w(iface=nil)
+			inj = PacketFu::Inject.new(:iface => (iface || Config.new.config[:iface]))
 			inj.array = [@headers[0].to_s]
 			inj.inject
 		end

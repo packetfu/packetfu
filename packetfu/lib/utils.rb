@@ -11,13 +11,13 @@ module PacketFu
 		#
 		# === Parameters
 		#   :eth_saddr
-		#    Source MAC address. Defaults to $packetfu_iam[:eth_saddr]
+		#    Source MAC address. Defaults to "00:00:00:00:00:00".
 		#   :ip_saddr
-		#    Source IP address. Defaults to $packetfu_iam[:ip_saddr]
+		#    Source IP address. Defaults to "0.0.0.0"
 		#   :flavor
-		#    The flavor of the ARP request.
+		#    The flavor of the ARP request. Defaults to :none.
 		#   :timeout
-		#    Timeout in seconds. Default is 3.
+		#    Timeout in seconds. Defaults to 3.
 		#
 		#  === Example
 		#    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
@@ -29,10 +29,10 @@ module PacketFu
 		#  irritate your co-workers.
 		def self.arp(target_ip,args={})
 			arp_pkt = PacketFu::ARPPacket.new(:flavor => (args[:flavor] || :none))
-			arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = (args[:eth_saddr] || $packetfu_iam[:eth_saddr])
+			arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = (args[:eth_saddr] || $packetfu_default.config[:eth_saddr] || "00:00:00:00:00:00" )
 			arp_pkt.eth_daddr = "ff:ff:ff:ff:ff:ff"
 			arp_pkt.arp_daddr_mac = "00:00:00:00:00:00"
-			arp_pkt.arp_saddr_ip = (args[:ip_saddr] || $packetfu_iam[:ip_saddr])
+			arp_pkt.arp_saddr_ip = (args[:ip_saddr] || $packetfu_default.config[:ip_saddr] || "0.0.0.0")
 			arp_pkt.arp_daddr_ip = target_ip 
 			# Stick the Capture object in its own thread.
 			cap_thread = Thread.new do
@@ -56,22 +56,23 @@ module PacketFu
 
 		# Discovers the local IP and Ethernet address, which is useful for writing
 		# packets you expect to get a response to. Note, this is a noisy
-		# operation; a UDP packet is generated and dropped on to $packetfu_iface,
-		# and then captured (which means you need to be root to do this).
+		# operation; a UDP packet is generated and dropped on to the default (or named)
+		# interface, and then captured (which means you need to be root to do this).
 		#
 		# whoami? returns a hash of :eth_saddr, :eth_src, :ip_saddr, :ip_src,
 		# :eth_dst, and :eth_daddr (the last two are usually suitable for a
-		# gateway mac address).
+		# gateway mac address). It's most useful as an argument to PacketFu::Config.new.
 		#
 		# === Parameters
-		#   :save => true|false
-		#    If true, the information is written to $packetfu_iam
+		#   :iface => "eth0"
+		#    An interface to listen for packets on. Note that since we rely on the OS to send the probe packet,
+		#    you will need to specify a target which will use this interface.
 		#   :target => "1.2.3.4"
 		#    A target IP address. By default, a packet will be sent to a random address in the 177/8 network.
-		#    Since this network is IANA reserved (for now), this network should be handled by your gateway.
-		#
+		#    Since this network is IANA reserved (for now), this network should be handled by your default gateway
+		#    and default interface.
 		def self.whoami?(args={})
-			if $packetfu_iface =~ /lo/ # Linux loopback
+			if args[:iface] =~ /^lo/ # Linux loopback more or less.
 				dst_host = "127.0.0.1"
 			else
 				dst_host = (args[:target] || IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET).to_s)
@@ -86,6 +87,8 @@ module PacketFu
 			if pkt 
 				if pkt.payload == msg
 				my_data =	{
+					:iface => args[:iface] || Pcap.lookupdev || 'lo',
+					:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
 					:eth_saddr => pkt.eth_saddr,
 					:eth_src => pkt.eth_src.to_s,
 					:ip_saddr => pkt.ip_saddr,
@@ -99,7 +102,6 @@ module PacketFu
 			else
 				raise SocketError, "Didn't recieve the whomi() packet."
 			end
-			$packetfu_iam = my_data if args[:save]
 			my_data
 		end
 

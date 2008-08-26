@@ -19,14 +19,16 @@ usage unless target_ip = ARGV[0]		# Need a target IP.
 usage unless Process.euid.zero?			# Need to be root.
 IPAddr.new(target_ip)								# Check to see it's really an IP address, and not a herring or something.
 
+$packetfu_default = PacketFu::Config.new(PacketFu::whoami?).config
+
 def arp(target_ip)
 
 	arp_pkt = PacketFu::ARPPacket.new(:flavor => "Windows")
-	arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = $packetfu_iam[:eth_saddr]
+	arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = $packetfu_default[:eth_saddr]
 	arp_pkt.eth_daddr = "ff:ff:ff:ff:ff:ff"
 	arp_pkt.arp_daddr_mac = "00:00:00:00:00:00"
 
-	arp_pkt.arp_saddr_ip = $packetfu_iam[:ip_saddr]
+	arp_pkt.arp_saddr_ip = $packetfu_default[:ip_saddr]
 	arp_pkt.arp_daddr_ip = target_ip 
 
 	# Stick the Capture object in its own thread.
