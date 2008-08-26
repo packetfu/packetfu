@@ -72,9 +72,10 @@ module PacketFu
 		def truth
 			"You can't handle the truth" ; true
 		end
+		
 		#:stopdoc:
-		alias_method :inject :truth
-		alias_method :a2w :truth
+		alias_method :inject, :truth
+		alias_method :a2w, :truth
 		#:startdoc:
 
 	end

@@ -154,48 +154,6 @@ module PacketFu
 			end
 		end
 
-		# Discovers the local IP and Ethernet address, which is useful for writing
-		# packets you expect to get a response to. Note, this is a noisy
-		# operation; a UDP packet is generated and dropped on to $packetfu_iface,
-		# and then captured (which means you need to be root to do this).
-		#
-		# === Parameters
-		#   :save => true|false
-		#    If true, the information is written to $packetfu_iam
-		#
-		def self.whoami?(args={})
-
-			if $packetfu_iface =~ /lo/ # Linux loopback
-				dst_host = "127.0.0.1"
-			else
-				dst_host = "10.1.#{rand(0xff)+1}.#{rand(0xff)+1}"
-			end
-			dst_port = rand(0xffff-1024)+1024
-			msg = "PacketFu::whoami? #{(Time.now.to_i + rand(0xffffff)+1)}"
-			cap = Capture.new(:start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
-			UDPSocket.open.send(msg,0,dst_host,dst_port)
-			cap.save
-			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
-			cap = nil
-			if pkt 
-				if pkt.payload == msg
-				my_data =	{
-					:eth_saddr => pkt.eth_saddr,
-					:eth_src => pkt.eth_src.to_s,
-					:ip_saddr => pkt.ip_saddr,
-					:ip_src => pkt.ip_src.to_s
-				}
-				else raise SecurityError, 
-					"whoami() packet doesn't match sent data. Something fishy's going on."
-				end
-			else
-				raise SocketError, "Didn't recieve the whomi() packet."
-			end
-			$packetfu_iam = my_data if args[:save]
-			my_data
-		end
-
-
 	end # class Capture
 end # module PacketFu
 

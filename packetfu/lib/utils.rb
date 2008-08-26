@@ -52,6 +52,58 @@ module PacketFu
 				target_mac
 			end # cap_thread
 			cap_thread.value
+		end # def self.arp
+
+		# Discovers the local IP and Ethernet address, which is useful for writing
+		# packets you expect to get a response to. Note, this is a noisy
+		# operation; a UDP packet is generated and dropped on to $packetfu_iface,
+		# and then captured (which means you need to be root to do this).
+		#
+		# whoami? returns a hash of :eth_saddr, :eth_src, :ip_saddr, :ip_src,
+		# :eth_dst, and :eth_daddr (the last two are usually suitable for a
+		# gateway mac address).
+		#
+		# === Parameters
+		#   :save => true|false
+		#    If true, the information is written to $packetfu_iam
+		#   :target => "1.2.3.4"
+		#    A target IP address. By default, a packet will be sent to a random address in the 177/8 network.
+		#    Since this network is IANA reserved (for now), this network should be handled by your gateway.
+		#
+		def self.whoami?(args={})
+			if $packetfu_iface =~ /lo/ # Linux loopback
+				dst_host = "127.0.0.1"
+			else
+				dst_host = (args[:target] || IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET).to_s)
+			end
+			dst_port = rand(0xffff-1024)+1024
+			msg = "PacketFu::whoami? #{(Time.now.to_i + rand(0xffffff)+1)}"
+			cap = Capture.new(:start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
+			UDPSocket.open.send(msg,0,dst_host,dst_port)
+			cap.save
+			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
+			cap = nil
+			if pkt 
+				if pkt.payload == msg
+				my_data =	{
+					:eth_saddr => pkt.eth_saddr,
+					:eth_src => pkt.eth_src.to_s,
+					:ip_saddr => pkt.ip_saddr,
+					:ip_src => pkt.ip_src.to_s,
+					:eth_dst => pkt.eth_dst.to_s,
+					:eth_daddr => pkt.eth_daddr
+				}
+				else raise SecurityError, 
+					"whoami() packet doesn't match sent data. Something fishy's going on."
+				end
+			else
+				raise SocketError, "Didn't recieve the whomi() packet."
+			end
+			$packetfu_iam = my_data if args[:save]
+			my_data
 		end
-	end
-end
+
+
+	end # class Utils
+end # module PacketFu
+

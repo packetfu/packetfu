@@ -85,7 +85,7 @@ module PacketFu
 	#
 	#
 	def self.whoami?
-		Capture.whoami?(:save => true)
+		Utils.whoami?(:save => true)
 	end
 
 	whoami? if $packetfu_do_whoami and Process.euid.zero?
