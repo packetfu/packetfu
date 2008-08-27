@@ -13,7 +13,7 @@ def packetfu_ascii_art
 |/       |/     \\|(_______/|_/    \\/(_______/   )_(   |/       (_______)
  ____________________________              ____________________________
 (                            )            (                            )
-|                            )( )( )( )( )(                            |
+| 01000001 00101101 01001000 )( )( )( )( )( 00101101 01000001 00100001 |
 |                            )( )( )( )( )(                            |
 (____________________________)            (____________________________)
             a mid-level packet manipulation library for ruby           
@@ -23,6 +23,13 @@ EOM
 
 require 'examples'
 require 'packetfu'
+
+module PacketFu
+	def whoami?(args={})
+		Utils.whoami?(args)
+	end
+end
+
 include PacketFu
 
 packetfu_ascii_art

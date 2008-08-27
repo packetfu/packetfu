@@ -33,15 +33,21 @@ module PacketFu
 	#
 	# For more on TCP packets, see http://www.networksorcery.com/enp/protocol/tcp.htm
 	class TCPHeader < BinData::MultiValue
+
+	  # Create a new TCPHeader object, and intialize with a random sequence number. 
+		def initialize(*args)
+			@random_seq = rand(0xffffffff)
+			super
+		end
 		uint16be	:tcp_src
 		uint16be	:tcp_dst
-		uint32be	:tcp_seq
+		uint32be	:tcp_seq,		:initial_value => lambda {tcp_calc_seq}
 		uint32be	:tcp_ack
 		bit4			:tcp_hlen,	:initial_value => 5 # Must recalc as options are set. 
 		bit3			:tcp_reserved
 		tcp_ecn		:tcp_ecn
 		tcp_flags	:tcp_flags
-		uint16be	:tcp_win
+		uint16be	:tcp_win,		:initial_value => 0x4000 # WinXP's default syn packet
 		uint16be	:tcp_sum, 	:initial_value =>	0 # Must set this upon generation.
 		uint16be	:tcp_urg
 		string		:tcp_opts
@@ -67,6 +73,10 @@ module PacketFu
 				self.tcp_opts += ("\x00" * pad)
 			end
 			self.tcp_hlen = ((20 + self.tcp_opts.to_s.size) / 4)
+		end
+
+		def tcp_calc_seq
+			@random_seq
 		end
 
 		# Returns the actual length of the TCP options.
@@ -127,6 +137,8 @@ module PacketFu
 	#    TODO: Sets the "flavor" of the TCP packet. This will include TCP options and the initial window
 	#    size, per stack. There is a lot of variety here, and it's one of the most useful methods to
 	#    remotely fingerprint devices. :flavor will span both ip and tcp for consistency.
+	#   :type
+	#    TODO: Set up particular types of packets (syn, psh_ack, rst, etc). This can change the initial flavor.
 	#  :config
 	#   A hash of return address details, often the output of Utils.whoami?
 	class TCPPacket < Packet
@@ -138,12 +150,25 @@ module PacketFu
 			@eth_header = 	(args[:eth] || EthHeader.new)
 			@ip_header 	= 	(args[:ip]	|| IPHeader.new)
 			@tcp_header = 	(args[:tcp] || TCPHeader.new)
+			@flavor     =		(args[:flavor] || "Default" )
 
 			@ip_header.body = @tcp_header
 			@eth_header.body = @ip_header
 			@headers = [@eth_header, @ip_header, @tcp_header]
 
 			@ip_header.ip_proto=0x06
+				
+			case @flavor.to_s.downcase
+			when "windows" # WinXP's default syn
+				@tcp_header.tcp_win = 0x4000
+				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACK.OK"
+			when "linux" # Ubuntu Linux 2.6.24-19-generic default syn
+				@tcp_header.tcp_win = 5840
+				# On my machine, the timestamp clock is incremented 255 every second. This will pretend
+				# to an uptime of between 0-60 hours, looks like.
+				ts_val = Time.now.to_i + rand(0x4fffffff)
+				@tcp_header.tcp_options="MSS:1460,SACK.OK,TS:#{ts_val};0,NOP,WS:7"
+			end
 			super
 			tcp_calc_sum
 		end
