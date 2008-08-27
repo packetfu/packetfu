@@ -29,17 +29,18 @@ module PacketFu
 		#  irritate your co-workers.
 		def self.arp(target_ip,args={})
 			arp_pkt = PacketFu::ARPPacket.new(:flavor => (args[:flavor] || :none))
-			arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = (args[:eth_saddr] || $packetfu_default.config[:eth_saddr] || "00:00:00:00:00:00" )
+			arp_pkt.eth_saddr = arp_pkt.arp_saddr_mac = (args[:eth_saddr] || ($packetfu_default.config[:eth_saddr] if $packetfu_default) || "00:00:00:00:00:00" )
 			arp_pkt.eth_daddr = "ff:ff:ff:ff:ff:ff"
 			arp_pkt.arp_daddr_mac = "00:00:00:00:00:00"
-			arp_pkt.arp_saddr_ip = (args[:ip_saddr] || $packetfu_default.config[:ip_saddr] || "0.0.0.0")
+			arp_pkt.arp_saddr_ip = (args[:ip_saddr] || ($packetfu_default.config[:ip_saddr] if $packetfu_default) || "0.0.0.0")
 			arp_pkt.arp_daddr_ip = target_ip 
+			iface = (args[:iface] || ($packetfu_default.iface if $packetfu_default) || "eth0")
 			# Stick the Capture object in its own thread.
 			cap_thread = Thread.new do
 				target_mac = nil
-				cap = PacketFu::Capture.new(:start => true, 
+				cap = PacketFu::Capture.new(:iface => iface, :start => true, 
 				:filter => "arp src #{target_ip} and ether dst #{arp_pkt.eth_saddr}")
-				arp_pkt.to_w # Shorthand for sending single packets to the default interface.
+				arp_pkt.to_w(iface) # Shorthand for sending single packets to the default interface.
 				timeout = 0
 				while target_mac.nil? && timeout <= (args[:timeout] || 3)
 					if cap.save > 0
@@ -77,9 +78,10 @@ module PacketFu
 			else
 				dst_host = (args[:target] || IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET).to_s)
 			end
+
 			dst_port = rand(0xffff-1024)+1024
-			msg = "PacketFu::whoami? #{(Time.now.to_i + rand(0xffffff)+1)}"
-			cap = Capture.new(:start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
+			msg = "PacketFu whoami? packet #{(Time.now.to_i + rand(0xffffff)+1)}"
+			cap = Capture.new(:iface => (args[:iface] || Pcap.lookupdev), :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
 			UDPSocket.open.send(msg,0,dst_host,dst_port)
 			cap.save
 			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
@@ -105,7 +107,15 @@ module PacketFu
 			my_data
 		end
 
+		# This is a brute-force approach at trying to find a suitable interface with an IP address.
+		def self.lookupdev
+			# XXX cycle through eth0-9 and wlan0-9, and if a cap start throws a RuntimeErorr (and we're
+			# root), it's not a good interface. Boy, really ought to fix lookupdev directly with another
+			# method that returns an array rather than just the first candidate.
+		end
+
 
 	end # class Utils
+
 end # module PacketFu
 

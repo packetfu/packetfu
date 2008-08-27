@@ -35,9 +35,12 @@ module PacketFu
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1
 
+			setup_params(args)
+		end
+
+		def setup_params(args={})
 			filter = args[:filter] # Not global; filter criteria can change.
 			start = args[:start] || false
-
 			capture if start
 			bpf(:filter=>filter) if filter
 		end
@@ -94,6 +97,7 @@ module PacketFu
 		#     Provide a bpf filter to enable for the capture. For example, 'ip and not tcp'
 		def bpf(args={})
 			filter = args[:filter]
+			capture if @stream.class == Array
 			@stream.setfilter(filter)
 		end
 
