@@ -4,6 +4,8 @@ module PacketFu
 	# The Read class facilitates reading from libpcap files, which is the native file format
 	# for packet capture utilities such as tcpdump, Wireshark, and PacketFu::PcapFile.
 	#
+	# This class requires PcapRub to be loaded (for now).
+	#
 	# == Example
 	#
 	#   pkt_array = PacketFu::Read.f2a(:file => 'pcaps/my_capture.pcap')

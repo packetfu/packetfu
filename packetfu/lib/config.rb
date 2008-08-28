@@ -31,7 +31,9 @@ module PacketFu
 			:pcapfile								# A declared default file to write to.
 	
 		def initialize(args={})
-			@iface = Pcap.lookupdev || "lo" # In case there aren't any... 
+			if Process.euid.zero?
+				@iface = Pcap.lookupdev || "lo" # In case there aren't any...
+			end	
 			@pcapfile = "/tmp/out.pcap"
 			args.each_pair { |k,v| self.instance_variable_set(("@" + k.to_s).intern,v) }
 		end

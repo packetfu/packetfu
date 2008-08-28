@@ -51,7 +51,7 @@ def arp(target_ip)
 	end
 
 	# Timeout for cap_thread
-	sleep 3; puts "Oh noes! Couldn't get an arp out of #{target_ip}. Maybe it's you."
+	sleep 3; puts "Oh noes! Couldn't get an arp out of #{target_ip}. Maybe it's not here."
 	exit 1
 end
 

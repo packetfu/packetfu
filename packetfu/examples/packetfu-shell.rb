@@ -56,19 +56,19 @@ include PacketFu
 def banner
 	packetfu_ascii_art
 	puts ">>> PacketFu Shell #{PacketFu.version}."
-	if Process.euid.zero?
+	if Process.euid.zero? && @@pcaprub_loaded 
 		puts ">>> Use $packetfu_default.config for salient networking details."
 		print "IP:  %-15s Mac: %s" % [$packetfu_default.ip_saddr, $packetfu_default.eth_saddr]
 		puts "   Gateway: %s" % $packetfu_default.eth_daddr
 		print "Net: %-15s" % [Pcap.lookupnet(Pcap.lookupdev)][0]
 		print "  " * 13 
 		puts "Iface:   %s" % [Pcap.lookupdev]
-		puts ">>> Running as root, packet capturing/injecting enabled."
+		puts ">>> Packet capturing/injecting enabled."
 	else
-		puts ">>> Running as non-root, packet capturing/injecting disabled."
+		puts ">>> Packet capturing/injecting disabled."
 	end
 	puts "<>" * 36
 end
 
-$packetfu_default = Config.new(Utils.whoami?) if Process.euid.zero?
+$packetfu_default = Config.new(Utils.whoami?) if(@@pcaprub_loaded && Process.euid.zero?)
 banner

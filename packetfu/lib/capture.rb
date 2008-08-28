@@ -4,7 +4,9 @@ module PacketFu
 	# The Capture class is used to construct PcapRub objects in order to collect
 	# packets from an interface.
 	#
-	# You will need root (or root-like) privileges in order to capture from the interface.
+	# This class requires PcapRub. In addition, you will need root (or root-like) privileges 
+	# in order to capture from the interface.
+	#
 	# Note, on some wireless cards, setting :promisc => true will disable capturing.
 	#
 	# == Example
