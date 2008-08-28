@@ -73,7 +73,7 @@ module PacketFu
 		#    Since this network is IANA reserved (for now), this network should be handled by your default gateway
 		#    and default interface.
 		def self.whoami?(args={})
-			if args[:iface] =~ /^lo/ # Linux loopback more or less.
+			if args[:iface] =~ /^lo/ # Linux loopback more or less. Need a switch for windows loopback, too.
 				dst_host = "127.0.0.1"
 			else
 				dst_host = (args[:target] || IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET).to_s)
@@ -85,24 +85,31 @@ module PacketFu
 			UDPSocket.open.send(msg,0,dst_host,dst_port)
 			cap.save
 			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
-			cap = nil
-			if pkt 
-				if pkt.payload == msg
-				my_data =	{
-					:iface => args[:iface] || Pcap.lookupdev || 'lo',
-					:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
-					:eth_saddr => pkt.eth_saddr,
-					:eth_src => pkt.eth_src.to_s,
-					:ip_saddr => pkt.ip_saddr,
-					:ip_src => pkt.ip_src.to_s,
-					:eth_dst => pkt.eth_dst.to_s,
-					:eth_daddr => pkt.eth_daddr
-				}
-				else raise SecurityError, 
-					"whoami() packet doesn't match sent data. Something fishy's going on."
+			timeout = 0
+			while timeout < 1 # Sometimes packet generation can be a little pokey.
+				if pkt
+					timeout = 1.1 # Cancel the timeout
+					if pkt.payload == msg
+					my_data =	{
+						:iface => args[:iface] || Pcap.lookupdev || 'lo',
+						:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
+						:eth_saddr => pkt.eth_saddr,
+						:eth_src => pkt.eth_src.to_s,
+						:ip_saddr => pkt.ip_saddr,
+						:ip_src => pkt.ip_src.to_s,
+						:eth_dst => pkt.eth_dst.to_s,
+						:eth_daddr => pkt.eth_daddr
+					}
+					else raise SecurityError, 
+						"whoami() packet doesn't match sent data. Something fishy's going on."
+					end
+				else
+					sleep 0.1; timeout += 0.1
+					cap.save
+					pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
 				end
-			else
-				raise SocketError, "Didn't recieve the whomi() packet."
+				raise SocketError, "Didn't recieve the whomi() packet." if !pkt
+				cap = nil
 			end
 			my_data
 		end

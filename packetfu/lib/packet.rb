@@ -4,6 +4,7 @@ module PacketFu
 	# Packet is the parent class of EthPacket, IPPacket, UDPPacket, TCPPacket, and all
 	# other packets.
 	class Packet
+		attr_reader :flavor # Packet Headers are responsible for their own specific flavor methods.
 
 		# Parse() creates the correct packet type based on the data, and returns the apporpiate
 		# Packet subclass. 
@@ -69,7 +70,7 @@ module PacketFu
 			when /^ipv6_/
 				@ipv6_header.send(sym,*args)
 			else
-				raise NoMethodError, "Uknown method `#{sym}' for this packet object."
+				raise NoMethodError, "Unknown method `#{sym}' for this packet object."
 			end
 		end
 
@@ -243,6 +244,7 @@ module PacketFu
 					end
 				end
 			end
+
 		end
 
 	end # class Packet

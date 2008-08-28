@@ -33,13 +33,15 @@ module PacketFu
 	#
 	# For more on TCP packets, see http://www.networksorcery.com/enp/protocol/tcp.htm
 	class TCPHeader < BinData::MultiValue
+		attr_accessor :flavor
 
 	  # Create a new TCPHeader object, and intialize with a random sequence number. 
-		def initialize(*args)
+		def initialize(args={})
 			@random_seq = rand(0xffffffff)
+			@random_src = rand_port
 			super
 		end
-		uint16be	:tcp_src
+		uint16be	:tcp_src,		:initial_value => lambda {tcp_calc_src} 
 		uint16be	:tcp_dst
 		uint32be	:tcp_seq,		:initial_value => lambda {tcp_calc_seq}
 		uint32be	:tcp_ack
@@ -79,6 +81,15 @@ module PacketFu
 			@random_seq
 		end
 
+		def tcp_calc_src
+			@random_src
+		end
+
+		# Generates a random high port. This is affected by packet flavor.
+		def rand_port
+			rand(0xffff - 1025) + 1025
+		end
+
 		# Returns the actual length of the TCP options.
 		def tcp_opts_len
 			tcp_opts.to_s.size * 4
@@ -96,13 +107,41 @@ module PacketFu
 			self.tcp_opts=TcpOpts.encode(arg) 
 		end
 
-		# Recalculates calculated fields for TCP.
+		# Equivalent to tcp_src
+		def tcp_sport
+			self.tcp_src
+		end
+
+		# Equivalent to tcp_src=
+		def tcp_sport=(arg)
+			self.tcp_src=(arg)
+		end
+
+		# Equivalent to tcp_dst
+		def tcp_dport
+			self.tcp_dst
+		end
+		
+		# Equivalent to tcp_dst=
+		def tcp_dport=(arg)
+			self.tcp_dst=(arg)
+		end
+
+		# Recalculates calculated fields for TCP (except checksum which is at the Packet level).
 		def tcp_recalc(arg=:all)
 			case arg
 			when :tcp_hlen
 				tcp_calc_hlen
+			when :tcp_src
+				@random_tcp_src = rand_port
+			when :tcp_sport
+				@random_tcp_src = rand_port
+			when :tcp_seq
+				@random_tcp_seq = rand(0xffffffff) 
 			when :all
 				tcp_calc_hlen
+				@random_tcp_src = rand_port
+				@random_tcp_seq = rand(0xffffffff) 
 			else
 				raise ArgumentError, "No such field `#{arg}'"
 			end
@@ -150,34 +189,54 @@ module PacketFu
 			@eth_header = 	(args[:eth] || EthHeader.new)
 			@ip_header 	= 	(args[:ip]	|| IPHeader.new)
 			@tcp_header = 	(args[:tcp] || TCPHeader.new)
-			@flavor     =		(args[:flavor] || "Default" )
+			@tcp_header.flavor = args[:flavor].to_s.downcase
 
 			@ip_header.body = @tcp_header
 			@eth_header.body = @ip_header
 			@headers = [@eth_header, @ip_header, @tcp_header]
 
 			@ip_header.ip_proto=0x06
-				
-			case @flavor.to_s.downcase
+			super
+			if args[:flavor]
+				tcp_calc_flavor(@tcp_header.flavor)
+			else
+				tcp_calc_sum
+			end
+		end
+
+		# Sets the correct flavor for TCP Packets. Recognized flavors are:
+		#   windows, linux, freebsd
+		def tcp_calc_flavor(str)
+			ts_val = Time.now.to_i + rand(0x4fffffff)
+			ts_sec = rand(0xffffff)
+			case @tcp_header.flavor = str.to_s.downcase
 			when "windows" # WinXP's default syn
 				@tcp_header.tcp_win = 0x4000
 				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACK.OK"
+				@tcp_header.tcp_src = rand(5000 - 1026) + 1026
+				@ip_header.ip_ttl = 64
 			when "linux" # Ubuntu Linux 2.6.24-19-generic default syn
 				@tcp_header.tcp_win = 5840
-				# On my machine, the timestamp clock is incremented 255 every second. This will pretend
-				# to an uptime of between 0-60 hours, looks like.
-				ts_val = Time.now.to_i + rand(0x4fffffff)
 				@tcp_header.tcp_options="MSS:1460,SACK.OK,TS:#{ts_val};0,NOP,WS:7"
+				@tcp_header.tcp_src = rand(61_000 - 32_000) + 32_000
+				@ip_header.ip_ttl = 64
+			when "freebsd" # Freebsd
+				@tcp_header.tcp_win = 0xffff
+				@tcp_header.tcp_options="MSS:1460,NOP,WS:3,NOP,NOP,TS:#{ts_val};#{ts_sec},SACK.OK,EOL,EOL"
+				@ip_header.ip_ttl = 64
+			else
+				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACK.OK"
 			end
-			super
 			tcp_calc_sum
 		end
 
 		# tcp_calc_sum() computes the TCP checksum, and is called upon intialization. It usually
 		# should be called just prior to dropping packets to a file or on the wire.
+		#--
+		# This is /not/ delegated down to @tcp_header since we need info
+		# from the IP header, too.
+		#++
 		def tcp_calc_sum
-			# This is /not/ delegated down to @tcp_header since we need info
-			# from the IP header, too.
 			checksum =  (ip_src.to_i >> 16)
 			checksum += (ip_src.to_i & 0xffff)
 			checksum += (ip_dst.to_i >> 16)

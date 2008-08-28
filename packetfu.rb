@@ -40,23 +40,10 @@ require 'packetfu/lib/utils'
 require 'packetfu/lib/config'
 
 # = PacketFu
+#:main:README
 #
 # A library for reading a writing packets to an interface or to a libpcap-formatted file.
-# It is maintained at http://code.google.com/p/packetfu/
-#
-# == Installation
-#
-# PacketFu should live somewhere in your path. I haven't decided yet
-# on packaging, mainly because I need to figure out what works best
-# for Linux/Win/OSX (and FreeBSD, and Solaris maybe); your best bet 
-# is to just drop it into /usr/local/lib/site_ruby/1.8 or where ever 
-# you install bindata to.
-#
-# == Requirements
-#
-# BinData: http://bindata.rubyforge.org
-#
-# PcapRub: http://www.metasploit.com/svn/framework3/trunk/external/pcaprub
+# It is maintained at http://code.google.com/p/packetfu
 #
 module PacketFu
 
