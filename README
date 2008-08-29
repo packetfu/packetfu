@@ -19,4 +19,8 @@ Marshall Beddoe's PcapRub is required only for packet reading and writing from a
 
 == Examples
 
+== Author
+
+PacketFu is maintained primarily by Tod Beardsley <todb@planb-security.net>
+
 == License
