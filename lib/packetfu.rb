@@ -12,7 +12,7 @@ require 'bindata'
 #
 # So, for now, PacketFu will distribute with a slightly forked BinData.
 # We'll unfork when 0.9.3 is released and all will be right with the world.
-if BinData::VERSION != "0.9.2-eofpatch"
+if BinData::VERSION < "0.9.2-eofpatch"
 	raise LoadError, "BinData not at version 0.9.2-eofpatch"
 end
 
@@ -64,7 +64,7 @@ module PacketFu
 
 	# Returns the version.
 	def self.version
-		"0.0.1-dev" # August 22, 2008
+		"0.0.2-dev" # August 29, 2008
 	end
 
 end
