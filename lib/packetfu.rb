@@ -18,39 +18,39 @@ module PacketFu
 		if Pcap.version < "0.8-dev"
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
-		require 'packetfu/lib/capture' 
-		require 'packetfu/lib/read' 	
-		require 'packetfu/lib/inject'
+		require 'packetfu/capture' 
+		require 'packetfu/read' 	
+		require 'packetfu/inject'
 		@@pcaprub_loaded = true
 	rescue LoadError
 	end
 end
 
 # Doesn't require PcapRub
-require 'packetfu/lib/pcap'
-require 'packetfu/lib/write' 
+require 'packetfu/pcap'
+require 'packetfu/write' 
 
 # Packet crafting/parsing goodness.
-require 'packetfu/lib/packet'
-require 'packetfu/lib/invalid'
-require 'packetfu/lib/eth'
-require 'packetfu/lib/ip'
-require 'packetfu/lib/arp'
-require 'packetfu/lib/icmp'
-require 'packetfu/lib/udp'
-require 'packetfu/lib/tcp'
-require 'packetfu/lib/ipv6'
+require 'packetfu/packet'
+require 'packetfu/invalid'
+require 'packetfu/eth'
+require 'packetfu/ip'
+require 'packetfu/arp'
+require 'packetfu/icmp'
+require 'packetfu/udp'
+require 'packetfu/tcp'
+require 'packetfu/ipv6'
 
 # Various often-used utilities.
-require 'packetfu/lib/utils'
+require 'packetfu/utils'
 
 # A place to keep defaults.
-require 'packetfu/lib/config'
+require 'packetfu/config'
 
 #:main:PacketFu
 #
-#:include:README
-#:include:LICENSE
+#:include:../README
+#:include:../LICENSE
 
 module PacketFu
 

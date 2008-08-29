@@ -1,4 +1,4 @@
-require 'packetfu/lib/tcpopts'
+require 'packetfu/tcpopts'
 module PacketFu
 
 	# Implements the Explict Congestion Notification for TCPHeader.
