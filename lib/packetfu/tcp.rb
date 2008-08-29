@@ -2,6 +2,13 @@ require 'packetfu/tcpopts'
 module PacketFu
 
 	# Implements the Explict Congestion Notification for TCPHeader.
+	#
+	# ==== Header Definition
+	#
+	#
+	#  bit1  :n
+	#  bit1  :c
+	#  bit1  :e
 	class TcpEcn < BinData::MultiValue
 		bit1	:n
 		bit1	:c
@@ -14,6 +21,15 @@ module PacketFu
 	end
 
 	# Implements flags for TCPHeader.
+	#
+	# ==== Header Definition
+	#
+	#  bit1  :urg
+	#  bit1  :ack
+	#  bit1  :psh
+	#  bit1  :rst
+	#  bit1  :syn
+	#  bit1  :fin
 	class TcpFlags < BinData::MultiValue
 		bit1	:urg
 		bit1	:ack
@@ -32,15 +48,26 @@ module PacketFu
 	# volume.
 	#
 	# For more on TCP packets, see http://www.networksorcery.com/enp/protocol/tcp.htm
+	#
+	# ==== Header Definition
+	# 
+	#   uint16be  :tcp_src,  :initial_value => lambda {tcp_calc_src}
+	#   uint16be  :tcp_dst
+	#   uint32be  :tcp_seq,  :initial_value => lambda {tcp_calc_seq}
+	#   uint32be  :tcp_ack
+	#   bit4      :tcp_hlen, :initial_value => 5       # Must recalc as options are set. 
+	#   bit3      :tcp_reserved
+	#   tcp_ecn   :tcp_ecn
+	#   tcp_flags :tcp_flags
+	#   uint16be  :tcp_win,  :initial_value => 0x4000 # WinXP's default syn packet
+	#   uint16be  :tcp_sum,  :initial_value => 0      # Must set this upon generation.
+	#   uint16be  :tcp_urg
+	#   string    :tcp_opts
+	#   rest      :body
+	#
+	# See also TcpEcn, TcpFlags, TcpOpts
 	class TCPHeader < BinData::MultiValue
-		attr_accessor :flavor
 
-	  # Create a new TCPHeader object, and intialize with a random sequence number. 
-		def initialize(args={})
-			@random_seq = rand(0xffffffff)
-			@random_src = rand_port
-			super
-		end
 		uint16be	:tcp_src,		:initial_value => lambda {tcp_calc_src} 
 		uint16be	:tcp_dst
 		uint32be	:tcp_seq,		:initial_value => lambda {tcp_calc_seq}
@@ -54,6 +81,15 @@ module PacketFu
 		uint16be	:tcp_urg
 		string		:tcp_opts
 		rest			:body
+
+		# Create a new TCPHeader object, and intialize with a random sequence number. 
+		def initialize(args={})
+			@random_seq = rand(0xffffffff)
+			@random_src = rand_port
+			super
+		end
+
+		attr_accessor :flavor
 
 		# tcp_calc_hlen adjusts the header length to account for tcp_opts. Note
 		# that if tcp_opts does not fall on a 32-bit boundry, tcp_calc_hlen will
@@ -155,7 +191,6 @@ module PacketFu
 	#
   #    tcp_pkt = PacketFu::TCPPacket.new
   #    tcp_pkt.tcp_flags.syn=1
-  #    tcp_pkt.tcp_src=rand(0xffff-1024) + 1024
   #    tcp_pkt.tcp_dst=80
   #    tcp_pkt.tcp_win=5840
   #    tcp_pkt.tcp_options="mss:1460,sack.ok,ts:#{rand(0xffffffff)};0,nop,ws:7"
@@ -165,7 +200,6 @@ module PacketFu
 	#
   #    tcp_pkt.recalc
   #    tcp_pkt.to_f('/tmp/tcp.pcap')
-	#  
 	#
 	# == Parameters
 	#  :eth
@@ -272,14 +306,16 @@ module PacketFu
 			@tcp_header.tcp_sum = checksum
 		end
 
-		# tcp_recalc() recalculates various fields of the TCP packet. Valid arguments are:
+		# Recalculates various fields of the TCP packet.
+		#
+		# ==== Parameters
 		#
 		#   :all
 		#     Recomputes all calculated fields.
 		#   :tcp_sum
 		#     Recomputes the TCP checksum.
 		#   :tcp_hlen
-		#     Recomutes the TCP header length. Useful after options are added.
+		#     Recomputes the TCP header length. Useful after options are added.
 		def tcp_recalc(arg=:all)
 			case arg
 			when :tcp_sum

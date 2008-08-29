@@ -2,6 +2,13 @@
 module PacketFu
 
 	# Octets implements the addressing scheme for IP.
+	#
+	# ==== Header Definition
+	#
+	#  uint8 :o1
+	#  uint8 :o2
+	#  uint8 :o3
+	#  uint8 :o4
 	class Octets < BinData::MultiValue
 		uint8	:o1
 		uint8	:o2
@@ -31,13 +38,22 @@ module PacketFu
 	# IPHeader is a complete IP struct, used in IPPacket. Most traffic on most networks today is IP-based.
 	#
 	# For more on IP packets, see http://www.networksorcery.com/enp/protocol/ip.htm
+	#
+	# ==== Header Definition
+	#
+	#   bit4     :ip_v,     :initial_value => 4
+	#   bit4     :ip_hl,    :initial_value => 5
+	#   uint8    :ip_tos,   :initial_value => 0                     # TODO: Break out the bits
+	#   uint16be :ip_len,   :initial_value => lambda { ip_calc_len } 
+	#   uint16be :ip_id,    :initial_value => lambda { ip_calc_id } # IRL, hardly random. 
+	#   uint16be :ip_frag,  :initial_value => 0                     # TODO: Break out the bits
+	#   uint8    :ip_ttl,   :initial_value => 0xff                  # Changes per flavor
+	#   uint8    :ip_proto, :initial_value => 0x01                  # TCP: 0x06, UDP 0x11, ICMP 0x01
+	#   uint16be :ip_sum,   :initial_value => lambda { ip_calc_sum }
+	#   octets   :ip_src                                            # No value as this is a MultiValue
+	#   octets   :ip_dst                                            # Ditto.
+	#   rest     :body
 	class IPHeader < BinData::MultiValue
-
-		# Creates a new IPHeader object, and intialize with a random IPID. 
-		def initialize(*args)
-			@random_id = rand(0xffff)
-			super
-		end
 
 		bit4 				:ip_v, 		:initial_value => 4
 		bit4 				:ip_hl, 	:initial_value => 5
@@ -51,6 +67,12 @@ module PacketFu
 		octets			:ip_src 																							# No value as this is a MultiValue
 		octets			:ip_dst 																							# Ditto.
 		rest				:body
+		
+		# Creates a new IPHeader object, and intialize with a random IPID. 
+		def initialize(*args)
+			@random_id = rand(0xffff)
+			super
+		end
 
 		# Calulcate the true length of the packet.
 		def ip_calc_len

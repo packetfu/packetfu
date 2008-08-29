@@ -4,6 +4,18 @@ module PacketFu
 	# EthOui is the Organizationally Unique Identifier portion of a MAC address, used in EthHeader.
 	#
 	# See the OUI list at http://standards.ieee.org/regauth/oui/oui.txt
+	#
+	# ==== Header Definition
+	#
+	#  bit1     :b0
+	#  bit1     :b1
+	#  bit1     :b2
+	#  bit1     :b3
+	#  bit1     :b4
+	#  bit1     :b5
+	#  bit1     :local
+	#  bit1     :multicast
+	#  uint16be :oui,      :initial_value => 0x1ac5 # :)
 	class EthOui < BinData::MultiValue
 		bit1			:b0
 		bit1			:b1
@@ -16,7 +28,14 @@ module PacketFu
 		uint16be	:oui,	:initial_value => 0x1ac5 # :)
 	end
 
-  # EthNic is the Network Interface Controler portion of a MAC address, used in EthHeader.	
+  # EthNic is the Network Interface Controler portion of a MAC address, used in EthHeader.
+	#
+	# ==== Header Definition
+	#
+	#   unit8 :n1
+	#   unit8 :n2
+	#   unit8 :n3
+	#
 	class EthNic < BinData::MultiValue
 		uint8		:n1
 		uint8		:n2
@@ -24,18 +43,30 @@ module PacketFu
 	end
 
 	# EthMac is the combination of an EthOui and EthNic, used in EthHeader.
+	#
+	# ==== Header Definition
+	#
+	#   eth_oui :oui  # See EthOui
+	#   eth_nic :nic  # See EthOui
 	class EthMac < BinData::MultiValue
-		eth_oui	:oui
-		eth_nic	:nic
+		eth_oui	:oui		# See EthOui
+		eth_nic	:nic		# See EthOui
 	end
 	
 	# EthHeader is a complete Ethernet struct, used in EthPacket. 
 	# It's the base header for all other protocols, such as IPHeader, TCPHeader, etc. 
 	#
 	# For more on the construction on MAC addresses, see http://en.wikipedia.org/wiki/MAC_address
+	#
+	# ==== Header Definition
+	#
+	#  eth_mac  :eth_dst                             # See EthMac
+	#  eth_mac  :eth_src                             # See EthMac
+	#  uint16be :eth_proto, :initial_value => 0x0800 # IP 0x0800, Arp 0x0806
+	#  rest     :body
 	class EthHeader < BinData::MultiValue
-		eth_mac		:eth_dst
-		eth_mac		:eth_src
+		eth_mac		:eth_dst														 # See EthMac
+		eth_mac		:eth_src														 # See EthMac
 		uint16be	:eth_proto, :initial_value => 0x0800 # IP 0x0800, Arp 0x0806
 		rest			:body
 

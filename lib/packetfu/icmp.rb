@@ -5,6 +5,14 @@ module PacketFu
 	# administration and connectivity testing.
 	#
 	# For more on ICMP packets, see http://www.networksorcery.com/enp/protocol/icmp.htm
+	# 
+	# ==== Header Definition
+	#
+	#   uint8     :icmp_type
+	#   uint8     :icmp_code
+	#   uint16be  :icmp_sum,  :initial_value => lambda { icmp_calc_sum }
+	#   rest      :body
+		
 	class ICMPHeader < BinData::MultiValue
 		uint8			:icmp_type
 		uint8			:icmp_code

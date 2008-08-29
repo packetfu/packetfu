@@ -6,6 +6,20 @@ module PacketFu
 	# ARP is used to discover the machine address of nearby devices.
 	#
 	# See http://www.networksorcery.com/enp/protocol/arp.htm for details.
+	#
+	# ==== Header Definition
+	#
+	#	 uint16be :arp_hw,        :initial_value => 1      # Ethernet
+	#	 uint16be :arp_proto,     :initial_value => 0x0800 # IP
+	#	 uint8    :arp_hw_len,    :initial_value => 6
+	#	 uint8    :arp_proto_len, :initial_value => 4
+	#	 uint16be :arp_opcode,    :initial_value => 1      # 1: Request, 2: Reply, 3: Request-Reverse, 4: Reply-Reverse
+	#	 eth_mac  :arp_src_mac                             # From eth.rb
+	#	 octets   :arp_src_ip                              # From ip.rb
+	#	 eth_mac  :arp_dst_mac                             # From eth.rb
+	#	 octets   :arp_dst_ip                              # From ip.rb
+	#	 rest     :body
+	#
 	class ARPHeader < BinData::MultiValue
 
 		uint16be	:arp_hw, 				:initial_value => 1 # Ethernet

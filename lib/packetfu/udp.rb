@@ -5,11 +5,18 @@ module PacketFu
 	# rely on UDP, such as DNS and World of Warcraft.
 	#
 	# For more on UDP packets, see http://www.networksorcery.com/enp/protocol/udp.htm
-	class UDPHeader < BinData::MultiValue
+	#
+	# ==== Header Definition
+	#  uint16be  :udp_src
+	#  uint16be  :udp_dst
+	#  uint16be  :udp_len,  :initial_value => lambda {udp_calc_len}
+	#  uint16be  :udp_sum,  :initial_value =>  0                    # Checksum off
+	#  rest      :body
+ class UDPHeader < BinData::MultiValue
 		uint16be	:udp_src
 		uint16be	:udp_dst
 		uint16be	:udp_len,	:initial_value => lambda {udp_calc_len}
-		uint16be	:udp_sum,	:initial_value =>  0 # Checksum off unless it's explicitly set.
+		uint16be	:udp_sum,	:initial_value =>  0 # Checksum off
 		rest			:body
 
 		# Returns the true length of the UDP packet.

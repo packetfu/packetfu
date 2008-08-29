@@ -15,9 +15,11 @@ Dion Mendel's BinData is absolutely critical for PacketFu. Specifically, BinData
 
 PcapRub: www.metasploit.com/svn/framework3/trunk/external/pcaprub
 
-Marshall Beddoe's PcapRub is required only for packet reading and writing from a network interfaces (which is a pretty big only). PcapRub itself relies on libpcap 0.9.8 or later for packet injection. It also requires root privilieges to access the interface directly.
+Marshall Beddoe's PcapRub is required only for packet reading and writing from a network interfaces (which is a pretty big only). PcapRub itself relies on libpcap 0.9.8 or later for packet injection. It also requires root privilieges to access the interface directly. Perhaps most noteworthy, PcapRub is <b>not</b> included in this distribution, as the vagaries of libpcap driver install can lead to some unexpected results. You are on your own for that.
 
 == Examples
+
+Wouldn't that be nice? The best way to learn right now is to pore over the documentation, and mess around with packetfu-shell.rb
 
 == Author
 

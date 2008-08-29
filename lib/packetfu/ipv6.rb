@@ -2,7 +2,15 @@
 module PacketFu
 
 	# AddrIpv6 handles addressing for IPv6Header
-	class AddrIpv6 < BinData::MultiValue
+	#
+	# ==== Header Definition
+	#
+	#
+	# uint32be :a1
+	# uint32be :a2
+	# uint32be :a3
+	# uint32be :a4
+ class AddrIpv6 < BinData::MultiValue
 
 		uint32be	:a1
 		uint32be	:a2
@@ -12,6 +20,18 @@ module PacketFu
 	end
 
 	# IPv6Header is complete IPv6 struct, used in IPv6Packet. 
+	#
+	# ==== Header Definition
+	#
+	#  bit4      :ipv6_v,    :initial_value => 6                        # Versiom
+	#  bit8      :ipv6_class                                            # Class
+	#  bit20     :ipv6_label                                            # Label
+	#  uint16be  :ipv6_len,  :initial_value => lambda { ipv6_calc_len } # Payload length
+	#  uint8     :ipv6_next                                             # Next Header
+	#  uint8     :ipv6_hop,  :initial_value => 0xff                     # Hop limit
+	#  addr_ipv6 :ipv6_src
+	#  addr_ipv6 :ipv6_dst
+	#  rest      :body
 	class IPv6Header < BinData::MultiValue
 
 		bit4			:ipv6_v,		:initial_value => 6			# Versiom
