@@ -1,4 +1,4 @@
-*.rb
-packetfu/lib
-packetfu/examples/packetfu-shell.rb
-README
+lib/packetfu.rb
+lib/packetfu/
+examples/packetfu-shell.rb
+
