@@ -19,7 +19,7 @@ usage unless target_ip = ARGV[0]		# Need a target IP.
 usage unless Process.euid.zero?			# Need to be root.
 IPAddr.new(target_ip)								# Check to see it's really an IP address, and not a herring or something.
 
-$packetfu_default = PacketFu::Config.new(PacketFu::whoami?).config
+$packetfu_default = PacketFu::Config.new(PacketFu::Utils.whoami?).config
 
 def arp(target_ip)
 

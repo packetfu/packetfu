@@ -65,7 +65,8 @@ def banner
 		puts "Iface:   %s" % [Pcap.lookupdev]
 		puts ">>> Packet capturing/injecting enabled."
 	else
-		puts ">>> Packet capturing/injecting disabled."
+		print ">>> Packet capturing/injecting disabled. "
+		puts Process.euid.zero? ? "(no PcapRub)" : "(not root)"
 	end
 	puts "<>" * 36
 end

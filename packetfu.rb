@@ -20,15 +20,17 @@ module PacketFu
 		end
 		require 'packetfu/lib/capture' 
 		require 'packetfu/lib/read' 	
-		require 'packetfu/lib/write' 
 		require 'packetfu/lib/inject'
-		require 'packetfu/lib/pcap'
 		@@pcaprub_loaded = true
 	rescue LoadError
 	end
 end
 
+# Doesn't require PcapRub
+require 'packetfu/lib/pcap'
+require 'packetfu/lib/write' 
 
+# Packet crafting/parsing goodness.
 require 'packetfu/lib/packet'
 require 'packetfu/lib/invalid'
 require 'packetfu/lib/eth'
@@ -55,11 +57,6 @@ module PacketFu
 	# Returns the version.
 	def self.version
 		"0.0.1-dev" # August 22, 2008
-	end
-
-	# A toplevel delegator for Utils.whoami?
-	def self.whoami?
-		Utils.whoami?
 	end
 
 end
