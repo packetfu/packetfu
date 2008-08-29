@@ -234,6 +234,67 @@ module PacketFu
 			peek_data.join
 		end
 
+		# Hexify provides a neatly-formatted dump of binary data, familar to hex readers.
+		def hexify(str)
+			hexascii_lines = str.to_s.unpack("H*")[0].scan(/.{1,32}/)
+			chars = str.to_s.gsub(/[\x00-\x1f\x7f-\xff]/,'.')
+			chars_lines = chars.scan(/.{1,16}/)
+			ret = []
+			hexascii_lines.size.times {|i| ret << "%-48s  %s" % [hexascii_lines[i].gsub(/(.{2})/,"\\1 "),chars_lines[i]]}
+			ret.join("\n")
+		end
+
+		# Returns a hex-formatted representation of the packet.
+		#
+		# ==== Arguments
+		#
+		# 0..9 : If a number is given only the layer in @header[arg] will be displayed. Note that this will include all @headers included in that header.
+		# :layers : If :layers is specified, the dump will return an array of headers by layer level.
+		# :all : An alias for arg=0.
+		#
+		# ==== Examples
+		#
+		# irb(main):003:0> pkt = TCPPacket.new
+		# irb(main):003:0> puts pkt.inspect_hex(:layers)
+		# 00 1a c5 00 00 00 00 1a c5 00 00 00 08 00 45 00   ..............E.
+		# 00 28 83 ce 00 00 ff 06 38 02 00 00 00 00 00 00   .(......8.......
+		# 00 00 a6 0f 00 00 ac 89 7b 26 00 00 00 00 50 00   ........{&....P.
+		# 40 00 a2 25 00 00                                 @..%..
+		# 45 00 00 28 83 ce 00 00 ff 06 38 02 00 00 00 00   E..(......8.....
+		# 00 00 00 00 a6 0f 00 00 ac 89 7b 26 00 00 00 00   ..........{&....
+		# 50 00 40 00 a2 25 00 00                           P.@..%..
+		# a6 0f 00 00 ac 89 7b 26 00 00 00 00 50 00 40 00   ......{&....P.@.
+		# a2 25 00 00                                       .%..
+		# => nil
+		# irb(main):004:0> puts pkt.inspect_hex(:layers)[2]
+		# a6 0f 00 00 ac 89 7b 26 00 00 00 00 50 00 40 00   ......{&....P.@.
+		# a2 25 00 00                                       .%..
+		# => nil
+		#
+		def inspect_hex(arg=0)
+			case arg
+			when :layers
+				ret = []
+				@headers.size.times do |i|
+					ret << hexify(@headers[i])
+				end
+				ret
+			when (0..9)
+				if @headers[arg]
+					hexify(@headers[arg])
+				else
+					nil
+				end
+			when :all
+				inspect_hex(0)
+			end
+		end
+
+		# For packets, inspect is overloaded as inspect_hex(0).
+		def inspect
+			self.inspect_hex
+		end
+
 		def initialize(args={})
 			if args[:config]
 				args[:config].each_pair do |k,v|
@@ -244,7 +305,6 @@ module PacketFu
 					end
 				end
 			end
-
 		end
 
 	end # class Packet
