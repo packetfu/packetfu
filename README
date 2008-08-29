@@ -11,7 +11,7 @@ PacketFu should live somewhere in your path. I haven‘t decided yet on packagin
 
 BinData: http://bindata.rubyforge.org
 
-Dion Mendel's BinData is absolutely critical for PacketFu.
+Dion Mendel's BinData is absolutely critical for PacketFu. Specifically, BinData's subversion r99 or later is required, in order to make use of the :eof patch. So, BinData r101 is included in this distribution until 0.9.3 or later is released.
 
 PcapRub: www.metasploit.com/svn/framework3/trunk/external/pcaprub
 
