@@ -58,6 +58,9 @@ end
 include PacketFu
 
 # Draws a picture. Includes a nunchuck, so you know that it's serious.
+# I /think/ this is how you're supposed to spell it in a kana charset.
+# http://jisho.org/words?jap=+%E3%83%91%E3%82%B1%E3%83%83%E3%83%88%E3%83%95&eng=&dict=edict
+#
 def packetfu_ascii_art
 	puts <<EOM
  _______  _______  _______  _        _______ _________ _______          
@@ -73,7 +76,8 @@ def packetfu_ascii_art
 | 01000001 00101101 01001000 )( )( )( )( )( 00101101 01000001 00100001 |
 |                            )( )( )( )( )(                            |
 (____________________________)            (____________________________)
-            a mid-level packet manipulation library for ruby           
+                               パケットフ
+             a mid-level packet manipulation library for ruby
 
 EOM
 	end
