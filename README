@@ -5,7 +5,7 @@ It is maintained at http://code.google.com/p/packetfu
 
 == Installation
 
-PacketFu should live somewhere in your path. I haven‘t decided yet on packaging, will probably succumb to gems; your best bet is to just drop it into /usr/local/lib/site_ruby/1.8 or where ever you install bindata to.
+PacketFu should live somewhere in your path. I haven't decided yet on packaging, will probably succumb to gems; your best bet is to just drop it into /usr/local/lib/site_ruby/1.8 or where ever you install bindata to.
 
 == Requirements
 
