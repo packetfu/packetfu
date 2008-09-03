@@ -66,7 +66,6 @@ module PacketFu
 	class UDPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header, :udp_header
-		attr_reader :size, :length
 		
 		def initialize(args={})
 			@eth_header = 	(args[:eth] || EthHeader.new)

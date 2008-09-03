@@ -291,9 +291,18 @@ module PacketFu
 		end
 
 		# For packets, inspect is overloaded as inspect_hex(0).
+		# Not sure if this is a great idea yet, but it sure makes
+		# the irb output more sane.
 		def inspect
 			self.inspect_hex
 		end
+
+		# Returns the size of the packet (as a binary string)
+		def size
+			self.to_s.size
+		end
+
+		alias_method :length, :size
 
 		def initialize(args={})
 			if args[:config]

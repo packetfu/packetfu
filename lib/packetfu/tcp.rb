@@ -217,7 +217,6 @@ module PacketFu
 	class TCPPacket < Packet
 
 		attr_accessor :eth_header, :ip_header, :tcp_header, :headers
-		attr_reader :size, :length
 		
 		def initialize(args={})
 			@eth_header = 	(args[:eth] || EthHeader.new)
