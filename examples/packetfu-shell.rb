@@ -90,9 +90,9 @@ def banner
 		puts ">>> Use $packetfu_default.config for salient networking details."
 		print "IP:  %-15s Mac: %s" % [$packetfu_default.ip_saddr, $packetfu_default.eth_saddr]
 		puts "   Gateway: %s" % $packetfu_default.eth_daddr
-		print "Net: %-15s" % [Pcap.lookupnet(Pcap.lookupdev)][0]
+		print "Net: %-15s" % [Pcap.lookupnet($packetfu_default.iface)][0]
 		print "  " * 13 
-		puts "Iface:   %s" % [Pcap.lookupdev]
+		puts "Iface:   %s" % [($packetfu_default.iface)]
 		puts ">>> Packet capturing/injecting enabled."
 	else
 		print ">>> Packet capturing/injecting disabled. "
@@ -101,5 +101,11 @@ def banner
 	puts "<>" * 36
 end
 
-$packetfu_default = Config.new(Utils.whoami?) if(@@pcaprub_loaded && Process.euid.zero?)
+# Silly wlan0 workaround
+begin
+	$packetfu_default = Config.new(Utils.whoami?) if(@@pcaprub_loaded && Process.euid.zero?)
+rescue RuntimeError
+	$packetfu_default = Config.new(Utils.whoami?(:iface => 'wlan0')) if(@@pcaprub_loaded && Process.euid.zero?)
+end
+
 banner
