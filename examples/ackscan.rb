@@ -1,13 +1,13 @@
-#!/usr/bin/evn ruby
+#!/usr/bin/env ruby
 require 'packetfu'
 # Portscanning!
 # Run this on one machine
 #cap = Capture.new(:iface=>'wlan0') # or whatever your interface is
-# Run this on another
 #cap.show_live(:filter => 'src net 209.85.165')
+# Run this on another:
+#cap = Capture.new(:iface=>'wlan0') # or whatever your interface is
 #cap = Capture.new(:iface=>'wlan0') # or whatever your interface is
 # Run this on the third
-#cap.show_live(:filter => 'dst net 209.85.165')
 def do_scan
 	puts "Generating packets..."
 	pkt_array = gen_packets.sort_by {rand}
