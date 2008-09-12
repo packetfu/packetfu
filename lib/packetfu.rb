@@ -21,19 +21,31 @@ require 'singleton'
 
 module PacketFu
 	@@pcaprub_loaded = false
+  
+  def self.pcaprub_platform_require
+    if File.directory?("C:\\")
+      require 'pcaprub_win32/pcaprub'
+      @@pcaprub_loaded = true
+    elsif File.directory?("/usr")
+       require 'pcaprub' # Presumes you already have it. Apple, does this work for you?
+       @@pcaprub_loaded = true
+    else
+      @@pcaprub_loaded = false # Still false
+    end
+  end
+  
 	begin
-		require 'pcaprub'
+		pcaprub_platform_require
 		if Pcap.version < "0.8-dev"
+      @@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
 		require 'packetfu/capture' 
 		require 'packetfu/read' 	
 		require 'packetfu/inject'
-		@@pcaprub_loaded = true
 	rescue LoadError
 	end
 end
-
 # Doesn't require PcapRub
 require 'packetfu/pcap'
 require 'packetfu/write' 
