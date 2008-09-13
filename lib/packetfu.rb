@@ -76,7 +76,7 @@ module PacketFu
 
 	# Returns the version.
 	def self.version
-		"0.0.3" # September 3, 2008
+		"0.1.0" # September 13, 2008
 	end
 
 end

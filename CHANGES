@@ -1,10 +1,11 @@
 = Changelog
 
-== Version x
-  Various bugs.
-  Added a windows compatability mode.
+== Version x # In the future
+
+== Version 0.1.0 # September 13, 2008
+  Various minor bugs fixed.
+  Added a Windows compatability mode via a compiled pcaprub.
+    Note: Works fine on XP, works okay on Vista. Users are encouraged to compile their own pcaprub installations.
 
 == Verison 0.0.3 # September 3, 2008 # r25
   First tagged version. Naturally, bugs were found that moment.
-
-
