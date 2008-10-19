@@ -5,6 +5,7 @@ module PacketFu
 	# other packets.
 	class Packet
 		attr_reader :flavor # Packet Headers are responsible for their own specific flavor methods.
+		attr_accessor :headers # All packets have a header collection, useful for determining protocol trees.
 
 		# Parse() creates the correct packet type based on the data, and returns the apporpiate
 		# Packet subclass. 
@@ -293,14 +294,38 @@ module PacketFu
 		# For packets, inspect is overloaded as inspect_hex(0).
 		# Not sure if this is a great idea yet, but it sure makes
 		# the irb output more sane.
-		def inspect
-			self.inspect_hex
-		end
+		#def inspect
+		#	self.inspect_hex
+		#end
 
 		# Returns the size of the packet (as a binary string)
 		def size
 			self.to_s.size
 		end
+
+		# Returns an array of protocols contained in this packet. For example:
+		#
+		#   t = PacketFu::TCPPacket.new
+		#   => 00 1a c5 00 00 00 00 1a c5 00 00 00 08 00 45 00   ..............E.
+		#   00 28 3c ab 00 00 ff 06 7f 25 00 00 00 00 00 00   .(<......%......
+		#   00 00 93 5e 00 00 ad 4f e4 a4 00 00 00 00 50 00   ...^...O......P.
+		#   40 00 4a 92 00 00                                 @.J...
+		#   t.proto
+		#   => ["Eth", "IP", "TCP"]
+		#
+		def proto
+			type_array = []
+			self.headers.each {|header| type_array << header.class.to_s.split('::').last.gsub(/Header$/,'')}
+			type_array
+		end
+
+		def is_eth? ;	self.proto.include? "Eth"; end
+		def is_ip? ;	self.proto.include? "IP"; end
+		def is_tcp? ;	self.proto.include? "TCP"; end
+		def is_udp? ;	self.proto.include? "UDP"; end
+		def is_arp? ; self.proto.include? "ARP"; end
+		def is_ipv6? ; self.proto.include? "IPv6" ; end
+		def is_icmp? ; self.proto.include? "ICMP" ; end
 
 		alias_method :length, :size
 
