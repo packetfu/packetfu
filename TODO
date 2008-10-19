@@ -1,0 +1,18 @@
+TODO for PacketFu
+
+Next version:
+
+Ensure pcaprub is loaded sensibly -- Windows version still probably isn't right in all cases.
+Rewrite TCPOpts to be safe and sane -- use BinData structs
+Rewrite packet file reading and writing to be pure ruby instead of pcaprub's versions.
+Pcapfiles should take and honor usec fields.
+Add HD's .is_tcp? and friends.
+Collect HD's patches to ensure compatability with Metasploit
+Create a gem distribution
+
+Someday:
+Rewrite the whole protocol tree so a simple 'require protocol' is sufficent.
+Think about adding taint values to rewritten packets?
+Merge in release version of BinData once readeof-patch is committed to a tagged version
+Drop version requirements for BinData and Pcaprub once the minimum release versions are sufficient.
+
