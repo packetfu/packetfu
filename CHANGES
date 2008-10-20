@@ -1,6 +1,8 @@
 = Changelog
 
 == Version x # In the future
+	Added .is_proto? functions, self.proto function, Packet.headers attr_accessor across the board.
+  Various minor bugs.
 
 == Version 0.1.0 # September 13, 2008
   Various minor bugs fixed.

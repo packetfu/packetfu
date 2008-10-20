@@ -114,7 +114,7 @@ module PacketFu
 			@eth_header.eth_proto = 0x86dd
 			@eth_header.body=@ipv6_header
 
-			@headers = [@eth_header, @arp_header]
+			@headers = [@eth_header, @ipv6_header]
 			super
 		end
 

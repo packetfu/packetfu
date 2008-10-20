@@ -293,10 +293,10 @@ module PacketFu
 
 		# For packets, inspect is overloaded as inspect_hex(0).
 		# Not sure if this is a great idea yet, but it sure makes
-		# the irb output more sane.
-		#def inspect
-		#	self.inspect_hex
-		#end
+		# the irb output more sane. 
+		def inspect
+			self.proto.join("|") + "\n" + self.inspect_hex
+		end
 
 		# Returns the size of the packet (as a binary string)
 		def size
@@ -319,12 +319,23 @@ module PacketFu
 			type_array
 		end
 
+		alias_method :protocol, :proto
+
+		# Returns true if this is an Ethernet packet. Else, false.
 		def is_eth? ;	self.proto.include? "Eth"; end
+		alias_method :is_ethernet?, :is_eth?
+
+		# Returns true if this is an IP packet. Else, false.
 		def is_ip? ;	self.proto.include? "IP"; end
+		# Returns true if this is an TCP packet. Else, false.
 		def is_tcp? ;	self.proto.include? "TCP"; end
+		# Returns true if this is an UDP packet. Else, false.
 		def is_udp? ;	self.proto.include? "UDP"; end
+		# Returns true if this is an ARP packet. Else, false.
 		def is_arp? ; self.proto.include? "ARP"; end
+		# Returns true if this is an IPv6 packet. Else, false.
 		def is_ipv6? ; self.proto.include? "IPv6" ; end
+		# Returns true if this is an ICMP packet. Else, false.
 		def is_icmp? ; self.proto.include? "ICMP" ; end
 
 		alias_method :length, :size

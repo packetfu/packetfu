@@ -6,7 +6,6 @@ Ensure pcaprub is loaded sensibly -- Windows version still probably isn't right 
 Rewrite TCPOpts to be safe and sane -- use BinData structs
 Rewrite packet file reading and writing to be pure ruby instead of pcaprub's versions.
 Pcapfiles should take and honor usec fields.
-Add HD's .is_tcp? and friends.
 Collect HD's patches to ensure compatability with Metasploit
 Create a gem distribution
 
