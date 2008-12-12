@@ -1,5 +1,6 @@
 require 'bindata/io'
 require 'bindata/lazy'
+require 'bindata/params'
 require 'bindata/registry'
 require 'bindata/sanitize'
 require 'stringio'
@@ -32,91 +33,42 @@ module BinData
   #                           <tt>:check_offset</tt>, except that it will
   #                           adjust the IO offset instead of raising an error.
   class Base
+
     class << self
-      # Returns the mandatory parameters used by this class.  Any given args
-      # are appended to the parameters list.  The parameters for a class will
-      # include the parameters of its ancestors.
-      def mandatory_parameters(*args)
-        unless defined? @mandatory_parameters
-          @mandatory_parameters = []
-          ancestors[1..-1].each do |parent|
-            if parent.respond_to?(:mandatory_parameters)
-              pmp = parent.mandatory_parameters
-              @mandatory_parameters.concat(pmp)
-            end
-          end
-        end
-        if not args.empty?
-          args.each { |arg| @mandatory_parameters << arg.to_sym }
-          @mandatory_parameters.uniq!
-        end
-        @mandatory_parameters
-      end
-      alias_method :mandatory_parameter, :mandatory_parameters
+      extend Parameters
 
-      # Returns the optional parameters used by this class.  Any given args
-      # are appended to the parameters list.  The parameters for a class will
-      # include the parameters of its ancestors.
-      def optional_parameters(*args)
-        unless defined? @optional_parameters
-          @optional_parameters = []
-          ancestors[1..-1].each do |parent|
-            if parent.respond_to?(:optional_parameters)
-              pop = parent.optional_parameters
-              @optional_parameters.concat(pop)
-            end
-          end
-        end
-        if not args.empty?
-          args.each { |arg| @optional_parameters << arg.to_sym }
-          @optional_parameters.uniq!
-        end
-        @optional_parameters
-      end
-      alias_method :optional_parameter, :optional_parameters
+      # Define methods for:
+      #   bindata_mandatory_parameters
+      #   bindata_optional_parameters
+      #   bindata_default_parameters
+      #   bindata_mutually_exclusive_parameters
 
-      # Returns the default parameters used by this class.  Any given args
-      # are appended to the parameters list.  The parameters for a class will
-      # include the parameters of its ancestors.
-      def default_parameters(params = {})
-        unless defined? @default_parameters
-          @default_parameters = {}
-          ancestors[1..-1].each do |parent|
-            if parent.respond_to?(:default_parameters)
-              pdp = parent.default_parameters
-              @default_parameters = @default_parameters.merge(pdp)
-            end
-          end
-        end
-        if not params.empty?
-          @default_parameters = @default_parameters.merge(params)
-        end
-        @default_parameters
-      end
-      alias_method :default_parameter, :default_parameters
-
-      # Returns the pairs of mutually exclusive parameters used by this class.
-      # Any given args are appended to the parameters list.  The parameters for
-      # a class will include the parameters of its ancestors.
-      def mutually_exclusive_parameters(*args)
-        unless defined? @mutually_exclusive_parameters
-          @mutually_exclusive_parameters = []
-          ancestors[1..-1].each do |parent|
-            if parent.respond_to?(:mutually_exclusive_parameters)
-              pmep = parent.mutually_exclusive_parameters
-              @mutually_exclusive_parameters.concat(pmep)
-            end
-          end
-        end
-        if not args.empty?
-          @mutually_exclusive_parameters << [args[0].to_sym, args[1].to_sym]
-        end
-        @mutually_exclusive_parameters
+      define_x_parameters(:bindata_mandatory, []) do |array, args|
+        args.each { |arg| array << arg.to_sym }
+        array.sort! { |a,b| a.to_s <=> b.to_s }
+        array.uniq!
       end
 
-      # Returns a list of parameters that are accepted by this object
-      def accepted_parameters
-        (mandatory_parameters + optional_parameters + default_parameters.keys).uniq
+      define_x_parameters(:bindata_optional, []) do |array, args|
+        args.each { |arg| array << arg.to_sym }
+        array.sort! { |a,b| a.to_s <=> b.to_s }
+        array.uniq!
+      end
+
+      define_x_parameters(:bindata_default, {}) do |hash, args|
+        params = args.length > 0 ? args[0] : {}
+        hash.merge!(params)
+      end
+
+      define_x_parameters(:bindata_mutually_exclusive, []) do |array, args|
+        array << [args[0].to_sym, args[1].to_sym]
+        array.uniq!
+      end
+
+      # Returns a list of internal parameters that are accepted by this object
+      def internal_parameters
+        (bindata_mandatory_parameters + bindata_optional_parameters +
+         bindata_default_parameters.keys).uniq
       end
 
       # Ensures that +params+ is of the form expected by #initialize.
@@ -128,12 +80,12 @@ module BinData
         end
 
         # add default parameters
-        default_parameters.each do |k,v|
+        bindata_default_parameters.each do |k,v|
           params[k] = v unless params.has_key?(k)
         end
 
         # ensure mandatory parameters exist
-        mandatory_parameters.each do |prm|
+        bindata_mandatory_parameters.each do |prm|
           if not params.has_key?(prm)
             raise ArgumentError, "parameter ':#{prm}' must be specified " +
                                  "in #{self}"
@@ -141,12 +93,17 @@ module BinData
         end
 
         # ensure mutual exclusion
-        mutually_exclusive_parameters.each do |param1, param2|
+        bindata_mutually_exclusive_parameters.each do |param1, param2|
           if params.has_key?(param1) and params.has_key?(param2)
             raise ArgumentError, "params #{param1} and #{param2} " +
                                  "are mutually exclusive"
           end
         end
+      end
+
+      # Can this data object self reference itself?
+      def recursive?
+        false
       end
 
       # Instantiates this class and reads from +io+.  For single value objects
@@ -166,26 +123,27 @@ module BinData
     end
 
     # Define the parameters we use in this class.
-    optional_parameters :check_offset, :adjust_offset
-    default_parameters :onlyif => true
-    mutually_exclusive_parameters :check_offset, :adjust_offset
+    bindata_optional_parameters :check_offset, :adjust_offset
+    bindata_default_parameters :onlyif => true
+    bindata_mutually_exclusive_parameters :check_offset, :adjust_offset
 
     # Creates a new data object.
     #
     # +params+ is a hash containing symbol keys.  Some params may
-    # reference callable objects (methods or procs).  +env+ is the
-    # environment that these callable objects are evaluated in.
-    def initialize(params = {}, env = nil)
-      unless SanitizedParameters === params
-        params = Sanitizer.sanitize(self, params)
-      end
+    # reference callable objects (methods or procs).  +parent+ is the
+    # parent data object (e.g. struct, array, choice) this object resides
+    # under.
+    def initialize(params = {}, parent = nil)
+      @params = Sanitizer.sanitize(self.class, params)
+      @parent = parent
+    end
 
-      @params = params.accepted_parameters
+    # The parent data object.
+    attr_accessor :parent
 
-      # set up the environment
-      @env             = env || LazyEvalEnv.new
-      @env.params      = params.extra_parameters
-      @env.data_object = self
+    # Returns all the custom parameters supplied to this data object.
+    def custom_parameters
+      @params.extra_parameters
     end
 
     # Reads data into this data object by calling #do_read then #done_read.
@@ -201,10 +159,10 @@ module BinData
     def do_read(io)
       raise ArgumentError, "io must be a BinData::IO" unless BinData::IO === io
 
-      clear
       check_offset(io)
 
       if eval_param(:onlyif)
+        clear
         _do_read(io)
       end
     end
@@ -267,33 +225,33 @@ module BinData
       snapshot.inspect
     end
 
+    # Returns the object this object represents.
+    def obj
+      self
+    end
+
     #---------------
     private
-
-    # Creates a new LazyEvalEnv for use by a child data object.
-    def create_env
-      LazyEvalEnv.new(@env)
-    end
 
     # Returns the value of the evaluated parameter.  +key+ references a
     # parameter from the +params+ hash used when creating the data object.
     # +values+ contains data that may be accessed when evaluating +key+.
     # Returns nil if +key+ does not refer to any parameter.
     def eval_param(key, values = nil)
-      @env.lazy_eval(@params[key], values)
+      LazyEvaluator.eval(no_eval_param(key), self, values)
     end
 
     # Returns the parameter from the +params+ hash referenced by +key+.
     # Use this method if you are sure the parameter is not to be evaluated.
     # You most likely want #eval_param.
-    def param(key)
-      @params[key]
+    def no_eval_param(key)
+      @params.internal_parameters[key]
     end
 
     # Returns whether +key+ exists in the +params+ hash used when creating
     # this data object.
     def has_param?(key)
-      @params.has_key?(key.to_sym)
+      @params.internal_parameters.has_key?(key)
     end
 
     # Checks that the current offset of +io+ is as expected.  This should
@@ -361,7 +319,7 @@ module BinData
     end
 
     # Returns the number of bytes it will take to write this data.
-    def _do_num_bytes
+    def _do_num_bytes(what)
       raise NotImplementedError
     end
 

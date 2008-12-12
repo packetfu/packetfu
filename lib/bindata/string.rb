@@ -51,10 +51,10 @@ module BinData
     register(self.name, self)
 
     # These are the parameters used by this class.
-    optional_parameters  :read_length, :length, :trim_value
-    default_parameters   :pad_char => "\0"
-    mutually_exclusive_parameters :read_length, :length
-    mutually_exclusive_parameters :length, :value
+    bindata_optional_parameters :read_length, :length, :trim_value
+    bindata_default_parameters  :pad_char => "\0"
+    bindata_mutually_exclusive_parameters :read_length, :length
+    bindata_mutually_exclusive_parameters :length, :value
 
     class << self
 
@@ -84,7 +84,9 @@ module BinData
     # trimmed as required.
     def value
       v = val_to_str(_value)
-      v.sub!(/#{eval_param(:pad_char)}*$/, "") if param(:trim_value) == true
+      if no_eval_param(:trim_value) == true
+        v.sub!(/#{eval_param(:pad_char)}*$/, "")
+      end
       v
     end
 

@@ -4,16 +4,9 @@ end
 
 require 'bindata'
 
-# This version requirement is a bit of a lie; we need svn version 
-# 99 or later, so we can make use of this commit:
-# r99 | dmendel | 2008-07-24 23:45:49 -0500 (Thu, 24 Jul 2008) | 1 line
-#
-# Allow arrays to read until eof
-#
-# So, for now, PacketFu will distribute with a slightly forked BinData.
-# We'll unfork when 0.9.3 is released and all will be right with the world.
-if BinData::VERSION < "0.9.2-eofpatch"
-	raise LoadError, "BinData not at version 0.9.2-eofpatch"
+# Happy day, unforking BinData.
+if BinData::VERSION < "0.9.3"
+	raise LoadError, "BinData not at version 0.9.3 or later."
 end
 
 require 'ipaddr'
