@@ -37,17 +37,32 @@ module PacketFu
 			def array_to_file(args={}) 
 				filename = args[:filename] || args[:file] || args[:out] || :nowrite
 				arr = args[:arr] || args[:array] || []
-				ts = args[:ts] || args[:timestamp] || Time.now.to_i
-				ts_inc = args[:ts_inc] || args[:timestamp_increment] || 1
+				ts = args[:ts] || args[:timestamp] || Time.now.to_f
+				ts_inc = args[:ts_inc] || args[:timestamp_increment]
+				time_now = ts
 				if arr.class != Array
 					raise ArgumentError, "This needs to be an array."
 				end
 				formatted_packets = []
 				arr.each do |pkt|
+					time_now += (ts_inc || 1)
+					timestamp = [time_now.to_i,((time_now - (time_now.to_i)) * 10**6)].pack("VV")
 					this_pkt = PcapPacket.new
-					this_pkt.data = pkt[0,0xffff]
-					this_pkt.orig_len = pkt.size # orig_len isn't calc'ed already.
-					this_pkt.ts_sec = ts += decimal_to_usecs(ts_inc)[0]
+					if pkt.class == String
+						this_pkt.data = pkt[0,0xffff]
+						this_pkt.orig_len = pkt.size
+						this_pkt.timestamp.read(timestamp)
+					elsif pkt.class == Hash
+						this_pkt.data = pkt.values[0][0,0xffff]
+						this_pkt.orig_len = pkt.values[0].size
+						if ts_inc
+							this_pkt.timestamp.read(timestamp)
+						else
+							this_pkt.timestamp.read(pkt.keys[0])
+						end
+					else
+						raise ArgumentError, "Unknown packet data format, should be either Strings or Hashes of {timestamp=>data}."
+					end
 					formatted_packets << this_pkt.to_s
 				end
 				filedata = PcapFile.new
@@ -59,19 +74,11 @@ module PacketFu
 				else
 					ret = [nil,filedata.to_s.size,arr.size,ts,ts_inc]
 				end
-				
 			end
 
 			# A synonym for array_to_file()
 			def a2f(args={})
 				array_to_file(args)
-			end
-
-			# TODO: Wire this in later to enable incrementing by microseconds.
-			def decimal_to_usecs(decimal)
-				secs = decimal.to_i
-				usecs = decimal.to_f.to_s.split('.')[1]
-				[secs,usecs]
 			end
 
 		end

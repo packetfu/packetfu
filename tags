@@ -237,6 +237,7 @@ TCPPacket	lib/packetfu/tcp.rb	/^	class TCPPacket < Packet$/;"	c	class:PacketFu
 TcpEcn	lib/packetfu/tcp.rb	/^	class TcpEcn < BinData::MultiValue$/;"	c	class:PacketFu
 TcpFlags	lib/packetfu/tcp.rb	/^	class TcpFlags < BinData::MultiValue$/;"	c	class:PacketFu
 TcpOpts	lib/packetfu/tcpopts.rb	/^	class TcpOpts$/;"	c	class:PacketFu
+Timestamp	lib/packetfu/pcap.rb	/^	class Timestamp < BinData::MultiValue$/;"	c	class:PacketFu
 UDPHeader	lib/packetfu/udp.rb	/^ class UDPHeader < BinData::MultiValue$/;"	c	class:PacketFu
 UDPPacket	lib/packetfu/udp.rb	/^	class UDPPacket < Packet$/;"	c	class:PacketFu
 Uint16be	lib/bindata/int.rb	/^  class Uint16be < BinData::Single$/;"	c	class:BinData
@@ -329,7 +330,6 @@ create_read_code	lib/bindata/int.rb	/^    def self.create_read_code(nbits, endia
 create_to_s_code	lib/bindata/float.rb	/^    def self.create_to_s_code(single_precision, endian)$/;"	F	class:BinData.Float
 create_to_s_code	lib/bindata/int.rb	/^    def self.create_to_s_code(nbits, endian)$/;"	F	class:BinData.Integer
 create_uint_methods	lib/bindata/int.rb	/^    def self.create_uint_methods(klass, nbits, endian)$/;"	F	class:BinData.Integer
-decimal_to_usecs	lib/packetfu/write.rb	/^			def decimal_to_usecs(decimal)$/;"	f	class:PacketFu.Write
 decode	lib/packetfu/tcpopts.rb	/^		def self.decode(str)$/;"	F	class:PacketFu
 default_parameters	lib/bindata/base.rb	/^      def default_parameters(params = {})$/;"	f	class:BinData.Base
 define_methods	lib/bindata/bits.rb	/^    def self.define_methods(klass, nbits, endian, clamp)$/;"	F	class:BinData.BitField

@@ -12,14 +12,18 @@ module PacketFu
 		uint32le			:network,		:initial_value => 1
 	end
 
+	class Timestamp < BinData::MultiValue
+		uint32le	:sec
+		uint32le	:usec
+	end
+
 	# PcapPacket describes a complete libpcap-formatted packet, which includes timestamp
 	# and length information. It is used in PcapPackets class.
 	class PcapPacket < BinData::MultiValue
-		uint32le	:ts_sec
-		uint32le	:ts_usec
-		uint32le	:incl_len,	:value => lambda {data.length}
-		uint32le	:orig_len	
-		string		:data,		:read_length => :incl_len
+		timestamp		:timestamp		
+		uint32le		:incl_len,	:value => lambda {data.length}
+		uint32le		:orig_len	
+		string			:data,		:read_length => :incl_len
 	end
 
 	# PcapPackets is an BinData array type, used to collect packets and their associated

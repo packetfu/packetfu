@@ -32,7 +32,7 @@ module PacketFu
 				pcap_arr = []
 				pf.body.data.each do |pkt|
 					if args[:keep_timestamps] || args[:keep_ts] || args[:ts]
-						timestamp = [pkt.ts_sec,pkt.ts_usec].pack("VV")
+						timestamp = pkt.timestamp.to_s 
 						pcap_arr << {timestamp => pkt.data}
 					else
 						pcap_arr << pkt.data
