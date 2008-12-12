@@ -30,51 +30,50 @@ module PacketFu
 	#
 	# Read, Capture
 	class Write
-		
-		# Writes an array of binary data to a libpcap file.
-		def self.array_to_file(args={}) 
-			filename = args[:filename] || args[:file] || args[:out] || :nowrite
-			arr = args[:arr] || args[:array] || []
-			ts = args[:ts] || args[:timestamp] || Time.now.to_i
-			ts_inc = args[:ts_inc] || args[:timestamp_increment] || 1
 
-			if arr.class != Array
-				raise ArgumentError, "This needs to be an array."
-			end
+		class << self
 			
-			formatted_packets = []
-			arr.each do |pkt|
-				this_pkt = PcapPacket.new
-				this_pkt.data = pkt[0,0xffff]
-				this_pkt.orig_len = pkt.size # orig_len isn't calc'ed already.
-				this_pkt.ts_sec = ts += decimal_to_usecs(ts_inc)[0]
-				formatted_packets << this_pkt.to_s
+			# Writes an array of binary data to a libpcap file.
+			def array_to_file(args={}) 
+				filename = args[:filename] || args[:file] || args[:out] || :nowrite
+				arr = args[:arr] || args[:array] || []
+				ts = args[:ts] || args[:timestamp] || Time.now.to_i
+				ts_inc = args[:ts_inc] || args[:timestamp_increment] || 1
+				if arr.class != Array
+					raise ArgumentError, "This needs to be an array."
+				end
+				formatted_packets = []
+				arr.each do |pkt|
+					this_pkt = PcapPacket.new
+					this_pkt.data = pkt[0,0xffff]
+					this_pkt.orig_len = pkt.size # orig_len isn't calc'ed already.
+					this_pkt.ts_sec = ts += decimal_to_usecs(ts_inc)[0]
+					formatted_packets << this_pkt.to_s
+				end
+				filedata = PcapFile.new
+				filedata.read(PcapFile.new.to_s + formatted_packets.join) # Like a cat playing the bass.
+				if filename != :nowrite
+					File.open(filename.to_s,'w') {|file| file.write filedata}
+					# Return [filename, file size, # of packets, initial timestamp, timestamp increment]
+					ret = [filename,filedata.to_s.size,arr.size,ts,ts_inc]
+				else
+					ret = [nil,filedata.to_s.size,arr.size,ts,ts_inc]
+				end
+				
 			end
-			filedata = PcapFile.new
-			filedata.read(PcapFile.new.to_s + formatted_packets.join) # Like a cat playing the bass.
 
-			if filename != :nowrite
-				out = File.new(filename.to_s, 'w')
-				out.print filedata
-				out.close
-				# Return [filename, file size, # of packets, initial timestamp, timestamp increment]
-				ret = [filename,filedata.to_s.size,arr.size,ts,ts_inc]
-			else
-				ret = [nil,filedata.to_s.size,arr.size,ts,ts_inc]
+			# A synonym for array_to_file()
+			def a2f(args={})
+				array_to_file(args)
 			end
-			
-		end
 
-		# A synonym for array_to_file()
-		def self.a2f(args={})
-			self.array_to_file(args)
-		end
+			# TODO: Wire this in later to enable incrementing by microseconds.
+			def decimal_to_usecs(decimal)
+				secs = decimal.to_i
+				usecs = decimal.to_f.to_s.split('.')[1]
+				[secs,usecs]
+			end
 
-		# TODO: Wire this in later to enable incrementing by microseconds.
-		def self.decimal_to_usecs(decimal)
-			secs = decimal.to_i
-			usecs = decimal.to_f.to_s.split('.')[1]
-			[secs,usecs]
 		end
 
 		# IRB tab-completion hack.

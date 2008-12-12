@@ -278,7 +278,7 @@ _snapshot	lib/bindata/my_array.rb	/^    def _snapshot$/;"	f	class:BinData
 _snapshot	lib/bindata/single.rb	/^    def _snapshot$/;"	f	class:BinData.Single
 _snapshot	lib/bindata/struct.rb	/^    def _snapshot$/;"	f	class:BinData.Struct
 _value	lib/bindata/single.rb	/^    def _value$/;"	f	class:BinData.Single
-a2f	lib/packetfu/write.rb	/^		def self.a2f(args={})$/;"	F	class:PacketFu.Write
+a2f	lib/packetfu/write.rb	/^			def a2f(args={})$/;"	f	class:PacketFu.Write
 a2w	lib/packetfu/inject.rb	/^		def a2w(args={})$/;"	f	class:PacketFu.Inject
 accepted_parameters	lib/bindata/base.rb	/^      def accepted_parameters$/;"	f	class:BinData.Base
 add_variable	lib/bindata/lazy.rb	/^    def add_variable(sym, value)$/;"	f	class:BinData.LazyEvalEnv
@@ -298,7 +298,7 @@ arp_saddr_ip	lib/packetfu/arp.rb	/^		def arp_saddr_ip$/;"	f	class:PacketFu.ARPHe
 arp_saddr_ip=	lib/packetfu/arp.rb	/^		def arp_saddr_ip=(addr)$/;"	f	class:PacketFu.ARPHeader
 arp_saddr_mac	lib/packetfu/arp.rb	/^		def arp_saddr_mac$/;"	f	class:PacketFu.ARPHeader
 arp_saddr_mac=	lib/packetfu/arp.rb	/^		def arp_saddr_mac=(mac)$/;"	f	class:PacketFu.ARPHeader
-array_to_file	lib/packetfu/write.rb	/^		def self.array_to_file(args={}) $/;"	F	class:PacketFu.Write
+array_to_file	lib/packetfu/write.rb	/^			def array_to_file(args={}) $/;"	f	class:PacketFu.Write
 array_to_wire	lib/packetfu/inject.rb	/^		def array_to_wire(args={})$/;"	f	class:PacketFu.Inject
 banner	examples/packetfu-shell.rb	/^def banner$/;"	f
 bpf	lib/packetfu/capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
@@ -329,7 +329,7 @@ create_read_code	lib/bindata/int.rb	/^    def self.create_read_code(nbits, endia
 create_to_s_code	lib/bindata/float.rb	/^    def self.create_to_s_code(single_precision, endian)$/;"	F	class:BinData.Float
 create_to_s_code	lib/bindata/int.rb	/^    def self.create_to_s_code(nbits, endian)$/;"	F	class:BinData.Integer
 create_uint_methods	lib/bindata/int.rb	/^    def self.create_uint_methods(klass, nbits, endian)$/;"	F	class:BinData.Integer
-decimal_to_usecs	lib/packetfu/write.rb	/^		def self.decimal_to_usecs(decimal)$/;"	F	class:PacketFu.Write
+decimal_to_usecs	lib/packetfu/write.rb	/^			def decimal_to_usecs(decimal)$/;"	f	class:PacketFu.Write
 decode	lib/packetfu/tcpopts.rb	/^		def self.decode(str)$/;"	F	class:PacketFu
 default_parameters	lib/bindata/base.rb	/^      def default_parameters(params = {})$/;"	f	class:BinData.Base
 define_methods	lib/bindata/bits.rb	/^    def self.define_methods(klass, nbits, endian, clamp)$/;"	F	class:BinData.BitField
@@ -360,12 +360,12 @@ eth_daddr=	lib/packetfu/eth.rb	/^		def eth_daddr=(mac)$/;"	f	class:PacketFu.EthH
 eth_saddr	lib/packetfu/eth.rb	/^		def eth_saddr$/;"	f	class:PacketFu.EthHeader
 eth_saddr=	lib/packetfu/eth.rb	/^		def eth_saddr=(mac)$/;"	f	class:PacketFu.EthHeader
 eval_param	lib/bindata/base.rb	/^    def eval_param(key, values = nil)$/;"	f	class:BinData
-f2a	lib/packetfu/read.rb	/^		def self.f2a(args={})$/;"	F	class:PacketFu.Read
+f2a	lib/packetfu/read.rb	/^			def f2a(args={})$/;"	f	class:PacketFu.Read
 field_names	lib/bindata/struct.rb	/^    def field_names(include_hidden = false)$/;"	f	class:BinData.Struct
 fields	lib/bindata/multi_value.rb	/^      def fields$/;"	f	class:BinData.MultiValue
 fields	lib/bindata/single_value.rb	/^      def fields$/;"	f	class:BinData.SingleValue
 fields	lib/bindata/struct.rb	/^      def fields$/;"	f	class:BinData.Struct
-file_to_array	lib/packetfu/read.rb	/^		def self.file_to_array(args={})$/;"	F	class:PacketFu.Read
+file_to_array	lib/packetfu/read.rb	/^			def file_to_array(args={})$/;"	f	class:PacketFu.Read
 find_obj_for_name	lib/bindata/struct.rb	/^    def find_obj_for_name(name)$/;"	f	class:BinData.Struct
 first	lib/bindata/array.rb	/^    def first(n = nil)$/;"	f	class:BinData
 first	lib/bindata/my_array.rb	/^    def first(n = nil)$/;"	f	class:BinData
@@ -607,8 +607,8 @@ to_s	lib/packetfu/packet.rb	/^		def to_s$/;"	f	class:PacketFu.Packet
 to_w	lib/packetfu/packet.rb	/^		def to_w(iface=nil)$/;"	f	class:PacketFu.Packet
 to_x	lib/packetfu/ip.rb	/^		def to_x$/;"	f	class:PacketFu.Octets
 translate	lib/packetfu/tcpopts.rb	/^		def self.translate(arr)$/;"	F
-truth	lib/packetfu/read.rb	/^		def truth$/;"	f	class:PacketFu.Read
-truth	lib/packetfu/write.rb	/^		def truth$/;"	f	class:PacketFu.Write
+truth	lib/packetfu/read.rb	/^		def truth$/;"	f	class:PacketFu
+truth	lib/packetfu/write.rb	/^		def truth$/;"	f	class:PacketFu
 type	lib/pcaprub_win32/pcaprub.c	/^    char type;$/;"	m	struct:rbpcap	file:
 type_exists?	lib/bindata/sanitize.rb	/^      def type_exists?(type, endian = nil)$/;"	f	class:BinData.Sanitizer
 udp_calc_len	lib/packetfu/udp.rb	/^		def udp_calc_len$/;"	f	class:PacketFu.UDPHeader

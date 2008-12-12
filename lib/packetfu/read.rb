@@ -19,23 +19,33 @@ module PacketFu
 	#
 	# Write, Capture
 	class Read
-		
-		# file_to_array() translates a libpcap file into an array of packets.
-		def self.file_to_array(args={})
-			filename = args[:filename] || args[:file] || args[:out]
 
-			raise ArgumentError, "Need a :filename in string form to read from." if (filename.nil? || filename.class != String)
-			p = Pcap.open_offline(filename) #Using HD's patch instead of parsing it myself.
-			pcap_arr = []
-			while this_packet = p.next 
-				pcap_arr << this_packet
+		class << self
+
+			# file_to_array() translates a libpcap file into an array of packets.
+			# Note, the timestamp keeping business isn't useful for anything yet.
+			def file_to_array(args={})
+				filename = args[:filename] || args[:file] || args[:out]
+				raise ArgumentError, "Need a :filename in string form to read from." if (filename.nil? || filename.class != String)
+				f = File.open(filename,'r') {|file| file.read}
+				pf = PcapFile.read(f)
+				pcap_arr = []
+				pf.body.data.each do |pkt|
+					if args[:keep_timestamps] || args[:keep_ts] || args[:ts]
+						timestamp = [pkt.ts_sec,pkt.ts_usec].pack("VV")
+						pcap_arr << {timestamp => pkt.data}
+					else
+						pcap_arr << pkt.data
+					end
+				end
+				pcap_arr
 			end
-			pcap_arr
-		end
-		
-		# f2a() is equivalent to file_to_array
-		def self.f2a(args={})
-			self.file_to_array(args)
+
+			# f2a() is equivalent to file_to_array
+			def f2a(args={})
+				file_to_array(args)
+			end
+
 		end
 
 		# IRB tab-completion hack.
@@ -54,4 +64,5 @@ module PacketFu
 		#:startdoc:
 
 	end
+
 end
