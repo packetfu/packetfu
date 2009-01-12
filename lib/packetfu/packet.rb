@@ -337,6 +337,8 @@ module PacketFu
 		def is_ipv6? ; self.proto.include? "IPv6" ; end
 		# Returns true if this is an ICMP packet. Else, false.
 		def is_icmp? ; self.proto.include? "ICMP" ; end
+		# Returns true if the outermost layer has data. Else, false.
+		def has_data? ; self.payload.size.zero? ? false : true ; end
 
 		alias_method :length, :size
 

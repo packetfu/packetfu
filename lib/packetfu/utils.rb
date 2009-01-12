@@ -108,7 +108,7 @@ module PacketFu
 					cap.save
 					pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
 				end
-				raise SocketError, "Didn't recieve the whomi() packet." if !pkt
+				raise SocketError, "Didn't receive the whomi() packet." if !pkt
 				cap = nil
 			end
 			my_data

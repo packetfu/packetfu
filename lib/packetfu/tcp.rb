@@ -97,7 +97,7 @@ module PacketFu
 		# eventuality by padding with NOP options at OS-specific points in the 
 		# option field. The practical effect of this is, you should tcp_calc_hlen
 		# only when all the options are already set; otherwise, additional options
-		# will be lost to the reciever as \x00 is an EOL option. Additionally,
+		# will be lost to the receiver as \x00 is an EOL option. Additionally,
 		# (and this is almost certainly a bug), there is no sanity checking to
 		# ensure the final tcp_opts value is 44 bytes or less (any more will bleed
 		# over into the tcp payload). You are forewarned!
