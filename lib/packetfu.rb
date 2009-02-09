@@ -14,27 +14,31 @@ require 'singleton'
 
 module PacketFu
 	@@pcaprub_loaded = false
-  
+	
+	# PacketFu works best with Pcaprub version 0.8-dev, available from the 
+	# Metasploit SVN repository at:
+	# https://metasploit.com/svn/framework3/trunk/external/pcaprub/
+	# ..but if you're cool without good Ruby threading support and no Windows
+	# winpcap love, then you can try your luck with 
+	# http://pcaprub.rubyforge.org/svn/
+	# which is version 0.7-dev at the moment.
   def self.pcaprub_platform_require
     if File.directory?("C:\\")
-      require 'pcaprub_win32/pcaprub'
-      @@pcaprub_loaded = true
-    elsif File.directory?("/usr")
-       require 'pcaprub' # Presumes you already have it. Apple, does this work for you?
-       @@pcaprub_loaded = true
+			require 'pcaprub_win32/pcaprub'
+      @@pcaprub_loaded = true 
     else
-      @@pcaprub_loaded = false # Still false
+			require 'pcaprub' # Linux and Mac (Apple uses pcaprub.bundle, Linux uses pcaprub.so)
+      @@pcaprub_loaded = true if($".grep(/pcaprub\./).size > 0)
     end
   end
-  
+
 	begin
 		pcaprub_platform_require
-		if Pcap.version < "0.8-dev"
+		if Pcap.version !~ /[0-9]\.[7-9][0-9]?(-dev)?/ # Regex for 0.7-dev and beyond.
       @@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
 		require 'packetfu/capture' 
-		require 'packetfu/read' 	
 		require 'packetfu/inject'
 	rescue LoadError
 	end
@@ -42,6 +46,7 @@ end
 # Doesn't require PcapRub
 require 'packetfu/pcap'
 require 'packetfu/write' 
+require 'packetfu/read' 	
 
 # Packet crafting/parsing goodness.
 require 'packetfu/packet'

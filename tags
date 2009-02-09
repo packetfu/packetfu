@@ -372,6 +372,7 @@ first	lib/bindata/my_array.rb	/^    def first(n = nil)$/;"	f	class:BinData
 flushbits	lib/bindata/io.rb	/^    def flushbits$/;"	f	class:BinData.IO
 gen_packets	examples/ackscan.rb	/^def gen_packets$/;"	f
 get	lib/bindata/single_value.rb	/^    def get$/;"	f	class:BinData
+has_data?	lib/packetfu/packet.rb	/^		def has_data? ; self.payload.size.zero? ? false : true ; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
 has_param?	lib/bindata/base.rb	/^    def has_param?(key)$/;"	f	class:BinData
 hdr	lib/pcaprub_win32/pcaprub.c	/^	struct pcap_pkthdr hdr;$/;"	m	struct:rbpcapjob	typeref:struct:rbpcapjob::pcap_pkthdr	file:
 hexify	lib/packetfu/packet.rb	/^		def hexify(str)$/;"	f	class:PacketFu.Packet

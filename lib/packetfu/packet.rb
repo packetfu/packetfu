@@ -162,7 +162,9 @@ module PacketFu
 		# new payload data from old trailers, so things like pkt.payload += "some data" will not work
 		# correctly.
 		#
-		# So, to summarize; if you intend to alter the data, use :strip. If you don't, don't.
+		# So, to summarize; if you intend to alter the data, use :strip. If you don't, don't. Also,
+		# this is a horrid XXX hack. Stripping is useful (and fun!), but the default behavior really
+		# should be to create payloads correctly, and /not/ treat extra FCS data as a payload.
 		def read(io,args={})
 			if io.size >= 14
 				@eth_header.read(io[0,14])
