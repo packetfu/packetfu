@@ -13,6 +13,11 @@ require 'ipaddr'
 require 'singleton'
 
 module PacketFu
+
+	# Sets the expected byte order for a pcap file. See PacketFu::Read.set_byte_order
+	@byte_order = :little
+
+	# Checks if pcaprub is loaded correctly.
 	@@pcaprub_loaded = false
 	
 	# PacketFu works best with Pcaprub version 0.8-dev, available from the 

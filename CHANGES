@@ -3,11 +3,10 @@
 == Version x # In the future
 	Added .is_proto? functions, self.proto function, Packet.headers attr_accessor across the board.
 	Removed dependency on pcaprub to read pcap-formatted files. (r54)
-	Added ability to preserve timestamps when reading files using :keep_ts => true argument on Read#f2a
-		and Write honors both saved timestamp or invented timestamps. (r55)
+	Added ability to preserve timestamps when reading files using :keep_ts => true argument on Read#f2a and Write honors both saved timestamp or invented timestamps. (r55)
   Various minor bugs. (r56)
-	Relaxed the requirement for PcapRub to 0.7-dev now that I handle packet reading on my own.
-		Windows users and threading will be broke without 0.8-dev, though. (r57)
+	Relaxed the requirement for PcapRub to 0.7-dev now that I handle packet reading on my own. Windows users and threading will be broke without 0.8-dev, though. (r57)
+	Endianness of pcap files (for both reading and writing) is now supported (r58).
 
 == Version 0.1.0 # September 13, 2008
   Various minor bugs fixed.

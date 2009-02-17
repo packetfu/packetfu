@@ -39,6 +39,9 @@ module PacketFu
 				arr = args[:arr] || args[:array] || []
 				ts = args[:ts] || args[:timestamp] || Time.now.to_f
 				ts_inc = args[:ts_inc] || args[:timestamp_increment]
+				byte_order = args[:byte_order] || args[:endian] || args[:endianness]
+				Read.set_byte_order(byte_order) if [:big, :little].include? byte_order
+
 				time_now = ts
 				if arr.class != Array
 					raise ArgumentError, "This needs to be an array."
