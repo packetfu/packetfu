@@ -7,6 +7,7 @@
   Various minor bugs. (r56)
 	Relaxed the requirement for PcapRub to 0.7-dev now that I handle packet reading on my own. Windows users and threading will be broke without 0.8-dev, though. (r57)
 	Endianness of pcap files (for both reading and writing) is now supported (r58).
+	Handle non-version-4 IP packets correctlier (r59) (thanks tmanning!).
 
 == Version 0.1.0 # September 13, 2008
   Various minor bugs fixed.

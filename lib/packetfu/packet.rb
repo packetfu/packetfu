@@ -19,14 +19,14 @@ module PacketFu
 				case packet[12,2]														# Check the Eth protocol field.
 				when "\x08\x00"															# It's IP.
 					case (packet[14,1][0] >> 4)								# Check the IP version field.
-					when 4; 																	# It's IPv4.
+					when 4;				 														# It's IPv4.
 						case packet[23,1]												# Check the IP protocol field.
 						when "\x06"; p = TCPPacket.new					# Returns a TCPPacket.
 						when "\x11"; p = UDPPacket.new					# Returns a UDPPacket.
 						when "\x01"; p = ICMPPacket.new					# Returns an ICMPPacket.
 						else; p = IPPacket.new									# Returns an IPPacket since we can't tell the transport layer.
 						end
-					else; p = EthPacket.new										# Returns an EthPacket since we don't know any other IP version.
+					else; p = IPPacket.new										# Returns an EthPacket since we don't know any other IP version.
 					end
 				when "\x08\x06"															# It's arp
 					if packet.size >= 28											# Min size for complete arp
@@ -171,36 +171,41 @@ module PacketFu
 				eth_proto_num = io[12,2].unpack("n")[0]
 				if eth_proto_num == 0x0800 # It's IP.
 					ip_hlen=(io[14] & 0x0f) * 4
-					ip_proto_num = io[23,1].unpack("C")[0]
-					@ip_header.read(io[14,ip_hlen])
-					@eth_header.body = @ip_header
-					if ip_proto_num == 0x06 # It's TCP.
-						tcp_len = io[16,2].unpack("n")[0] - 20
-						if args[:strip] # Drops trailers like frame check sequence (FCS). Often desired for cleaner packets.
-							tcp_all = io[ip_hlen+14,tcp_len] # Believe the tcp_len value; chop off anything that's not in range.
-						else
-							tcp_all = io[ip_hlen+14,0xffff] # Don't believe the tcp_len value; suck everything up.
+					ip_ver=(io[14] >> 4) # It's IPv4. Other versions, all bets are off!
+					if ip_ver == 4
+						ip_proto_num = io[23,1].unpack("C")[0]
+						@ip_header.read(io[14,ip_hlen])
+						if ip_proto_num == 0x06 # It's TCP.
+							tcp_len = io[16,2].unpack("n")[0] - 20
+							if args[:strip] # Drops trailers like frame check sequence (FCS). Often desired for cleaner packets.
+								tcp_all = io[ip_hlen+14,tcp_len] # Believe the tcp_len value; chop off anything that's not in range.
+							else
+								tcp_all = io[ip_hlen+14,0xffff] # Don't believe the tcp_len value; suck everything up.
+							end
+							tcp_hlen = ((tcp_all[12,1].unpack("C")[0]) >> 4) * 4
+							tcp_opts = tcp_all[20,tcp_hlen-20]
+							tcp_body = tcp_all[tcp_hlen,0xffff]
+							@tcp_header.read(tcp_all[0,20])
+							@tcp_header.tcp_opts=tcp_opts
+							@tcp_header.body=tcp_body
+							@ip_header.body = @tcp_header
+						elsif ip_proto_num == 0x11 # It's UDP.
+							udp_len = io[16,2].unpack("n")[0] - 20
+							if args[:strip] # Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.
+								@udp_header.read(io[ip_hlen+14,udp_len]) 
+							else # ... Suck it all up. BTW, this will change the lengths if they are ever recalc'ed. Bummer.
+								@udp_header.read(io[ip_hlen+14,0xffff])
+							end
+							@ip_header.body = @udp_header
+						elsif ip_proto_num == 1 # It's ICMP
+							@icmp_header.read(io[ip_hlen+14,0xffff])
+							@ip_header.body = @icmp_header
+						else # It's an IP packet for a protocol we don't have a decoder for.
+							@ip_header.body = io[16,io.size-16] 
 						end
-						tcp_hlen = ((tcp_all[12,1].unpack("C")[0]) >> 4) * 4
-						tcp_opts = tcp_all[20,tcp_hlen-20]
-						tcp_body = tcp_all[tcp_hlen,0xffff]
-						@tcp_header.read(tcp_all[0,20])
-						@tcp_header.tcp_opts=tcp_opts
-						@tcp_header.body=tcp_body
-						@ip_header.body = @tcp_header
-					elsif ip_proto_num == 0x11 # It's UDP.
-						udp_len = io[16,2].unpack("n")[0] - 20
-						if args[:strip] # Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.
-							@udp_header.read(io[ip_hlen+14,udp_len]) 
-						else # ... Suck it all up. BTW, this will change the lengths if they are ever recalc'ed. Bummer.
-							@udp_header.read(io[ip_hlen+14,0xffff])
-						end
-						@ip_header.body = @udp_header
-					elsif ip_proto_num == 1 # It's ICMP
-						@icmp_header.read(io[ip_hlen+14,0xffff])
-						@ip_header.body = @icmp_header
-					else # It's an IP packet for a protocol we don't have a decoder for.
-						@ip_header.body = io[16,io.size-16] 
+					else # It's not IPv4, so no idea what should come next. Just dump it all into an ip_header and ip payload.
+						@ip_header.read(io[14,ip_hlen])
+						@ip_header.body = io[16,io.size-16]
 					end
 					@eth_header.body = @ip_header
 				elsif eth_proto_num == 0x0806 # It's ARP
