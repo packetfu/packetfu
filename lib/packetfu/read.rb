@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# The Read class facilitates reading from libpcap files, which is the native file format
@@ -15,6 +14,9 @@ module PacketFu
 	#   :filename | :file | :out
 	#     The file to read from.
 	#
+	#   :keep_timestamps | :keep_ts | :ts
+	#     If set to true, the original timestamps are preserved.
+	#
 	# == See Also
 	#
 	# Write, Capture
@@ -22,14 +24,14 @@ module PacketFu
 
 		class << self
 
-			# get_byte_order reads the magic string of a pcap file, and determines
+			# get_byte_order() reads the magic string of a pcap file, and determines
 			# if it's :little or :big endian.
 			def get_byte_order(pcap_file)
 				byte_order = ((pcap_file[0,4] == "\xd4\xc3\xb2\xa1") ? :little : :big)
-				set_byte_order(byte_order)
+				return byte_order
 			end
 
-			# set_byte_order sets the byte order for the pcap file by deleting and reloading
+			# set_byte_order() sets the byte order for the pcap file by deleting and reloading
 			# the Pcap* library, if necessary. The default is little-endian, and is set in
 			# the main module definition for PacketFu up in packetfu.rb
 			def set_byte_order(byte_order)
@@ -47,7 +49,7 @@ module PacketFu
 				filename = args[:filename] || args[:file] || args[:out]
 				raise ArgumentError, "Need a :filename in string form to read from." if (filename.nil? || filename.class != String)
 				f = File.open(filename,'r') {|file| file.read}
-				get_byte_order(f)
+				set_byte_order(get_byte_order(f))
 				pf = PcapFile.read(f)
 				pcap_arr = []
 				pf.body.data.each do |pkt|

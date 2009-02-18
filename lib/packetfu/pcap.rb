@@ -1,6 +1,5 @@
 module PacketFu
 
-
 	# PcapHeader describes the libpcap file header format, and is used in PcapFile.
 	class PcapHeader < BinData::MultiValue
 		endian	PacketFu.instance_variable_get("@byte_order")

@@ -285,6 +285,7 @@ accepted_parameters	lib/bindata/base.rb	/^      def accepted_parameters$/;"	f	cl
 add_variable	lib/bindata/lazy.rb	/^    def add_variable(sym, value)$/;"	f	class:BinData.LazyEvalEnv
 append	lib/bindata/array.rb	/^    def append(value = nil)$/;"	f	class:BinData
 append	lib/bindata/my_array.rb	/^    def append(value = nil)$/;"	f	class:BinData
+append	lib/packetfu/write.rb	/^			def append(args={})$/;"	f	class:PacketFu.Write
 append_new_element	lib/bindata/array.rb	/^    def append_new_element$/;"	f	class:BinData
 append_new_element	lib/bindata/my_array.rb	/^    def append_new_element$/;"	f	class:BinData
 arp	examples/arp.rb	/^def arp(target_ip)$/;"	f
@@ -299,7 +300,7 @@ arp_saddr_ip	lib/packetfu/arp.rb	/^		def arp_saddr_ip$/;"	f	class:PacketFu.ARPHe
 arp_saddr_ip=	lib/packetfu/arp.rb	/^		def arp_saddr_ip=(addr)$/;"	f	class:PacketFu.ARPHeader
 arp_saddr_mac	lib/packetfu/arp.rb	/^		def arp_saddr_mac$/;"	f	class:PacketFu.ARPHeader
 arp_saddr_mac=	lib/packetfu/arp.rb	/^		def arp_saddr_mac=(mac)$/;"	f	class:PacketFu.ARPHeader
-array_to_file	lib/packetfu/write.rb	/^			def array_to_file(args={}) $/;"	f	class:PacketFu.Write
+array_to_file	lib/packetfu/write.rb	/^			def array_to_file(args={})$/;"	f	class:PacketFu.Write
 array_to_wire	lib/packetfu/inject.rb	/^		def array_to_wire(args={})$/;"	f	class:PacketFu.Inject
 banner	examples/packetfu-shell.rb	/^def banner$/;"	f
 bpf	lib/packetfu/capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
@@ -368,6 +369,7 @@ find_obj_for_name	lib/bindata/struct.rb	/^    def find_obj_for_name(name)$/;"	f	
 first	lib/bindata/array.rb	/^    def first(n = nil)$/;"	f	class:BinData
 first	lib/bindata/my_array.rb	/^    def first(n = nil)$/;"	f	class:BinData
 flushbits	lib/bindata/io.rb	/^    def flushbits$/;"	f	class:BinData.IO
+format_packets	lib/packetfu/write.rb	/^			def format_packets(args={})$/;"	f	class:PacketFu.Write
 gen_packets	examples/ackscan.rb	/^def gen_packets$/;"	f
 get	lib/bindata/single_value.rb	/^    def get$/;"	f	class:BinData
 get_byte_order	lib/packetfu/read.rb	/^			def get_byte_order(pcap_file)$/;"	f	class:PacketFu.Read
@@ -456,6 +458,7 @@ method_missing	lib/bindata/struct.rb	/^      def method_missing(symbol, *args)$/
 method_missing	lib/bindata/struct.rb	/^    def method_missing(symbol, *args, &block)$/;"	f	class:BinData.Struct
 method_missing	lib/packetfu/packet.rb	/^		def method_missing(sym, *args)$/;"	f	class:PacketFu.Packet
 mutually_exclusive_parameters	lib/bindata/base.rb	/^      def mutually_exclusive_parameters(*args)$/;"	f	class:BinData.Base
+next	lib/packetfu/capture.rb	/^		def next$/;"	f	class:PacketFu.Capture
 num_bytes	lib/bindata/base.rb	/^    def num_bytes(what = nil)$/;"	f	class:BinData
 octet_array	lib/packetfu/ip.rb	/^		def self.octet_array(addr)$/;"	F	class:PacketFu.IPHeader
 offset	lib/bindata/io.rb	/^    def offset$/;"	f	class:BinData.IO

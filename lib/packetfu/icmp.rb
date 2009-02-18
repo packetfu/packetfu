@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# ICMPHeader is a complete ICMP struct, used in ICMPPacket. ICMP is typically used for network
@@ -105,4 +104,3 @@ module PacketFu
 	end
 
 end # module PacketFu
-

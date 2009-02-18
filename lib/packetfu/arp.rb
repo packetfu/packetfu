@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# ARPHeader is a complete ARP struct, used in ARPPacket. 
@@ -171,4 +170,3 @@ module PacketFu
 	end # class ARPPacket
 
 end # module PacketFu
-

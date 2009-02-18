@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# TcpOpts handles the translation of TCP option strings to human-readable form,
@@ -167,7 +166,6 @@ module PacketFu
 		# weirdly-formed options. And it at least shouldn't raise 
 		# exceptions.
 		def self.option_to_s(optnum,value)
-
 			case optnum
 			when 2; "MSS:#{value.unpack("n")}" # Max Segment Size
 			when 3; "WS:#{value.unpack("C")}" # Window Scale
@@ -208,6 +206,7 @@ module PacketFu
 			else; "0x#{[optnum].pack("C").unpack("H*")[0].upcase}:#{value.unpack("H*")}"
 			end
 		end
-	end
-end
 
+	end
+
+end

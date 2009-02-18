@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# The Config class holds various bits of useful default information for packet creation.

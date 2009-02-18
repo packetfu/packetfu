@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# Octets implements the addressing scheme for IP.

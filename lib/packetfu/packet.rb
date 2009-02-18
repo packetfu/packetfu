@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# Packet is the parent class of EthPacket, IPPacket, UDPPacket, TCPPacket, and all
@@ -364,4 +363,3 @@ module PacketFu
 	end # class Packet
 
 end # module PacketFu
-

@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# The Capture class is used to construct PcapRub objects in order to collect
@@ -117,7 +116,12 @@ module PacketFu
 			while this_pkt = @stream.next
 				@array << this_pkt
 			end
-				@array.size
+			@array.size
+		end
+
+		# next() exposes the Stream object's next method to the outside world.
+		def next
+			return @stream.next
 		end
 
 		# w2a() is a equivalent to wire_to_array()
@@ -162,4 +166,3 @@ module PacketFu
 
 	end # class Capture
 end # module PacketFu
-

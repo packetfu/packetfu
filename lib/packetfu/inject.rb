@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# The Inject class handles injecting arrays of binary data on the wire.
@@ -64,4 +63,3 @@ module PacketFu
 
 	end
 end
-

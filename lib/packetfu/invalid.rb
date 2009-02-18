@@ -1,4 +1,3 @@
-
 module PacketFu
 
 	# InvalidHeader catches all packets that we don't already have a struct for, or
