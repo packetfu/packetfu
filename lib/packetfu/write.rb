@@ -88,8 +88,8 @@ module PacketFu
 				if append and filename != :nowrite and File.readable?(filename) and File.writable?(filename)
 					orig_byte_order = Read.get_byte_order(File.open(filename) {|f| f.read(4)})
 					if byte_order == orig_byte_order 
-						filedata = PcapFile.new.read(File.open(filename) {|f| f.read}).to_s
-						filedata += formatted_packets.join
+						f = File.open(filename,'a') {|file| file.write(formatted_packets.join) }
+						return [filename,formatted_packets.join.size,arr.size,ts,ts_inc]
 					else
 						orig_packets = Read.f2a(:file => filename, :ts => true) # This flips byte_order to the file's
 						Read.set_byte_order(byte_order) # This toggles it back.
