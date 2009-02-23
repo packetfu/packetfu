@@ -6,78 +6,44 @@ module PacketFu
 		attr_reader :flavor # Packet Headers are responsible for their own specific flavor methods.
 		attr_accessor :headers # All packets have a header collection, useful for determining protocol trees.
 
-		class << self
-
-			# quick_parse() determines what kind of packet this probably is. This is designed as a pre-test to
-			# parse() proper, and should not be relied upon by itself unless you absolutely trust the incoming
-			# data and know (for example) that the sizes are all right. 
-			def quick_parse(packet='')
-				case packet[23,1]
-				when "\x06"
-					TCPPacket.new
-				when "\x11"
-					UDPPacket.new
-				when "\x01"
-					ICMPPacket.new
-				else
-					case packet[12,2]
-					when "\x08\x00"
-						IPPacket.new
-					when "\x08\x06"
-						ARPPacket.new
-					when "\x86\xdd"
-						IPv6Packet.new
-					else 
-						EthPacket.new
+		# Parse() creates the correct packet type based on the data, and returns the apporpiate
+		# Packet subclass. 
+		#
+		# There is an assumption here that all incoming packets are either EthPacket
+		# or InvalidPacket types.
+		#
+		# New packet types should get an entry here. 
+		def self.parse(packet,args={})
+			if packet.size >= 14													# Min size for Ethernet. No check for max size, yet.
+				case packet[12,2]														# Check the Eth protocol field.
+				when "\x08\x00"															# It's IP.
+					case (packet[14,1][0] >> 4)								# Check the IP version field.
+					when 4;				 														# It's IPv4.
+						case packet[23,1]												# Check the IP protocol field.
+						when "\x06"; p = TCPPacket.new					# Returns a TCPPacket.
+						when "\x11"; p = UDPPacket.new					# Returns a UDPPacket.
+						when "\x01"; p = ICMPPacket.new					# Returns an ICMPPacket.
+						else; p = IPPacket.new									# Returns an IPPacket since we can't tell the transport layer.
+						end
+					else; p = IPPacket.new										# Returns an EthPacket since we don't know any other IP version.
 					end
-				end
-			end
-
-			# Parse() creates the correct packet type based on the data, and returns the apporpiate
-			# Packet subclass via read(). 
-			#
-			# There is an assumption here that all incoming packets are either EthPacket
-			# or InvalidPacket types.
-			#
-			# New packet types should get an entry here. 
-			#
-			# Parameters:
-			#
-			#   :strip : when true, packets are stripped of Ethernet trailer data, if present.
-			#   :fix   : when true, packet checksums are recalculated.
-			def parse(packet,args={})
-				# Make a quick guess for performance.
-				p = quick_parse(packet)
-				if packet.size >= 14									# Min size for Ethernet. No check for max size, yet.
-					case packet[12,2]										# Check the Eth protocol field.
-					when "\x08\x00"											# It's IP.
-						if (packet[14,1][0] >> 4) == 4		# Check the IP version field to see if it's 4.
-							return p												# TCP, UDP, ICMP, or IP.
-						else
-							p = EthPacket.new								# Returns a new EthPacket since we don't know any other IP version.
-						end
-					when "\x08\x06"											# It's purportedly ARP.
-						if packet.size >= 28							# Min size for complete ARP.
-							return p 												# Actually ARP.
-						else
-							p = EthPacket.new								# Returns a new EthPacket since we can't deal with tiny ARPs.
-						end
-					when "\x86\xdd"											# It's IPv6
-						if packet.size >= 54							# Min size for a complete IPv6 packet.
-							return p 												# IPv6
-						else
-							p = EthPacket.new								# Returns an EthPacket since we can't deal with tiny Ipv6.
-						end
-					else
-						p = EthPacket.new									# Returns an EthPacket since we can't tell the network layer.
+				when "\x08\x06"															# It's arp
+					if packet.size >= 28											# Min size for complete arp
+						p = ARPPacket.new
+					else; p = EthPacket.new										# Returns an EthPacket since we can't deal with tiny arps.
 					end
-				else
-					p = InvalidPacket.new								# Not the right size for Ethernet (jumbo frames are okay)
+				when "\x86\xdd"															# It's IPv6
+					if packet.size >= 54											# Min size for a complete IPv6 packet.
+						p = IPv6Packet.new
+					else; p = EthPacket.new										# Returns an EthPacket since we can't deal with tiny Ipv6.
+					end
+				else; p = EthPacket.new											# Returns an EthPacket since we can't tell the network layer.
 				end
-				p.read(packet,args)
-				# return p
+			else
+				p = InvalidPacket.new												# Not the right size for Ethernet (jumbo frames are okay)
 			end
-
+			p.read(packet,args)
+			return p
 		end
 
 		#method_missing() delegates protocol-specific field actions to the apporpraite

@@ -373,10 +373,10 @@ format_packets	lib/packetfu/write.rb	/^			def format_packets(args={})$/;"	f	clas
 gen_packets	examples/ackscan.rb	/^def gen_packets$/;"	f
 get	lib/bindata/single_value.rb	/^    def get$/;"	f	class:BinData
 get_byte_order	lib/packetfu/read.rb	/^			def get_byte_order(pcap_file)$/;"	f	class:PacketFu.Read
-has_data?	lib/packetfu/packet.rb	/^		def has_data? ; self.payload.size.zero? ? false : true ; end$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
+has_data?	lib/packetfu/packet.rb	/^		def has_data? ; self.payload.size.zero? ? false : true ; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
 has_param?	lib/bindata/base.rb	/^    def has_param?(key)$/;"	f	class:BinData
 hdr	lib/pcaprub_win32/pcaprub.c	/^	struct pcap_pkthdr hdr;$/;"	m	struct:rbpcapjob	typeref:struct:rbpcapjob::pcap_pkthdr	file:
-hexify	lib/packetfu/packet.rb	/^		def hexify(str)$/;"	f	class:PacketFu
+hexify	lib/packetfu/packet.rb	/^		def hexify(str)$/;"	f	class:PacketFu.Packet
 hide	lib/bindata/multi_value.rb	/^      def hide(*args)$/;"	f	class:BinData.MultiValue
 icmp_calc_sum	lib/packetfu/icmp.rb	/^		def icmp_calc_sum$/;"	f	class:PacketFu.ICMPHeader
 icmp_recalc	lib/packetfu/icmp.rb	/^		def icmp_recalc(arg=:all)$/;"	f	class:PacketFu.ICMPHeader
@@ -406,15 +406,15 @@ initialize	lib/packetfu/invalid.rb	/^		def initialize(args={})$/;"	f	class:Packe
 initialize	lib/packetfu/ip.rb	/^		def initialize(*args)$/;"	f	class:PacketFu.IPHeader
 initialize	lib/packetfu/ip.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.IPPacket
 initialize	lib/packetfu/ipv6.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.IPv6Packet
-initialize	lib/packetfu/packet.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
+initialize	lib/packetfu/packet.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
 initialize	lib/packetfu/tcp.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.TCPHeader
 initialize	lib/packetfu/tcp.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.TCPPacket
 initialize	lib/packetfu/udp.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.UDPPacket
 initialize	lib/packetfu/working-capture.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.Capture
 inject	lib/packetfu/inject.rb	/^		def inject(args={})$/;"	f	class:PacketFu.Inject
 inspect	lib/bindata/base.rb	/^    def inspect$/;"	f	class:BinData
-inspect	lib/packetfu/packet.rb	/^		def inspect$/;"	f	class:PacketFu
-inspect_hex	lib/packetfu/packet.rb	/^		def inspect_hex(arg=0)$/;"	f	class:PacketFu
+inspect	lib/packetfu/packet.rb	/^		def inspect$/;"	f	class:PacketFu.Packet
+inspect_hex	lib/packetfu/packet.rb	/^		def inspect_hex(arg=0)$/;"	f	class:PacketFu.Packet
 instantiate_all	lib/bindata/struct.rb	/^    def instantiate_all$/;"	f	class:BinData.Struct
 instantiate_obj	lib/bindata/struct.rb	/^    def instantiate_obj(idx)$/;"	f	class:BinData.Struct
 ip_calc_id	lib/packetfu/ip.rb	/^		def ip_calc_id$/;"	f	class:PacketFu.IPHeader
@@ -431,13 +431,13 @@ ipv6_daddr=	lib/packetfu/ipv6.rb	/^		def ipv6_daddr=(str)$/;"	f	class:PacketFu.I
 ipv6_recalc	lib/packetfu/ipv6.rb	/^		def ipv6_recalc(arg=:all)$/;"	f	class:PacketFu.IPv6Header
 ipv6_saddr	lib/packetfu/ipv6.rb	/^		def ipv6_saddr$/;"	f	class:PacketFu.IPv6Header
 ipv6_saddr=	lib/packetfu/ipv6.rb	/^		def ipv6_saddr=(str)$/;"	f	class:PacketFu.IPv6Header
-is_arp?	lib/packetfu/packet.rb	/^		def is_arp? ; self.proto.include? "ARP"; end$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?.is_udp?
-is_eth?	lib/packetfu/packet.rb	/^		def is_eth? ;	self.proto.include? "Eth"; end$/;"	f	class:PacketFu
-is_icmp?	lib/packetfu/packet.rb	/^		def is_icmp? ; self.proto.include? "ICMP" ; end$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?
-is_ip?	lib/packetfu/packet.rb	/^		def is_ip? ;	self.proto.include? "IP"; end$/;"	f	class:PacketFu.is_eth?
-is_ipv6?	lib/packetfu/packet.rb	/^		def is_ipv6? ; self.proto.include? "IPv6" ; end$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?
-is_tcp?	lib/packetfu/packet.rb	/^		def is_tcp? ;	self.proto.include? "TCP"; end$/;"	f	class:PacketFu.is_eth?.is_ip?
-is_udp?	lib/packetfu/packet.rb	/^		def is_udp? ;	self.proto.include? "UDP"; end$/;"	f	class:PacketFu.is_eth?.is_ip?.is_tcp?
+is_arp?	lib/packetfu/packet.rb	/^		def is_arp? ; self.proto.include? "ARP"; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?
+is_eth?	lib/packetfu/packet.rb	/^		def is_eth? ;	self.proto.include? "Eth"; end$/;"	f	class:PacketFu.Packet
+is_icmp?	lib/packetfu/packet.rb	/^		def is_icmp? ; self.proto.include? "ICMP" ; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?
+is_ip?	lib/packetfu/packet.rb	/^		def is_ip? ;	self.proto.include? "IP"; end$/;"	f	class:PacketFu.Packet.is_eth?
+is_ipv6?	lib/packetfu/packet.rb	/^		def is_ipv6? ; self.proto.include? "IPv6" ; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?
+is_tcp?	lib/packetfu/packet.rb	/^		def is_tcp? ;	self.proto.include? "TCP"; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?
+is_udp?	lib/packetfu/packet.rb	/^		def is_udp? ;	self.proto.include? "UDP"; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?
 last	lib/bindata/array.rb	/^    def last(n = nil)$/;"	f	class:BinData
 last	lib/bindata/my_array.rb	/^    def last(n = nil)$/;"	f	class:BinData
 lazy_eval	lib/bindata/lazy.rb	/^    def lazy_eval(obj, overrides = nil)$/;"	f	class:BinData.LazyEvalEnv
@@ -456,7 +456,7 @@ method_missing	lib/bindata/single_value.rb	/^      def method_missing(symbol, *a
 method_missing	lib/bindata/single_value.rb	/^    def method_missing(symbol, *args, &block)$/;"	f	class:BinData
 method_missing	lib/bindata/struct.rb	/^      def method_missing(symbol, *args)$/;"	f	class:BinData.Struct.Snapshot
 method_missing	lib/bindata/struct.rb	/^    def method_missing(symbol, *args, &block)$/;"	f	class:BinData.Struct
-method_missing	lib/packetfu/packet.rb	/^		def method_missing(sym, *args)$/;"	f	class:PacketFu
+method_missing	lib/packetfu/packet.rb	/^		def method_missing(sym, *args)$/;"	f	class:PacketFu.Packet
 mutually_exclusive_parameters	lib/bindata/base.rb	/^      def mutually_exclusive_parameters(*args)$/;"	f	class:BinData.Base
 next	lib/packetfu/capture.rb	/^		def next$/;"	f	class:PacketFu.Capture
 num_bytes	lib/bindata/base.rb	/^    def num_bytes(what = nil)$/;"	f	class:BinData
@@ -470,23 +470,22 @@ packetfu_ascii_art	examples/packetfu-shell.rb	/^def packetfu_ascii_art$/;"	f
 param	lib/bindata/base.rb	/^    def param(key)$/;"	f	class:BinData
 params=	lib/bindata/lazy.rb	/^    def params=(p)$/;"	f	class:BinData.LazyEvalEnv
 parent_data_object	lib/bindata/lazy.rb	/^    def parent_data_object$/;"	f	class:BinData.LazyEvalEnv
-parse	lib/packetfu/packet.rb	/^			def parse(packet,args={})$/;"	f	class:PacketFu.Packet
-payload	lib/packetfu/packet.rb	/^		def payload$/;"	f	class:PacketFu
-payload=	lib/packetfu/packet.rb	/^		def payload=(args)$/;"	f	class:PacketFu
+parse	lib/packetfu/packet.rb	/^		def self.parse(packet,args={})$/;"	F	class:PacketFu.Packet
+payload	lib/packetfu/packet.rb	/^		def payload$/;"	f	class:PacketFu.Packet
+payload=	lib/packetfu/packet.rb	/^		def payload=(args)$/;"	f	class:PacketFu.Packet
 pcaprub_platform_require	lib/packetfu.rb	/^  def self.pcaprub_platform_require$/;"	F	class:PacketFu
 pd	lib/pcaprub_win32/pcaprub.c	/^    pcap_t *pd;$/;"	m	struct:rbpcap	file:
 peek	lib/packetfu/arp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.ARPPacket
 peek	lib/packetfu/icmp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.ICMPPacket
 peek	lib/packetfu/ip.rb	/^		def peek(args={})$/;"	f	class:PacketFu.IPPacket
 peek	lib/packetfu/ipv6.rb	/^		def peek(args={})$/;"	f	class:PacketFu.IPv6Packet
-peek	lib/packetfu/packet.rb	/^		def peek(args={})$/;"	f	class:PacketFu
+peek	lib/packetfu/packet.rb	/^		def peek(args={})$/;"	f	class:PacketFu.Packet
 peek	lib/packetfu/tcp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.TCPPacket
 peek	lib/packetfu/udp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.UDPPacket
 pkt	lib/pcaprub_win32/pcaprub.c	/^    char *pkt;$/;"	m	struct:rbpcapjob	file:
-proto	lib/packetfu/packet.rb	/^		def proto$/;"	f	class:PacketFu
+proto	lib/packetfu/packet.rb	/^		def proto$/;"	f	class:PacketFu.Packet
 push	lib/bindata/array.rb	/^    def push(*args)$/;"	f	class:BinData
 push	lib/bindata/my_array.rb	/^    def push(*args)$/;"	f	class:BinData
-quick_parse	lib/packetfu/packet.rb	/^			def quick_parse(packet='')$/;"	f	class:PacketFu.Packet
 rand_port	lib/packetfu/tcp.rb	/^		def rand_port$/;"	f	class:PacketFu.TCPHeader
 rand_source_ip	examples/slammer.rb	/^def rand_source_ip$/;"	f
 rb_cPcap	lib/pcaprub_win32/pcaprub.c	/^static VALUE rb_cPcap;$/;"	v	file:
@@ -514,8 +513,8 @@ rbpcapjob	lib/pcaprub_win32/pcaprub.c	/^typedef struct rbpcapjob {$/;"	s	file:
 rbpcapjob_t	lib/pcaprub_win32/pcaprub.c	/^} rbpcapjob_t;$/;"	t	typeref:struct:rbpcapjob	file:
 read	lib/bindata/base.rb	/^      def read(io)$/;"	f	class:BinData.Base
 read	lib/bindata/base.rb	/^    def read(io)$/;"	f	class:BinData
-read	lib/packetfu/packet.rb	/^		def read(io)$/;"	f	class:PacketFu
-read	lib/packetfu/packet.rb	/^		def read(io,args={})$/;"	f	class:PacketFu
+read	lib/packetfu/packet.rb	/^		def read(io)$/;"	f	class:PacketFu.Packet
+read	lib/packetfu/packet.rb	/^		def read(io,args={})$/;"	f	class:PacketFu.Packet
 read_val	lib/bindata/bits.rb	/^        def read_val(io)$/;"	f	class:BinData.BitField.define_methods
 read_val	lib/bindata/float.rb	/^        def read_val(io)$/;"	f	class:BinData.Float.define_methods
 read_val	lib/bindata/int.rb	/^        def read_val(io)$/;"	f	class:BinData.Integer.define_methods
@@ -526,7 +525,7 @@ read_val	lib/bindata/string.rb	/^    def read_val(io)$/;"	f	class:BinData
 read_val	lib/bindata/stringz.rb	/^    def read_val(io)$/;"	f	class:BinData.Stringz
 readbits	lib/bindata/io.rb	/^    def readbits(nbits, endian = :big)$/;"	f	class:BinData.IO
 readbytes	lib/bindata/io.rb	/^    def readbytes(n)$/;"	f	class:BinData.IO
-recalc	lib/packetfu/packet.rb	/^		def recalc(arg=:all)$/;"	f	class:PacketFu
+recalc	lib/packetfu/packet.rb	/^		def recalc(arg=:all)$/;"	f	class:PacketFu.Packet
 recursive?	lib/bindata/multi_value.rb	/^      def recursive?$/;"	f	class:BinData.MultiValue
 register	lib/bindata/base.rb	/^      def register(name, klass)$/;"	f	class:BinData.Base
 register	lib/bindata/registry.rb	/^    def register(name, klass)$/;"	f	class:BinData.Registry
@@ -565,7 +564,7 @@ single_value?	lib/bindata/base.rb	/^    def single_value?$/;"	f	class:BinData
 single_value?	lib/bindata/my_array.rb	/^    def single_value?$/;"	f	class:BinData
 single_value?	lib/bindata/single.rb	/^    def single_value?$/;"	f	class:BinData.Single
 single_value?	lib/bindata/struct.rb	/^    def single_value?$/;"	f	class:BinData.Struct
-size	lib/packetfu/packet.rb	/^		def size$/;"	f	class:PacketFu
+size	lib/packetfu/packet.rb	/^		def size$/;"	f	class:PacketFu.Packet
 snapshot	lib/bindata/base.rb	/^    def snapshot$/;"	f	class:BinData
 start	lib/packetfu/capture.rb	/^		def start(args={})$/;"	f	class:PacketFu.Capture
 start	lib/packetfu/working-capture.rb	/^		def start(args={})$/;"	f	class:PacketFu.Capture
@@ -603,13 +602,13 @@ the_choice	lib/bindata/choice.rb	/^    def the_choice$/;"	f	class:BinData
 to_ary	lib/bindata/array.rb	/^    def to_ary$/;"	f	class:BinData
 to_ary	lib/bindata/my_array.rb	/^    def to_ary$/;"	f	class:BinData
 to_ary	lib/packetfu/ip.rb	/^		def to_ary$/;"	f	class:PacketFu.Octets
-to_f	lib/packetfu/packet.rb	/^		def to_f(filename=nil)$/;"	f	class:PacketFu
+to_f	lib/packetfu/packet.rb	/^		def to_f(filename=nil)$/;"	f	class:PacketFu.Packet
 to_i	lib/packetfu/ip.rb	/^		def to_i$/;"	f	class:PacketFu.Octets
 to_i	lib/packetfu/tcp.rb	/^		def to_i$/;"	f	class:PacketFu.TcpEcn
 to_i	lib/packetfu/tcp.rb	/^		def to_i$/;"	f	class:PacketFu.TcpFlags
 to_s	lib/bindata/base.rb	/^    def to_s$/;"	f	class:BinData
-to_s	lib/packetfu/packet.rb	/^		def to_s$/;"	f	class:PacketFu
-to_w	lib/packetfu/packet.rb	/^		def to_w(iface=nil)$/;"	f	class:PacketFu
+to_s	lib/packetfu/packet.rb	/^		def to_s$/;"	f	class:PacketFu.Packet
+to_w	lib/packetfu/packet.rb	/^		def to_w(iface=nil)$/;"	f	class:PacketFu.Packet
 to_x	lib/packetfu/ip.rb	/^		def to_x$/;"	f	class:PacketFu.Octets
 translate	lib/packetfu/tcpopts.rb	/^		def self.translate(arr)$/;"	F
 truth	lib/packetfu/read.rb	/^		def truth$/;"	f	class:PacketFu
@@ -644,7 +643,7 @@ wire_to_array	lib/packetfu/capture.rb	/^		def wire_to_array(args={})$/;"	f	class
 wire_to_array	lib/packetfu/working-capture.rb	/^		def wire_to_array(args={})$/;"	f	class:PacketFu.Capture
 with_endian	lib/bindata/sanitize.rb	/^    def with_endian(endian, &block)$/;"	f	class:BinData
 write	lib/bindata/base.rb	/^    def write(io)$/;"	f	class:BinData
-write	lib/packetfu/packet.rb	/^		def write(io)$/;"	f	class:PacketFu
+write	lib/packetfu/packet.rb	/^		def write(io)$/;"	f	class:PacketFu.Packet
 writebits	lib/bindata/io.rb	/^    def writebits(val, nbits, endian = :big)$/;"	f	class:BinData.IO
 writebytes	lib/bindata/io.rb	/^    def writebytes(str)$/;"	f	class:BinData.IO
 wtf	lib/pcaprub_win32/pcaprub.c	/^	int wtf;$/;"	m	struct:rbpcapjob	file:
