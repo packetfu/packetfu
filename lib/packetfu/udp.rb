@@ -35,6 +35,26 @@ module PacketFu
 			end
 		end
 
+		# Equivalent to udp_src
+		def udp_sport
+			self.udp_src
+		end
+
+		# Equivalent to udp_src=
+		def udp_sport=(arg)
+			self.udp_src=(arg)
+		end
+
+		# Equivalent to udp_dst
+		def udp_dport
+			self.udp_dst
+		end
+		
+		# Equivalent to udp_dst=
+		def udp_dport=(arg)
+			self.udp_dst=(arg)
+		end
+
 	end
 
 	# UDPPacket is used to construct UDP Packets. They contain an EthHeader, an IPHeader, and a UDPHeader.
