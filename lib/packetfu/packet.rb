@@ -350,7 +350,7 @@ module PacketFu
 
 		# For packets, inspect is overloaded as inspect_hex(0).
 		# Not sure if this is a great idea yet, but it sure makes
-		# the irb output more sane. 
+		# the irb output more sane. Fix this with PacketFu.toggle_inspect
 		def inspect
 			self.proto.join("|") + "\n" + self.inspect_hex
 		end
@@ -412,5 +412,61 @@ module PacketFu
 		end
 
 	end # class Packet
+
+	@@inspect_style = :pretty
+
+	# If @@inspect_style is :ugly, set the inspect method to the usual inspect. 
+	# By default, @@inspect_style is :pretty. This default may change if people
+	# hate it.
+	# Since PacketFu is designed with irb in mind, the normal inspect is way too
+	# verbose when new packets are created, and it ruins the aesthetics of the
+	# PacketFu console or quick hping-like exercises in irb.
+	#
+	# However, there are cases where knowing things like object id numbers, the complete
+	# @header array, etc. is useful (especially in debugging). So, toggle_inspect
+	# provides a means for a script to declar which style of inspect to use.
+	# 
+	# This method may be an even worse idea than the original monkeypatch to Packet.inspect,
+	# since it would almost certainly be better to redefine inspect just in the PacketFu console.
+	# We'll see what happens.
+	#
+	# == Example
+	#
+	#  irb(main):001:0> p = PacketFu::TCPPacket.new
+	#  => Eth|IP|TCP
+	#  00 1a c5 00 00 00 00 1a c5 00 00 00 08 00 45 00   ..............E.
+	#  00 28 ea d7 00 00 ff 06 d0 f8 00 00 00 00 00 00   .(..............
+	#  00 00 a9 76 00 00 f9 28 7e 95 00 00 00 00 50 00   ...v...(~.....P.
+	#  40 00 4e b0 00 00                                 @.N...
+	#  irb(main):002:0> PacketFu.toggle_inspect
+	#  => :ugly
+	#  irb(main):003:0> p = PacketFu::TCPPacket.new
+	#  => #<PacketFu::TCPPacket:0xb7acfd84 @headers=[{"eth_src"=>{"oui"=>{"local"=
+	#  >0, "oui"=>6853, "b0"=>0, "b1"=>0, "b2"=>0, "multicast"=>0, "b3"=>0, "b4"=>
+	#  0, "b5"=>0}, "nic"=>{"n1"=>0, "n2"=>0, "n3"=>0}}, "body"=>{"ip_tos"=>0, "ip
+	#  _src"=>{"o1"=>0, "o2"=>0, "o3"=>0, "o4"=>0}, "body"=>{"tcp_ecn"=>{"c"=>0, "
+	#  n"=>0, "e"=>0}, "tcp_dst"=>0, "tcp_win"=>16384, "body"=>"", "tcp_flags"=>{"
+	#  fin"=>0, "psh"=>0, "syn"=>0, "rst"=>0, "ack"=>0, "urg"=>0}, "tcp_hlen"=>5, 
+	#  "tcp_ack"=>0, "tcp_urg"=>0, "tcp_seq"=>1579966596, "tcp_sum"=>311, "tcp_res
+	#  erved"=>0, "tcp_opts"=>"", "tcp_src"=>45053}, "ip_dst"=>{"o1"=>0, "o2"=>0, 
+	#  "o3"=>0, "o4"=>0}, "ip_frag"=>0, "ip_proto"=>6, "ip_hl"=>5, "ip_len"=>40, "
+	#  ip_sum"=>44782, "ip_id"=>3298, "ip_v"=>4, "ip_ttl"=>255}, "eth_proto"=>2048
+	#  , "eth_dst"=>{"oui"=>{"local"=>0, "oui"=>6853, "b0"=>0, "b1"=>0, "b2"=>0, "
+	#  multicast"=>0, "b3"=>0, "b4"=>0, "b5"=>0}, "nic"=>{"n1"=>0, "n2"=>0, "n3"=>
+	#  0}}}, {"ip_tos"=>0, "ip_src"=>{"o1"=>0, "o2"=>0, "o3"=>0, "o4"=>0}, "body"=
+	#  >{"tcp_ecn"=>{"c"=>0, "n"=>0, "e"=>0}, "tcp_dst"=>0, "tcp_win"=>16384, "bod
+	#  y"=>"", "tcp_flags"=>{"fin"=>0, "psh"=>0, "syn"=>0, "rst"=>0, "ack"=>0, "ur
+	#  g"=>0}, "tcp_hlen"=>5, "tcp_ack"=>0, "tcp_urg"=>0, "tcp_seq"=>1579966596, "
+	#  [...etc...]
+	#  irb(main):004:0> 
+	def toggle_inspect
+		if @@inspect_style == :pretty
+			eval("class Packet; def inspect; super; end; end")
+			@@inspect_style = :ugly
+		else
+			eval("class Packet; def inspect; self.proto.join('|') + \"\n\" + self.inspect_hex; end; end")
+			@@inspect_style = :pretty
+		end
+	end
 
 end # module PacketFu

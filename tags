@@ -195,6 +195,7 @@ MultiValue	lib/bindata/multi_value.rb	/^  class MultiValue < BinData::Struct$/;"
 OFFLINE	lib/pcaprub_win32/pcaprub.c	15;"	d	file:
 Octets	lib/packetfu/ip.rb	/^	class Octets < BinData::MultiValue$/;"	c	class:PacketFu
 PCAPRUB_VERSION	lib/pcaprub_win32/pcaprub.c	13;"	d	file:
+Packet	examples/packetfu-shell.rb	/^	class Packet$/;"	c	class:PacketFu
 Packet	lib/packetfu/packet.rb	/^	class Packet$/;"	c	class:PacketFu
 PacketFu	examples/packetfu-shell.rb	/^module PacketFu$/;"	m
 PacketFu	lib/packetfu.rb	/^module PacketFu$/;"	m
@@ -302,7 +303,7 @@ arp_saddr_mac	lib/packetfu/arp.rb	/^		def arp_saddr_mac$/;"	f	class:PacketFu.ARP
 arp_saddr_mac=	lib/packetfu/arp.rb	/^		def arp_saddr_mac=(mac)$/;"	f	class:PacketFu.ARPHeader
 array_to_file	lib/packetfu/write.rb	/^			def array_to_file(args={})$/;"	f	class:PacketFu.Write
 array_to_wire	lib/packetfu/inject.rb	/^		def array_to_wire(args={})$/;"	f	class:PacketFu.Inject
-banner	examples/packetfu-shell.rb	/^def banner$/;"	f
+banner	examples/packetfu-shell.rb	/^def banner$/;"	f	class:PacketFu.Packet
 bpf	lib/packetfu/capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
 bpf	lib/packetfu/working-capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
 build_oui_list	examples/arphood.rb	/^def build_oui_list$/;"	f
@@ -412,6 +413,7 @@ initialize	lib/packetfu/tcp.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.
 initialize	lib/packetfu/udp.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.UDPPacket
 initialize	lib/packetfu/working-capture.rb	/^		def initialize(args={})$/;"	f	class:PacketFu.Capture
 inject	lib/packetfu/inject.rb	/^		def inject(args={})$/;"	f	class:PacketFu.Inject
+inspect	examples/packetfu-shell.rb	/^		def inspect$/;"	f	class:PacketFu.Packet
 inspect	lib/bindata/base.rb	/^    def inspect$/;"	f	class:BinData
 inspect	lib/packetfu/packet.rb	/^		def inspect$/;"	f	class:PacketFu.Packet
 inspect_hex	lib/packetfu/packet.rb	/^		def inspect_hex(arg=0)$/;"	f	class:PacketFu.Packet
@@ -466,7 +468,7 @@ offset_of	lib/bindata/lazy.rb	/^    def offset_of(sym)$/;"	f	class:BinData.LazyE
 offset_of	lib/bindata/struct.rb	/^    def offset_of(field)$/;"	f	class:BinData.Struct
 option_to_s	lib/packetfu/tcpopts.rb	/^		def self.option_to_s(optnum,value)$/;"	F
 optional_parameters	lib/bindata/base.rb	/^      def optional_parameters(*args)$/;"	f	class:BinData.Base
-packetfu_ascii_art	examples/packetfu-shell.rb	/^def packetfu_ascii_art$/;"	f
+packetfu_ascii_art	examples/packetfu-shell.rb	/^def packetfu_ascii_art$/;"	f	class:PacketFu.Packet
 param	lib/bindata/base.rb	/^    def param(key)$/;"	f	class:BinData
 params=	lib/bindata/lazy.rb	/^    def params=(p)$/;"	f	class:BinData.LazyEvalEnv
 parent_data_object	lib/bindata/lazy.rb	/^    def parent_data_object$/;"	f	class:BinData.LazyEvalEnv
@@ -610,6 +612,7 @@ to_s	lib/bindata/base.rb	/^    def to_s$/;"	f	class:BinData
 to_s	lib/packetfu/packet.rb	/^		def to_s$/;"	f	class:PacketFu.Packet
 to_w	lib/packetfu/packet.rb	/^		def to_w(iface=nil)$/;"	f	class:PacketFu.Packet
 to_x	lib/packetfu/ip.rb	/^		def to_x$/;"	f	class:PacketFu.Octets
+toggle_inspect	lib/packetfu/packet.rb	/^	def toggle_inspect$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?
 translate	lib/packetfu/tcpopts.rb	/^		def self.translate(arr)$/;"	F
 truth	lib/packetfu/read.rb	/^		def truth$/;"	f	class:PacketFu
 truth	lib/packetfu/write.rb	/^		def truth$/;"	f	class:PacketFu
