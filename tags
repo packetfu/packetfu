@@ -617,8 +617,12 @@ type	lib/pcaprub_win32/pcaprub.c	/^    char type;$/;"	m	struct:rbpcap	file:
 type_exists?	lib/bindata/sanitize.rb	/^      def type_exists?(type, endian = nil)$/;"	f	class:BinData.Sanitizer
 udp_calc_len	lib/packetfu/udp.rb	/^		def udp_calc_len$/;"	f	class:PacketFu.UDPHeader
 udp_calc_sum	lib/packetfu/udp.rb	/^		def udp_calc_sum$/;"	f	class:PacketFu.UDPPacket
+udp_dport	lib/packetfu/udp.rb	/^		def udp_dport$/;"	f	class:PacketFu.UDPHeader
+udp_dport=	lib/packetfu/udp.rb	/^		def udp_dport=(arg)$/;"	f	class:PacketFu.UDPHeader
 udp_recalc	lib/packetfu/udp.rb	/^		def udp_recalc(args=:all)$/;"	f	class:PacketFu.UDPHeader
 udp_recalc	lib/packetfu/udp.rb	/^		def udp_recalc(args=:all)$/;"	f	class:PacketFu.UDPPacket
+udp_sport	lib/packetfu/udp.rb	/^		def udp_sport$/;"	f	class:PacketFu.UDPHeader
+udp_sport=	lib/packetfu/udp.rb	/^		def udp_sport=(arg)$/;"	f	class:PacketFu.UDPHeader
 underscore_name	lib/bindata/registry.rb	/^    def underscore_name(name)$/;"	f	class:BinData.Registry
 usage	examples/arp.rb	/^def usage$/;"	f
 val_to_str	lib/bindata/float.rb	/^        def val_to_str(val)$/;"	f	class:BinData.Float.define_methods

@@ -42,8 +42,8 @@ module PacketFu
 			else
 				p = InvalidPacket.new												# Not the right size for Ethernet (jumbo frames are okay)
 			end
-			p.read(packet,args)
-			return p
+			parsed_packet = p.read(packet,args)
+			return parsed_packet
 		end
 
 		#method_missing() delegates protocol-specific field actions to the apporpraite
@@ -165,74 +165,121 @@ module PacketFu
 		# this is a horrid XXX hack. Stripping is useful (and fun!), but the default behavior really
 		# should be to create payloads correctly, and /not/ treat extra FCS data as a payload.
 		def read(io,args={})
-			if io.size >= 14
-				@eth_header.read(io[0,14])
-				eth_proto_num = io[12,2].unpack("n")[0]
-				if eth_proto_num == 0x0800 # It's IP.
-					ip_hlen=(io[14] & 0x0f) * 4
-					ip_ver=(io[14] >> 4) # It's IPv4. Other versions, all bets are off!
-					if ip_ver == 4
-						ip_proto_num = io[23,1].unpack("C")[0]
-						@ip_header.read(io[14,ip_hlen])
-						if ip_proto_num == 0x06 # It's TCP.
-							tcp_len = io[16,2].unpack("n")[0] - 20
-							if args[:strip] # Drops trailers like frame check sequence (FCS). Often desired for cleaner packets.
-								tcp_all = io[ip_hlen+14,tcp_len] # Believe the tcp_len value; chop off anything that's not in range.
-							else
-								tcp_all = io[ip_hlen+14,0xffff] # Don't believe the tcp_len value; suck everything up.
-							end
-							tcp_hlen =  ((tcp_all[12,1].unpack("C")[0]) >> 4) * 4
-							if tcp_hlen.to_i >= 20
+			begin
+				if io.size >= 14
+					@eth_header.read(io[0,14])
+					eth_proto_num = io[12,2].unpack("n")[0]
+					if eth_proto_num == 0x0800 # It's IP.
+						ip_hlen=(io[14] & 0x0f) * 4
+						ip_ver=(io[14] >> 4) # It's IPv4. Other versions, all bets are off!
+						if ip_ver == 4
+							ip_proto_num = io[23,1].unpack("C")[0]
+							@ip_header.read(io[14,ip_hlen])
+							if ip_proto_num == 0x06 # It's TCP.
+								tcp_len = io[16,2].unpack("n")[0] - 20
+								if args[:strip] # Drops trailers like frame check sequence (FCS). Often desired for cleaner packets.
+									tcp_all = io[ip_hlen+14,tcp_len] # Believe the tcp_len value; chop off anything that's not in range.
+								else
+									tcp_all = io[ip_hlen+14,0xffff] # Don't believe the tcp_len value; suck everything up.
+								end
+								tcp_hlen =  ((tcp_all[12,1].unpack("C")[0]) >> 4) * 4
+								if tcp_hlen.to_i >= 20
+									tcp_opts = tcp_all[20,tcp_hlen-20]
+									tcp_body = tcp_all[tcp_hlen,0xffff]
+									@tcp_header.read(tcp_all[0,20])
+									@tcp_header.tcp_opts=tcp_opts
+									@tcp_header.body=tcp_body
+									@ip_header.body = @tcp_header
+								else # It's a TCP packet with an impossibly small hlen, so it can't be real TCP. Abort! Abort!
+									@ip_header.body = io[16,io.size-16]
+								end
 								tcp_opts = tcp_all[20,tcp_hlen-20]
 								tcp_body = tcp_all[tcp_hlen,0xffff]
 								@tcp_header.read(tcp_all[0,20])
 								@tcp_header.tcp_opts=tcp_opts
 								@tcp_header.body=tcp_body
 								@ip_header.body = @tcp_header
-							else # It's a TCP packet with an impossibly small hlen, so it can't be real TCP. Abort! Abort!
-								@ip_header.body = io[16,io.size-16]
+							elsif ip_proto_num == 0x11 # It's UDP.
+								udp_len = io[16,2].unpack("n")[0] - 20
+								if args[:strip] # Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.
+									@udp_header.read(io[ip_hlen+14,udp_len]) 
+								else # ... Suck it all up. BTW, this will change the lengths if they are ever recalc'ed. Bummer.
+									@udp_header.read(io[ip_hlen+14,0xffff])
+								end
+								@ip_header.body = @udp_header
+							elsif ip_proto_num == 1 # It's ICMP
+								@icmp_header.read(io[ip_hlen+14,0xffff])
+								@ip_header.body = @icmp_header
+							else # It's an IP packet for a protocol we don't have a decoder for.
+								@ip_header.body = io[16,io.size-16] 
 							end
-						elsif ip_proto_num == 0x11 # It's UDP.
-							udp_len = io[16,2].unpack("n")[0] - 20
-							if args[:strip] # Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.
-								@udp_header.read(io[ip_hlen+14,udp_len]) 
-							else # ... Suck it all up. BTW, this will change the lengths if they are ever recalc'ed. Bummer.
-								@udp_header.read(io[ip_hlen+14,0xffff])
-							end
-							@ip_header.body = @udp_header
-						elsif ip_proto_num == 1 # It's ICMP
-							@icmp_header.read(io[ip_hlen+14,0xffff])
-							@ip_header.body = @icmp_header
-						else # It's an IP packet for a protocol we don't have a decoder for.
-							@ip_header.body = io[16,io.size-16] 
+						else # It's not IPv4, so no idea what should come next. Just dump it all into an ip_header and ip payload.
+							@ip_header.read(io[14,ip_hlen])
+							@ip_header.body = io[16,io.size-16]
 						end
-					else # It's not IPv4, so no idea what should come next. Just dump it all into an ip_header and ip payload.
-						@ip_header.read(io[14,ip_hlen])
-						@ip_header.body = io[16,io.size-16]
+						@eth_header.body = @ip_header
+					elsif eth_proto_num == 0x0806 # It's ARP
+						@arp_header.read(io[14,0xffff]) # You'll nearly have a trailer and you'll never know what size.
+						@eth_header.body=@arp_header
+					elsif eth_proto_num == 0x86dd # It's IPv6
+						@ipv6_header.read(io[14,0xffff])
+						@eth_header.body=@ipv6_header
+					else # It's an Ethernet packet for a protocol we don't have a decoder for
+						@eth_header.body = io[14,io.size-14]
 					end
-					@eth_header.body = @ip_header
-				elsif eth_proto_num == 0x0806 # It's ARP
-					@arp_header.read(io[14,0xffff]) # You'll nearly have a trailer and you'll never know what size.
-					@eth_header.body=@arp_header
-				elsif eth_proto_num == 0x86dd # It's IPv6
-					@ipv6_header.read(io[14,0xffff])
-					@eth_header.body=@ipv6_header
-				else # It's an Ethernet packet for a protocol we don't have a decoder for
-					@eth_header.body = io[14,io.size-14]
+					if (args[:fix] || args[:recalc])
+						# Unfortunately, we cannot simply recalc with abandon, since
+						# we may have unaccounted trailers that will sneak into the checksum.
+						# The better way to handle this is to put trailers in their own
+						# BinData field, but I'm not a-gonna right now. :/
+						ip_recalc(:ip_sum) if respond_to? :ip_header
+						recalc(:tcp) if respond_to? :tcp_header
+						recalc(:udp) if respond_to? :udp_header
+					end
+				else # You're not big enough for Ethernet. 
+					@invalid_header.read(io)
+				end	
+				# @headers[0]
+				self
+			rescue ::Exception => e
+				# remove last header
+				# nested_types = self.headers.collect {|header| header.class}
+				# nested_types.pop # whatever this packet type is, we weren't able to parse it
+				self.headers.pop
+				return_header_type = self.headers[self.headers.length-1].class.to_s
+				retklass = PacketFu::InvalidPacket
+				seekpos = 0
+				target_header = @invalid_header
+				case return_header_type.to_s
+				when "PacketFu::EthHeader"
+					retklass = PacketFu::EthPacket
+					seekpos = 0x0e
+					target_header = @eth_header
+				when "PacketFu::IPHeader"
+					retklass = PacketFu::IPPacket
+					seekpos = 0x0e + @ip_header.ip_hl * 4
+					target_header = @ip_header
+				when "PacketFu::TCPHeader"
+					retklass = PacketFu::TCPPacket
+					seekpos = 0x0e + @ip_header.ip_hl * 4 + @tcpheader.tcp_hlen
+					target_header = @tcp_header
+				when "PacketFu::UDPHeader"
+					retklass = PacketFu::UDPPacket
+				when "PacketFu::ARPHeader"
+					retklass = PacketFu::ARPPacket
+				when "PacketFu::ICMPHeader"
+					retklass = PacketFu::ICMPPacket
+				when "PacketFu::IPv6Header"
+					retklass = PacketFu::IPv6Packet
+				else
 				end
-				if (args[:fix] || args[:recalc])
-					# Unfortunately, we cannot simply recalc with abandon, since
-					# we may have unaccounted trailers that will sneak into the checksum.
-					# The better way to handle this is to put trailers in their own
-					# BinData field, but I'm not a-gonna right now. :/
-					ip_recalc(:ip_sum) if respond_to? :ip_header
-					recalc(:tcp) if respond_to? :tcp_header
-					recalc(:udp) if respond_to? :udp_header
-				end
-			else # You're not big enough for Ethernet. 
-				@invalid_header.read(io)
-			end	
-			@headers[0]
+			
+				io = io[seekpos,io.length - seekpos]
+				target_header.body = io
+				p = retklass.new
+				p.headers = self.headers
+				p
+			end
 		end
 
 		# Peek provides summary data on packet contents.
