@@ -12,6 +12,9 @@ end
 require 'ipaddr'
 require 'singleton'
 
+	require 'rubygems'
+	require 'ruby-prof'
+
 module PacketFu
 
 	# Sets the expected byte order for a pcap file. See PacketFu::Read.set_byte_order

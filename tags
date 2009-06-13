@@ -192,6 +192,7 @@ InvalidPacket	lib/packetfu/invalid.rb	/^	class	InvalidPacket < Packet$/;"	c	clas
 LIVE	lib/pcaprub_win32/pcaprub.c	16;"	d	file:
 LazyEvalEnv	lib/bindata/lazy.rb	/^  class LazyEvalEnv$/;"	c	class:BinData
 MultiValue	lib/bindata/multi_value.rb	/^  class MultiValue < BinData::Struct$/;"	c	class:BinData
+MultiValue	test/bindata/multi_value.rb	/^  class MultiValue < BinData::Struct$/;"	c
 OFFLINE	lib/pcaprub_win32/pcaprub.c	15;"	d	file:
 Octets	lib/packetfu/ip.rb	/^	class Octets < BinData::MultiValue$/;"	c	class:PacketFu
 PCAPRUB_VERSION	lib/pcaprub_win32/pcaprub.c	13;"	d	file:
@@ -225,7 +226,7 @@ PcapPackets	lib/packetfu/pcap.rb	/^	class PcapPackets < BinData::MultiValue$/;"	
 Read	lib/packetfu/read.rb	/^	class Read$/;"	c	class:PacketFu
 Registry	lib/bindata/registry.rb	/^  class Registry$/;"	c	class:BinData
 Rest	lib/bindata/rest.rb	/^  class Rest < BinData::Single$/;"	c	class:BinData
-SanitizedParameters	lib/bindata/sanitize.rb	/^  class SanitizedParameters$/;"	c
+SanitizedParameters	lib/bindata/sanitize.rb	/^  class SanitizedParameters$/;"	c	class:BinData
 Sanitizer	lib/bindata/sanitize.rb	/^  class Sanitizer$/;"	c	class:BinData
 Single	lib/bindata/single.rb	/^  class Single < BinData::Base$/;"	c	class:BinData
 SingleValue	lib/bindata/single_value.rb	/^  class SingleValue < Single$/;"	c	class:BinData
@@ -256,7 +257,7 @@ Write	lib/packetfu/write.rb	/^	class Write$/;"	c	class:PacketFu
 []=	lib/bindata/array.rb	/^    def []=(index, value)$/;"	f	class:BinData
 []=	lib/bindata/my_array.rb	/^    def []=(index, value)$/;"	f	class:BinData
 _do_num_bytes	lib/bindata/array.rb	/^    def _do_num_bytes(index)$/;"	f	class:BinData
-_do_num_bytes	lib/bindata/base.rb	/^    def _do_num_bytes$/;"	f	class:BinData
+_do_num_bytes	lib/bindata/base.rb	/^    def _do_num_bytes(what)$/;"	f	class:BinData
 _do_num_bytes	lib/bindata/bits.rb	/^        def _do_num_bytes(ignored)$/;"	f	class:BinData.BitField.define_methods
 _do_num_bytes	lib/bindata/float.rb	/^        def _do_num_bytes(ignored)$/;"	f	class:BinData.Float.define_methods
 _do_num_bytes	lib/bindata/int.rb	/^        def _do_num_bytes(ignored)$/;"	f	class:BinData.Integer.define_methods
@@ -282,7 +283,6 @@ _snapshot	lib/bindata/struct.rb	/^    def _snapshot$/;"	f	class:BinData.Struct
 _value	lib/bindata/single.rb	/^    def _value$/;"	f	class:BinData.Single
 a2f	lib/packetfu/write.rb	/^			def a2f(args={})$/;"	f	class:PacketFu.Write
 a2w	lib/packetfu/inject.rb	/^		def a2w(args={})$/;"	f	class:PacketFu.Inject
-accepted_parameters	lib/bindata/base.rb	/^      def accepted_parameters$/;"	f	class:BinData.Base
 add_variable	lib/bindata/lazy.rb	/^    def add_variable(sym, value)$/;"	f	class:BinData.LazyEvalEnv
 append	lib/bindata/array.rb	/^    def append(value = nil)$/;"	f	class:BinData
 append	lib/bindata/my_array.rb	/^    def append(value = nil)$/;"	f	class:BinData
@@ -307,6 +307,7 @@ banner	examples/packetfu-shell.rb	/^def banner$/;"	f	class:PacketFu.Packet
 bpf	lib/packetfu/capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
 bpf	lib/packetfu/working-capture.rb	/^		def bpf(args={})$/;"	f	class:PacketFu.Capture
 build_oui_list	examples/arphood.rb	/^def build_oui_list$/;"	f
+can_store_endian?	lib/bindata/sanitize.rb	/^    def can_store_endian?(klass, params)$/;"	f	class:BinData
 capture	lib/packetfu/capture.rb	/^		def capture(args={})$/;"	f	class:PacketFu.Capture
 capture	lib/packetfu/working-capture.rb	/^		def capture(args={})$/;"	f	class:PacketFu.Capture
 check_offset	lib/bindata/base.rb	/^    def check_offset(io)$/;"	f	class:BinData
@@ -323,7 +324,6 @@ clear?	lib/bindata/my_array.rb	/^    def clear?(index = nil)$/;"	f	class:BinData
 clear?	lib/bindata/single.rb	/^    def clear?$/;"	f	class:BinData.Single
 clear?	lib/bindata/struct.rb	/^    def clear?(name = nil)$/;"	f	class:BinData.Struct
 config	lib/packetfu/config.rb	/^		def config(arg=nil)$/;"	f	class:PacketFu.Config
-create_env	lib/bindata/base.rb	/^    def create_env$/;"	f	class:BinData
 create_float_methods	lib/bindata/float.rb	/^    def self.create_float_methods(klass, single_precision, endian)$/;"	F	class:BinData.Float
 create_int_methods	lib/bindata/int.rb	/^    def self.create_int_methods(klass, nbits, endian)$/;"	F	class:BinData.Integer
 create_methods	lib/bindata/bits.rb	/^    def self.create_methods(klass, nbits, endian)$/;"	F	class:BinData.BitField
@@ -332,12 +332,14 @@ create_read_code	lib/bindata/int.rb	/^    def self.create_read_code(nbits, endia
 create_to_s_code	lib/bindata/float.rb	/^    def self.create_to_s_code(single_precision, endian)$/;"	F	class:BinData.Float
 create_to_s_code	lib/bindata/int.rb	/^    def self.create_to_s_code(nbits, endian)$/;"	F	class:BinData.Integer
 create_uint_methods	lib/bindata/int.rb	/^    def self.create_uint_methods(klass, nbits, endian)$/;"	F	class:BinData.Integer
+custom_parameters	lib/bindata/base.rb	/^    def custom_parameters$/;"	f	class:BinData
 decode	lib/packetfu/tcpopts.rb	/^		def self.decode(str)$/;"	F	class:PacketFu
-default_parameters	lib/bindata/base.rb	/^      def default_parameters(params = {})$/;"	f	class:BinData.Base
 default_parameters	lib/bindata/multi_value.rb	/^      def default_parameters(params = {}); end$/;"	f	class:BinData.MultiValue
+default_parameters	test/bindata/multi_value.rb	/^      def default_parameters(params = {}); end$/;"	f	class:MultiValue
 define_methods	lib/bindata/bits.rb	/^    def self.define_methods(klass, nbits, endian, clamp)$/;"	F	class:BinData.BitField
 define_methods	lib/bindata/float.rb	/^    def self.define_methods(klass, single_precision, read, to_s)$/;"	F	class:BinData.Float
 define_methods	lib/bindata/int.rb	/^    def self.define_methods(klass, nbytes, clamp, read, to_s,$/;"	F	class:BinData.Integer
+dhms	test/packetfu-bechmark.rb	/^def dhms(i)$/;"	f
 do_num_bytes	lib/bindata/base.rb	/^    def do_num_bytes(what = nil)$/;"	f	class:BinData
 do_read	lib/bindata/base.rb	/^    def do_read(io)$/;"	f	class:BinData
 do_scan	examples/ackscan.rb	/^def do_scan$/;"	f
@@ -356,6 +358,7 @@ empty?	lib/bindata/my_array.rb	/^    def empty?$/;"	f	class:BinData
 encode	lib/packetfu/tcpopts.rb	/^		def self.encode(str)$/;"	F	class:PacketFu.TcpOpts
 endian	lib/bindata/multi_value.rb	/^      def endian(endian = nil)$/;"	f	class:BinData.MultiValue
 endian	lib/bindata/single_value.rb	/^      def endian(endian = nil)$/;"	f	class:BinData.SingleValue
+endian	test/bindata/multi_value.rb	/^      def endian(endian = nil)$/;"	f	class:MultiValue
 eth_daddr	lib/packetfu/eth.rb	/^		def eth_daddr$/;"	f	class:PacketFu.EthHeader
 eth_daddr=	lib/packetfu/eth.rb	/^		def eth_daddr=(mac)$/;"	f	class:PacketFu.EthHeader
 eth_saddr	lib/packetfu/eth.rb	/^		def eth_saddr$/;"	f	class:PacketFu.EthHeader
@@ -365,6 +368,7 @@ f2a	lib/packetfu/read.rb	/^			def f2a(args={})$/;"	f	class:PacketFu.Read
 field_names	lib/bindata/struct.rb	/^    def field_names(include_hidden = false)$/;"	f	class:BinData.Struct
 fields	lib/bindata/multi_value.rb	/^      def fields$/;"	f	class:BinData.MultiValue
 fields	lib/bindata/single_value.rb	/^      def fields$/;"	f	class:BinData.SingleValue
+fields	test/bindata/multi_value.rb	/^      def fields$/;"	f	class:MultiValue
 file_to_array	lib/packetfu/read.rb	/^			def file_to_array(args={})$/;"	f	class:PacketFu.Read
 find_obj_for_name	lib/bindata/struct.rb	/^    def find_obj_for_name(name)$/;"	f	class:BinData.Struct
 first	lib/bindata/array.rb	/^    def first(n = nil)$/;"	f	class:BinData
@@ -374,26 +378,30 @@ format_packets	lib/packetfu/write.rb	/^			def format_packets(args={})$/;"	f	clas
 gen_packets	examples/ackscan.rb	/^def gen_packets$/;"	f
 get	lib/bindata/single_value.rb	/^    def get$/;"	f	class:BinData
 get_byte_order	lib/packetfu/read.rb	/^			def get_byte_order(pcap_file)$/;"	f	class:PacketFu.Read
+go	test/packetfu-bechmark.rb	/^def go$/;"	f
+happy_dots	test/packetfu-bechmark.rb	/^def happy_dots(i,start_time)$/;"	f
 has_data?	lib/packetfu/packet.rb	/^		def has_data? ; self.payload.size.zero? ? false : true ; end$/;"	f	class:PacketFu.Packet.is_eth?.is_ip?.is_tcp?.is_udp?.is_arp?.is_ipv6?.is_icmp?
 has_param?	lib/bindata/base.rb	/^    def has_param?(key)$/;"	f	class:BinData
 hdr	lib/pcaprub_win32/pcaprub.c	/^	struct pcap_pkthdr hdr;$/;"	m	struct:rbpcapjob	typeref:struct:rbpcapjob::pcap_pkthdr	file:
 hexify	lib/packetfu/packet.rb	/^		def hexify(str)$/;"	f	class:PacketFu.Packet
 hide	lib/bindata/multi_value.rb	/^      def hide(*args)$/;"	f	class:BinData.MultiValue
+hide	test/bindata/multi_value.rb	/^      def hide(*args)$/;"	f	class:MultiValue
 icmp_calc_sum	lib/packetfu/icmp.rb	/^		def icmp_calc_sum$/;"	f	class:PacketFu.ICMPHeader
 icmp_recalc	lib/packetfu/icmp.rb	/^		def icmp_recalc(arg=:all)$/;"	f	class:PacketFu.ICMPHeader
 iface	lib/pcaprub_win32/pcaprub.c	/^    char iface[256];$/;"	m	struct:rbpcap	file:
 inherited	lib/bindata/multi_value.rb	/^      def inherited(subclass) #:nodoc:$/;"	f	class:BinData.MultiValue
 inherited	lib/bindata/single_value.rb	/^      def inherited(subclass) #:nodoc:$/;"	f	class:BinData.SingleValue
 inherited	lib/bindata/struct.rb	/^      def inherited(subclass) #:nodoc:$/;"	f	class:BinData.Struct
+inherited	test/bindata/multi_value.rb	/^      def inherited(subclass) #:nodoc:$/;"	f	class:MultiValue
 initialize	lib/bindata/array.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData
-initialize	lib/bindata/base.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData
+initialize	lib/bindata/base.rb	/^    def initialize(params = {}, parent = nil)$/;"	f	class:BinData
 initialize	lib/bindata/choice.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData
 initialize	lib/bindata/io.rb	/^    def initialize(io)$/;"	f	class:BinData.IO
 initialize	lib/bindata/lazy.rb	/^    def initialize(parent = nil)$/;"	f	class:BinData.LazyEvalEnv
 initialize	lib/bindata/my_array.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData
 initialize	lib/bindata/registry.rb	/^    def initialize$/;"	f	class:BinData.Registry
 initialize	lib/bindata/sanitize.rb	/^    def initialize$/;"	f	class:BinData
-initialize	lib/bindata/sanitize.rb	/^    def initialize(klass, params)$/;"	f	class:SanitizedParameters
+initialize	lib/bindata/sanitize.rb	/^    def initialize(klass, params)$/;"	f	class:BinData.SanitizedParameters
 initialize	lib/bindata/single.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData.Single
 initialize	lib/bindata/single_value.rb	/^    def initialize(params = {}, env = nil)$/;"	f	class:BinData
 initialize	lib/bindata/struct.rb	/^    def initialize(params = {}, parent = nil)$/;"	f	class:BinData.Struct
@@ -419,6 +427,7 @@ inspect	lib/packetfu/packet.rb	/^		def inspect$/;"	f	class:PacketFu.Packet
 inspect_hex	lib/packetfu/packet.rb	/^		def inspect_hex(arg=0)$/;"	f	class:PacketFu.Packet
 instantiate_all	lib/bindata/struct.rb	/^    def instantiate_all$/;"	f	class:BinData.Struct
 instantiate_obj	lib/bindata/struct.rb	/^    def instantiate_obj(idx)$/;"	f	class:BinData.Struct
+internal_parameters	lib/bindata/base.rb	/^      def internal_parameters$/;"	f	class:BinData.Base
 ip_calc_id	lib/packetfu/ip.rb	/^		def ip_calc_id$/;"	f	class:PacketFu.IPHeader
 ip_calc_len	lib/packetfu/ip.rb	/^		def ip_calc_len$/;"	f	class:PacketFu.IPHeader
 ip_calc_sum	lib/packetfu/ip.rb	/^		def ip_calc_sum$/;"	f	class:PacketFu.IPHeader
@@ -447,10 +456,11 @@ length	lib/bindata/array.rb	/^    def length$/;"	f	class:BinData
 length	lib/bindata/my_array.rb	/^    def length$/;"	f	class:BinData
 lookup	lib/bindata/registry.rb	/^    def lookup(name)$/;"	f	class:BinData.Registry
 lookup	lib/bindata/sanitize.rb	/^      def lookup(name, endian)$/;"	f	class:BinData.Sanitizer
+lookup_klass	lib/bindata/sanitize.rb	/^    def lookup_klass(type)$/;"	f	class:BinData
 lookupdev	lib/packetfu/utils.rb	/^		def self.lookupdev$/;"	F	class:PacketFu.Utils
 mac2str	lib/packetfu/eth.rb	/^		def self.mac2str(mac)$/;"	F	class:PacketFu.EthHeader
-mandatory_parameters	lib/bindata/base.rb	/^      def mandatory_parameters(*args)$/;"	f	class:BinData.Base
 mandatory_parameters	lib/bindata/multi_value.rb	/^      def mandatory_parameters(*args) ; end$/;"	f	class:BinData.MultiValue
+mandatory_parameters	test/bindata/multi_value.rb	/^      def mandatory_parameters(*args) ; end$/;"	f	class:MultiValue
 method_missing	lib/bindata/choice.rb	/^    def method_missing(symbol, *args, &block)$/;"	f	class:BinData
 method_missing	lib/bindata/lazy.rb	/^    def method_missing(symbol, *args)$/;"	f	class:BinData.LazyEvalEnv
 method_missing	lib/bindata/multi_value.rb	/^      def method_missing(symbol, *args)$/;"	f	class:BinData.MultiValue
@@ -459,20 +469,21 @@ method_missing	lib/bindata/single_value.rb	/^    def method_missing(symbol, *arg
 method_missing	lib/bindata/struct.rb	/^      def method_missing(symbol, *args)$/;"	f	class:BinData.Struct.Snapshot
 method_missing	lib/bindata/struct.rb	/^    def method_missing(symbol, *args, &block)$/;"	f	class:BinData.Struct
 method_missing	lib/packetfu/packet.rb	/^		def method_missing(sym, *args)$/;"	f	class:PacketFu.Packet
-mutually_exclusive_parameters	lib/bindata/base.rb	/^      def mutually_exclusive_parameters(*args)$/;"	f	class:BinData.Base
+method_missing	test/bindata/multi_value.rb	/^      def method_missing(symbol, *args)$/;"	f	class:MultiValue
 next	lib/packetfu/capture.rb	/^		def next$/;"	f	class:PacketFu.Capture
+no_eval_param	lib/bindata/base.rb	/^    def no_eval_param(key)$/;"	f	class:BinData
 num_bytes	lib/bindata/base.rb	/^    def num_bytes(what = nil)$/;"	f	class:BinData
+obj	lib/bindata/base.rb	/^    def obj$/;"	f	class:BinData
 octet_array	lib/packetfu/ip.rb	/^		def self.octet_array(addr)$/;"	F	class:PacketFu.IPHeader
 offset	lib/bindata/io.rb	/^    def offset$/;"	f	class:BinData.IO
 offset_of	lib/bindata/lazy.rb	/^    def offset_of(sym)$/;"	f	class:BinData.LazyEvalEnv
 offset_of	lib/bindata/struct.rb	/^    def offset_of(field)$/;"	f	class:BinData.Struct
 option_to_s	lib/packetfu/tcpopts.rb	/^		def self.option_to_s(optnum,value)$/;"	F
-optional_parameters	lib/bindata/base.rb	/^      def optional_parameters(*args)$/;"	f	class:BinData.Base
 packetfu_ascii_art	examples/packetfu-shell.rb	/^def packetfu_ascii_art$/;"	f	class:PacketFu.Packet
-param	lib/bindata/base.rb	/^    def param(key)$/;"	f	class:BinData
 params=	lib/bindata/lazy.rb	/^    def params=(p)$/;"	f	class:BinData.LazyEvalEnv
 parent_data_object	lib/bindata/lazy.rb	/^    def parent_data_object$/;"	f	class:BinData.LazyEvalEnv
 parse	lib/packetfu/packet.rb	/^		def self.parse(packet,args={})$/;"	F	class:PacketFu.Packet
+parse_packets	test/packetfu-bechmark.rb	/^def parse_packets$/;"	f
 payload	lib/packetfu/packet.rb	/^		def payload$/;"	f	class:PacketFu.Packet
 payload=	lib/packetfu/packet.rb	/^		def payload=(args)$/;"	f	class:PacketFu.Packet
 pcaprub_platform_require	lib/packetfu.rb	/^  def self.pcaprub_platform_require$/;"	F	class:PacketFu
@@ -485,6 +496,8 @@ peek	lib/packetfu/packet.rb	/^		def peek(args={})$/;"	f	class:PacketFu.Packet
 peek	lib/packetfu/tcp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.TCPPacket
 peek	lib/packetfu/udp.rb	/^		def peek(args={})$/;"	f	class:PacketFu.UDPPacket
 pkt	lib/pcaprub_win32/pcaprub.c	/^    char *pkt;$/;"	m	struct:rbpcapjob	file:
+profile_results	test/packet_create.rb	/^def profile_results$/;"	f
+profile_results	test/packetfu-bechmark.rb	/^def profile_results(filename)$/;"	f
 proto	lib/packetfu/packet.rb	/^		def proto$/;"	f	class:PacketFu.Packet
 push	lib/bindata/array.rb	/^    def push(*args)$/;"	f	class:BinData
 push	lib/bindata/my_array.rb	/^    def push(*args)$/;"	f	class:BinData
@@ -515,7 +528,6 @@ rbpcapjob	lib/pcaprub_win32/pcaprub.c	/^typedef struct rbpcapjob {$/;"	s	file:
 rbpcapjob_t	lib/pcaprub_win32/pcaprub.c	/^} rbpcapjob_t;$/;"	t	typeref:struct:rbpcapjob	file:
 read	lib/bindata/base.rb	/^      def read(io)$/;"	f	class:BinData.Base
 read	lib/bindata/base.rb	/^    def read(io)$/;"	f	class:BinData
-read	lib/packetfu/packet.rb	/^		def read(io)$/;"	f	class:PacketFu.Packet
 read	lib/packetfu/packet.rb	/^		def read(io,args={})$/;"	f	class:PacketFu.Packet
 read_val	lib/bindata/bits.rb	/^        def read_val(io)$/;"	f	class:BinData.BitField.define_methods
 read_val	lib/bindata/float.rb	/^        def read_val(io)$/;"	f	class:BinData.Float.define_methods
@@ -528,14 +540,15 @@ read_val	lib/bindata/stringz.rb	/^    def read_val(io)$/;"	f	class:BinData.Strin
 readbits	lib/bindata/io.rb	/^    def readbits(nbits, endian = :big)$/;"	f	class:BinData.IO
 readbytes	lib/bindata/io.rb	/^    def readbytes(n)$/;"	f	class:BinData.IO
 recalc	lib/packetfu/packet.rb	/^		def recalc(arg=:all)$/;"	f	class:PacketFu.Packet
+recursive?	lib/bindata/base.rb	/^      def recursive?$/;"	f	class:BinData.Base
 recursive?	lib/bindata/multi_value.rb	/^      def recursive?$/;"	f	class:BinData.MultiValue
+recursive?	test/bindata/multi_value.rb	/^      def recursive?$/;"	f	class:MultiValue
 register	lib/bindata/base.rb	/^      def register(name, klass)$/;"	f	class:BinData.Base
 register	lib/bindata/registry.rb	/^    def register(name, klass)$/;"	f	class:BinData.Registry
 remove_last_element	lib/bindata/my_array.rb	/^		def remove_last_element$/;"	f	class:BinData
 respond_to?	lib/bindata/choice.rb	/^    def respond_to?(symbol, include_private = false)$/;"	f	class:BinData
 respond_to?	lib/bindata/struct.rb	/^    def respond_to?(symbol, include_private = false)$/;"	f	class:BinData.Struct
-sanitize	lib/bindata/sanitize.rb	/^      def sanitize(obj, params)$/;"	f	class:BinData.Sanitizer
-sanitize	lib/bindata/sanitize.rb	/^    def sanitize(type, params)$/;"	f	class:BinData
+sanitize	lib/bindata/sanitize.rb	/^      def sanitize(klass, params)$/;"	f	class:BinData.Sanitizer
 sanitize_parameters	lib/bindata/my_array.rb	/^      def sanitize_parameters(sanitizer, params)$/;"	f	class:BinData.Array
 sanitize_parameters!	lib/bindata/array.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:BinData.Array
 sanitize_parameters!	lib/bindata/base.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:BinData.Base
@@ -544,6 +557,8 @@ sanitize_parameters!	lib/bindata/multi_value.rb	/^      def sanitize_parameters!
 sanitize_parameters!	lib/bindata/single_value.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:BinData.SingleValue
 sanitize_parameters!	lib/bindata/string.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:BinData.String
 sanitize_parameters!	lib/bindata/struct.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:BinData.Struct
+sanitize_parameters!	test/bindata/multi_value.rb	/^      def sanitize_parameters!(sanitizer, params)$/;"	f	class:MultiValue
+sanitize_params	lib/bindata/sanitize.rb	/^    def sanitize_params(klass, params)$/;"	f	class:BinData
 save	lib/packetfu/capture.rb	/^		def save(args={})$/;"	f	class:PacketFu.Capture
 save	lib/packetfu/working-capture.rb	/^		def save(args={})$/;"	f	class:PacketFu.Capture
 seekbytes	lib/bindata/io.rb	/^    def seekbytes(n)$/;"	f	class:BinData.IO
@@ -568,6 +583,7 @@ single_value?	lib/bindata/single.rb	/^    def single_value?$/;"	f	class:BinData.
 single_value?	lib/bindata/struct.rb	/^    def single_value?$/;"	f	class:BinData.Struct
 size	lib/packetfu/packet.rb	/^		def size$/;"	f	class:PacketFu.Packet
 snapshot	lib/bindata/base.rb	/^    def snapshot$/;"	f	class:BinData
+spotcheck_packets	test/packetfu-bechmark.rb	/^def spotcheck_packets$/;"	f
 start	lib/packetfu/capture.rb	/^		def start(args={})$/;"	f	class:PacketFu.Capture
 start	lib/packetfu/working-capture.rb	/^		def start(args={})$/;"	f	class:PacketFu.Capture
 str2mac	lib/packetfu/eth.rb	/^		def self.str2mac(mac)$/;"	F	class:PacketFu.EthHeader
