@@ -23,13 +23,9 @@ module PacketFu
 	# Checks if pcaprub is loaded correctly.
 	@@pcaprub_loaded = false
 	
-	# PacketFu works best with Pcaprub version 0.8-dev, available from the 
-	# Metasploit SVN repository at:
-	# https://metasploit.com/svn/framework3/trunk/external/pcaprub/
-	# ..but if you're cool without good Ruby threading support and no Windows
-	# winpcap love, then you can try your luck with 
-	# http://pcaprub.rubyforge.org/svn/
-	# which is version 0.7-dev at the moment.
+	# PacketFu works best with Pcaprub version 0.8-dev, now made available
+	# with this distribution. Say, can Mac users give me some idea of how
+	# to install on your hipster youth-oriented Bay Area grunge OS?
   def self.pcaprub_platform_require
     if File.directory?("C:\\")
 			require 'pcaprub_win32/pcaprub'
@@ -82,7 +78,7 @@ module PacketFu
 
 	# Returns the version.
 	def self.version
-		"0.1.1" # February 18, 2008
+		"0.2.0" # June 13, 2009
 	end
 
 end
