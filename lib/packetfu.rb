@@ -12,8 +12,8 @@ end
 require 'ipaddr'
 require 'singleton'
 
-	require 'rubygems'
-	require 'ruby-prof'
+#	require 'rubygems'
+#	require 'ruby-prof'
 
 module PacketFu
 
