@@ -7,7 +7,7 @@ class IntStringTest < Test::Unit::TestCase
 	include StructFu
 
 	def test_intstring_len
-		s = IntString.new(Int32, "hello!")
+		s = IntString.new("hello!", Int32)
 		assert_equal(s.len, s.int.v)
 		assert_not_equal(s.len, s.length)
 		s.len=10
@@ -15,27 +15,22 @@ class IntStringTest < Test::Unit::TestCase
 	end
 
 	def test_intstring_to_s
-		s = IntString.new(Int16, "hello!")
+		s = IntString.new("hello!", Int16)
 		assert_equal("\x00\x06hello!",s.to_s)
 		s.len=10
 		assert_equal("\x00\x0ahello!",s.to_s)
-		s = IntString.new(Int16, "hello!", :parse)
+		s = IntString.new("hello!", Int16, :parse)
 		s.len=10
 		assert_equal("\x00\x0ahello!\x00\x00\x00\x00",s.to_s)
-		s = IntString.new(Int16, "hello!", :fix)
+		s = IntString.new("hello!", Int16, :fix)
 		s.len=10
 		assert_equal("\x00\x06hello!",s.to_s)
 	end
 
 	def test_intstring_new
-		assert_equal("\x06Hello!",IntString.new(Int8,"Hello!").to_s)
-		assert_equal("\x00\x06Hello!",IntString.new(Int16,"Hello!").to_s)
-		assert_equal("\x06\x00\x00\x00Hello!",IntString.new(Int32le,"Hello!").to_s)
-	end
-
-	def test_intstring_error
-		assert_raise(StandardError) { IntString.new("Hello!") }
-		assert_raise(StandardError) { IntString.new(String,"Hello!") }
+		assert_equal("\x06Hello!",IntString.new("Hello!").to_s)
+		assert_equal("\x00\x06Hello!",IntString.new("Hello!",Int16).to_s)
+		assert_equal("\x06\x00\x00\x00Hello!",IntString.new("Hello!",Int32le).to_s)
 	end
 
 	def test_intstring_read

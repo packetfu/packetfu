@@ -5,7 +5,8 @@ module StructFu
 	# a one-byte length is presumed.  
 	class IntString < Struct.new(:int, :string, :mode)
 
-		def initialize(int=Int8,string='',mode=nil)
+		# TODO: Fix this so the string is first. Seems dumb now to have Int be first.
+		def initialize(string='',int=Int8,mode=nil)
 			unless int.respond_to?(:ancestors) && int.ancestors.include?(StructFu::Int)
 				raise StandardError, "Invalid length (#{int.inspect}) associated with this String."
 			else
