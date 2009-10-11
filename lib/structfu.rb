@@ -5,5 +5,4 @@
 module StructFu
 end
 require 'structfu/int.rb'
-require 'structfu/bit.rb'
 require 'structfu/string.rb'

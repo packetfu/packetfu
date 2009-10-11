@@ -1,5 +1,12 @@
 module StructFu
 
+	class String < ::String
+		def read(str)
+			self.replace str
+			self
+		end
+	end
+
 	# Provides a primitive for creating strings, preceeded by
 	# an Int type of length. By default, a string of length zero with
 	# a one-byte length is presumed.  
