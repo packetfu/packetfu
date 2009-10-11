@@ -41,8 +41,8 @@ module StructFu
 
 	class Int8 < Int
 
-		def initialize(v=nil, e=nil)
-			super(v,e,w=1)
+		def initialize(v=nil)
+			super(v,nil,w=1)
 			@packstr = "C"
 		end
 
@@ -70,13 +70,13 @@ module StructFu
 
 	class Int16le < Int16
 		def initialize(v=nil, e=:little)
-			super(v,e,w=2)
+			super(v,e)
 			@packstr = (self.e == :big) ? "n" : "v"
 		end
 	end
 
 	class Int32 < Int
-		def initialize(v=nil, e=:big, w=4)
+		def initialize(v=nil, e=:big)
 			super(v,e,w=4)
 			@packstr = (self.e == :big) ? "N" : "V"
 		end
@@ -90,7 +90,7 @@ module StructFu
 
 	class Int32le < Int32
 		def initialize(v=nil, e=:little)
-			super(v,e,w=4)
+			super(v,e)
 		end
 	end
 
