@@ -82,3 +82,17 @@ class PcapPacketTest < Test::Unit::TestCase
   end
 
 end
+
+class PcapPacketsTest < Test::Unit::TestCase
+	include PacketFu
+	def setup
+    @file = File.open('sample.pcap') {|f| f.read}
+	end
+
+	def test_pcappackets_read
+		p = PcapPackets.new
+		p.read @file
+		assert_equal(11,p.size)
+		assert_equal(@file[24,@file.size],p.to_s)
+	end
+end

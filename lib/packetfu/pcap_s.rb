@@ -115,7 +115,28 @@ module PacketFu
       self
     end
 
-
   end
+
+	class PcapPackets < Array
+		attr_accessor :byte_order # probably ought to be read-only but who am i.
+		def read(str)
+			magic = "\xa1\xb2\xc3\xd4"
+			if str[0,4] == magic
+				@byte_order = :big
+			elsif str[0,4] == magic.reverse
+				@byte_order = :little
+			else
+				raise ArgumentError, "Unknown file format for #{self.class}"
+			end
+			body = str[24,str.size]
+			while body.size > 16 # TODO: catch exceptions on malformed packets at end
+				p = PcapPacket.new(:endian => @byte_order)
+				p.read(body)
+				self<<p
+				body = body[p.sz,body.size]
+			end
+		self	
+		end
+	end
 
 end
