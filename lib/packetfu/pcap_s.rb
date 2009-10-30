@@ -184,7 +184,7 @@ module PacketFu
 		# use read() instead.
 		def file_to_array(args={})
 			filename = args[:filename] || args[:file] || args[:f]
-			unless (!filename.nil? || filename.class.ancestors.include?(String))
+			unless (!filename.nil? || filename.kind_of?(String))
 				raise ArgumentError, "Need a :filename for #{self.class}"
 			end
 			self.read File.open(filename) {|f| f.read}
@@ -201,7 +201,7 @@ module PacketFu
 		# Short story is, array_to_file() is out, and to_file() is in.
 		def to_file(args={})
 			filename = args[:filename] || args[:file] || args[:f]
-			unless (!filename.nil? || filename.class.ancestors.include?(String))
+			unless (!filename.nil? || filename.kind_of?(String))
 				raise ArgumentError, "Need a :filename for #{self.class}"
 			end
 			append = args[:append]
@@ -215,7 +215,7 @@ module PacketFu
 
 		# Shorthand method for writing a file with a filename argument.
 		def write(filename='out.pcap')
-			if filename.class.ancestors.include?(Hash)
+			if filename.kind_of?(Hash)
 				f = filename[:filename] || filename[:file] || filename[:f] || 'out.pcap'
 			else
 				f = filename.to_s
@@ -227,7 +227,7 @@ module PacketFu
 		# remain compatable with http://trac.metasploit.com/changeset/6213/framework3/trunk/lib/packetfu 
 		# since that append() wants a hash argument. 
 		def append(filename='out.pcap')
-			if filename.class.ancestors.include?(Hash)
+			if filename.kind_of?(Hash)
 				f = filename[:filename] || filename[:file] || filename[:f] || 'out.pcap'
 			else
 				f = filename.to_s
