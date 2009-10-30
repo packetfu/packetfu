@@ -84,6 +84,7 @@ class PcapPacketTest < Test::Unit::TestCase
 end
 
 class PcapPacketsTest < Test::Unit::TestCase
+
 	include PacketFu
 	def setup
     @file = File.open('sample.pcap') {|f| f.read}
@@ -95,4 +96,78 @@ class PcapPacketsTest < Test::Unit::TestCase
 		assert_equal(11,p.size)
 		assert_equal(@file[24,@file.size],p.to_s)
 	end
+
+end
+
+class PcapFileTest < Test::Unit::TestCase
+	require 'digest/md5'
+
+	include PacketFu
+	def setup
+    @file = File.open('sample.pcap') {|f| f.read}
+		@md5 = '1be3b5082bb135c6f22de8801feb3495'
+	end
+
+	def test_pcapfile_read
+		p = PcapFile.new
+		p.read @file
+		assert_equal(3,p.size)
+		assert_equal(@file.size, p.sz)
+		assert_equal(@file, p.to_s)
+	end
+
+	def test_pcapfile_file_to_array
+		p = PcapFile.new.file_to_array(:filename => 'sample.pcap')
+		assert_equal(@md5.downcase, Digest::MD5.hexdigest(@file).downcase)
+		assert_instance_of(Array, p)
+		assert_instance_of(String, p[0])
+		assert_equal(11,p.size)
+		assert_equal(78,p[0].size)
+		assert_equal(94,p[1].size)
+		assert_equal(74,p[10].size)
+	end
+
+	def test_pcapfile_read_and_write
+		p = PcapFile.new.read @file
+		p.to_file(:filename => 'out.pcap')
+		@newfile = File.open('out.pcap') {|f| f.read}
+		assert_equal(@file, @newfile)
+		p.to_file(:filename => 'out.pcap', :append => true)
+		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+		assert_equal(22, packet_array.size)
+	end
+
+	def test_pcapfile_write_again
+		p = PcapFile.new.read @file
+		p.write('out.pcap')
+		@newfile = File.open('out.pcap') {|f| f.read}
+		assert_equal(@file, @newfile)
+		p.append('out.pcap')
+		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+		assert_equal(22, packet_array.size)
+		File.unlink('out.pcap')
+	end
+
+	def test_pcapfile_write_yet_again
+		p = PcapFile.new.read @file
+		p.write(:filename => 'out.pcap')
+		@newfile = File.open('out.pcap') {|f| f.read}
+		assert_equal(@file, @newfile)
+		p.append(:filename => 'out.pcap')
+		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+		assert_equal(22, packet_array.size)
+		File.unlink('out.pcap')
+	end
+
+	def test_pcapfile_write_default
+		p = PcapFile.new.read @file
+		p.write
+		@newfile = File.open('out.pcap') {|f| f.read}
+		assert_equal(@file, @newfile)
+		p.append
+		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+		assert_equal(22, packet_array.size)
+		File.unlink('out.pcap')
+	end
+
 end
