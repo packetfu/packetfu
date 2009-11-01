@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'test_structfu'
 require 'test_pcap'
 require 'test_invalid'
