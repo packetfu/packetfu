@@ -378,6 +378,9 @@ module PacketFu
 
 		alias_method :protocol, :proto
 
+		# Returns true if this is an Invalid packet. Else, false.
+		def is_invalid? ;	self.proto.include? "Invalid"; end
+
 		# Returns true if this is an Ethernet packet. Else, false.
 		def is_eth? ;	self.proto.include? "Eth"; end
 		alias_method :is_ethernet?, :is_eth?

@@ -68,6 +68,12 @@ class EthPacketTest < Test::Unit::TestCase
 		assert_equal false, p.is_tcp?
 	end
 
+	def test_eth_packet_undecoded_body
+		p = Packet.parse("A" * 100)
+		assert p.is_eth?
+		assert_equal(("A" * (100-14)), p.payload)
+	end
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
