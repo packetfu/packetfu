@@ -42,13 +42,30 @@ class EthTest < Test::Unit::TestCase
 
 	def test_macaddr
 		assert_not_equal(@dst, @dstmac)
-		assert_equal(EthHeader.str2mac(@dst), @dstmac)
+		assert_equal(@dstmac,EthHeader.str2mac(@dst))
 		assert_equal(@dst, EthHeader.mac2str(@dstmac))
 		e = EthHeader.new
 		e.daddr=@dstmac
 		e.saddr=@srcmac
 		assert_equal(e.daddr, @dstmac)
 		assert_equal(e.saddr, @srcmac.gsub(/-/,':'))
+	end
+
+end
+
+class EthPacketTest < Test::Unit::TestCase
+	include PacketFu
+
+	def setup
+		@pcaps = PcapFile.new.file_to_array(:f => 'sample.pcap')
+	end
+
+	def test_create_packet
+		p = EthPacket.new
+		assert_kind_of EthPacket, p
+		assert_kind_of EthHeader, p.headers[0]
+		assert p.is_eth?
+		assert_equal false, p.is_tcp?
 	end
 
 end

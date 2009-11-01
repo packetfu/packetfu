@@ -59,9 +59,9 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#   unit8 :n1
-	#   unit8 :n2
-	#   unit8 :n3
+	#   uint8 :n1
+	#   uint8 :n2
+	#   uint8 :n3
 	#
 	class EthNic < Struct.new(:n0, :n1, :n2)
 
@@ -107,7 +107,6 @@ module PacketFu
 
 	end
 
-	
 	# EthHeader is a complete Ethernet struct, used in EthPacket. 
 	# It's the base header for all other protocols, such as IPHeader, 
 	# TCPHeader, etc. 
@@ -122,6 +121,8 @@ module PacketFu
 	#  uint16be :eth_proto, :initial_value => 0x0800 # IP 0x0800, Arp 0x0806
 	#  rest     :body
 	class EthHeader < Struct.new(:eth_dst, :eth_src, :eth_proto, :body)
+		include StructFu
+
 		def initialize(args={})
 			args[:eth_dst] ||= EthMac.new
 			args[:eth_src] ||= EthMac.new
@@ -162,9 +163,9 @@ module PacketFu
 		# irb> PacketFu::EthHeader.str2mac("\x11\x22\x33\x44\x55\x66")
 		#
 		# #=> "11:22:33:44:55:66"
-		def self.str2mac(mac)
-			if mac.size == 6 && mac.class == String
-				ret = mac.unpack("C6").collect {|x| sprintf("%02x",x)}.join(":")
+		def self.str2mac(mac='')
+			if mac.to_s.size == 6 && mac.kind_of?(::String)
+				ret = mac.unpack("C6").map {|x| sprintf("%02x",x)}.join(":")
 			end
 		end
 
@@ -190,6 +191,17 @@ module PacketFu
 		# Returns a more readable source MAC address.
 		def daddr
 			EthHeader.str2mac(self[:eth_dst].to_s)
+		end
+
+	end
+
+	class	EthPacket < Packet
+		attr_accessor :eth_header
+
+		def initialize(args={})
+			@eth_header = (args[:eth] || EthHeader.new)
+			@headers = [@eth_header]
+			super
 		end
 
 	end
