@@ -100,7 +100,7 @@ module PacketFu
 
 		def init_fields(args={})
 			args[:timestamp] ||= Timestamp.new(:endian => args[:endian])
-			args[:incl_len] ||= @int32.new(args[:data].sz)
+			args[:incl_len] ||= @int32.new(args[:data].to_s.size)
 			args[:orig_len] ||= @int32.new(0)
 			args[:data] ||= StructFu::String.new
 		end
@@ -120,6 +120,8 @@ module PacketFu
 	end
 
 	class PcapPackets < Array
+
+		include StructFu
 
 		attr_accessor :endian # probably ought to be read-only but who am i.
 

@@ -1,9 +1,17 @@
 # StructFu, a nifty way to leverage Ruby's built in Struct class
-# to create meaningful binary data. This is way pre-pre-alpha,
-# and not used for anything, as of early October, 2009
+# to create meaningful binary data. 
 
 module StructFu
+	# Normally, self.size and self.length will refer to the Struct
+	# size as an array. It's a hassle to redefine, so this introduces some
+	# shorthand to get at the size of the resultant string.
+	def sz
+		self.to_s.size
+	end
+
+	alias len sz
 end
+
 require 'structfu/int.rb'
 require 'structfu/string.rb'
 
