@@ -6,3 +6,5 @@ module StructFu
 end
 require 'structfu/int.rb'
 require 'structfu/string.rb'
+
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

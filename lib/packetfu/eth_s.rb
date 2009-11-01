@@ -196,4 +196,4 @@ module PacketFu
 
 end
 
-include PacketFu
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

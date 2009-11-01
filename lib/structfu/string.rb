@@ -108,3 +108,4 @@ module StructFu
 
 end
 
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
