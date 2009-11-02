@@ -84,13 +84,13 @@ class IntTest < Test::Unit::TestCase
 	end
 
 	def test_read
-		assert_equal(Int16.new.read("\x00\x07"),7) 
-		assert_equal(Int32.new.read("\x00\x00\x00\x0a"),10) 
+		assert_equal(7,Int16.new.read("\x00\x07").to_i) 
+		assert_equal(Int32.new.read("\x00\x00\x00\x0a").to_i,10) 
 		i = Int32.new
 		i.read("\x00\x00\x00\xff")
 		assert_equal(i.v, 255)
-		assert_equal(Int16le.new.read("\x07\x00"),7) 
-		assert_equal(Int32le.new.read("\x01\x04\x00\x00"),1025) 
+		assert_equal(7, Int16le.new.read("\x07\x00").to_i) 
+		assert_equal(1025,Int32le.new.read("\x01\x04\x00\x00").to_i) 
 		i = Int32le.new
 		i.read("\xff\x00\x00\x00")
 		assert_equal(i.v, 255)

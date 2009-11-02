@@ -12,7 +12,9 @@ class EthTest < Test::Unit::TestCase
 		@src = "\x00\x1b\x11\x51\xb7\xce"
 		@srcmac = "00-1b-11-51-b7-ce"
 		@proto = "\x08\x00"
-		@header = "00032f1a74de001b1151b7ce0800".scan(/../).map {|x| x.to_i(16)}.pack("C*")
+		@header = "00032f1a74de001b1151b7ce0800".scan(/../).map {
+			|x| x.to_i(16)
+		}.pack("C*")
 		@ethmac = EthMac.new
 		@eth = EthHeader.new
 	end

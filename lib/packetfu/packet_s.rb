@@ -80,11 +80,6 @@ module PacketFu
 		end
 
 		# In the event of no proper decoding, at least send it to the inner-most header.
-		def read(io)
-			@headers[0].read(io)
-		end
-
-		# In the event of no proper decoding, at least send it to the inner-most header.
 		def write(io)
 			@headers[0].write(io)
 		end
@@ -221,6 +216,7 @@ module PacketFu
 					elsif eth_proto_num == 0x0806 # It's ARP
 						@arp_header.read(io[14,0xffff]) # You'll nearly have a trailer and you'll never know what size.
 						@eth_header.body=@arp_header
+						@eth_header.body
 					elsif eth_proto_num == 0x86dd # It's IPv6
 						@ipv6_header.read(io[14,0xffff])
 						@eth_header.body=@ipv6_header
@@ -279,6 +275,7 @@ module PacketFu
 				p = retklass.new
 				p.headers = self.headers
 				p
+				raise e if $debug
 			end
 		end
 

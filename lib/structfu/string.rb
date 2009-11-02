@@ -2,6 +2,7 @@ module StructFu
 
 	class String < ::String
 		def read(str)
+			str = str.to_s
 			self.replace str
 			self
 		end

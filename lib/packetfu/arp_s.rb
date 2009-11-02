@@ -19,18 +19,51 @@ module PacketFu
 	#	 octets   :arp_dst_ip                              # From ip.rb
 	#	 rest     :body
 	#
-	class ARPHeader < BinData::MultiValue
+	class ARPHeader < Struct.new(:arp_hw, :arp_proto, :arp_hw_len,
+															 :arp_proto_len, :arp_opcode,
+															 :arp_src_mac, :arp_src_ip,
+															 :arp_dst_mac, :arp_dst_ip,
+															 :body)
+		include StructFu
 
-		uint16be	:arp_hw, 				:initial_value => 1 # Ethernet
-		uint16be	:arp_proto, 		:initial_value => 0x0800 # IP
-		uint8			:arp_hw_len,		:initial_value => 6
-		uint8			:arp_proto_len,	:initial_value => 4
-		uint16be	:arp_opcode,		:initial_value => 1 # 1: Request, 2: Reply, 3: Request-Reverse, 4: Reply-Reverse
-		eth_mac		:arp_src_mac		# From eth.rb
-		octets		:arp_src_ip			# From ip.rb
-		eth_mac		:arp_dst_mac		# From eth.rb
-		octets		:arp_dst_ip			# From ip.rb
-		rest			:body
+		def initialize(args={})
+			super( 
+			args[:arp_hw] ||= Int16.new(1),
+			args[:arp_proto] ||= Int16.new(0x0800),
+			args[:arp_hw_len] ||= Int8.new(6),
+			args[:arp_proto_len] ||= Int8.new(4),
+			args[:arp_opcode] ||= Int16.new(1),
+			args[:arp_src_mac] ||= EthMac.new,
+			args[:arp_src_ip] ||= Octets.new,
+			args[:arp_dst_mac] ||= EthMac.new,
+			args[:arp_dst_ip] ||= Octets.new,
+			args[:body] ||= StructFu::String.new)
+		end
+
+		def body=(str)
+			if str.kind_of? ::String
+				self[:body] = StructFu::String.new.read(str)
+			end
+		end
+
+		def to_s
+			self.to_a.map {|x| x.to_s}.join
+		end
+
+		def read(str)
+			str = str.to_s
+			self[:arp_hw].read(str[0,2])
+			self[:arp_proto].read(str[2,2])
+			self[:arp_hw_len].read(str[4,1])
+			self[:arp_proto_len].read(str[5,1])
+			self[:arp_opcode].read(str[6,2])
+			self[:arp_src_mac].read(str[8,6])
+			self[:arp_src_ip].read(str[14,4])
+			self[:arp_dst_mac].read(str[18,6])
+			self[:arp_dst_ip].read(str[24,4])
+			self[:body].read(str[28,str.size])
+			self
+		end
 
 		# Set the source MAC address in a more readable way.
 		def arp_saddr_mac=(mac)
@@ -58,30 +91,22 @@ module PacketFu
 
 		# Sets a more readable source IP address. 
 		def arp_saddr_ip=(addr)
-			addr = IPHeader.octet_array(addr)
-			arp_src_ip.o1 = addr[0]
-			arp_src_ip.o2 = addr[1]
-			arp_src_ip.o3 = addr[2]
-			arp_src_ip.o4 = addr[3]
+			arp_src_ip.read_quad(addr)
 		end
 
 		# Returns a more readable source IP address. 
 		def arp_saddr_ip
-			[arp_src_ip.o1,arp_src_ip.o2,arp_src_ip.o3,arp_src_ip.o4].join('.')
+			arp_src_ip.to_x
 		end
 
 		# Sets a more readable destination IP address.
 		def arp_daddr_ip=(addr)
-			addr = IPHeader.octet_array(addr)
-			arp_dst_ip.o1 = addr[0]
-			arp_dst_ip.o2 = addr[1]
-			arp_dst_ip.o3 = addr[2]
-			arp_dst_ip.o4 = addr[3]
+			arp_dst_ip.read_quad(addr)
 		end
 		
 		# Returns a more readable destination IP address.
 		def arp_daddr_ip
-			[arp_dst_ip.o1,arp_dst_ip.o2,arp_dst_ip.o3,arp_dst_ip.o4].join('.')
+			arp_dst_ip.to_x
 		end
 
 	end # class ARPHeader
@@ -117,7 +142,7 @@ module PacketFu
 		def initialize(args={})
 			@eth_header = (args[:eth] || EthHeader.new)
 			@arp_header = (args[:arp]	|| ARPHeader.new)
-			@eth_header.eth_proto = 0x806
+			@eth_header.eth_proto.read("\x08\x06")
 			@eth_header.body=@arp_header
 
 			# Please send more flavors to todb-packetfu@planb-security.net.

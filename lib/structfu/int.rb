@@ -33,8 +33,9 @@ module StructFu
 			super(value,endian,width,default=0)
 		end
 
-		def read(s)
-			self.v = s.unpack(@packstr).first
+		def read(str)
+			self.v = str.unpack(@packstr).first
+			self
 		end
 
 	end
@@ -50,9 +51,11 @@ module StructFu
 		 [(self.v || self.d)].pack("C")
 		end
 
-		def read(s)
-			self.v = s.unpack("C").first
+		def read(str)
+			self.v = str.unpack("C").first
+			self
 		end
+
 	end
 
 	class Int16 < Int
@@ -60,9 +63,16 @@ module StructFu
 			super(v,e,w=2)
 			@packstr = (self.e == :big) ? "n" : "v"
 		end
+
 		def to_s
 			[(self.v || self.d)].pack(@packstr)
 	 	end
+
+		def read(str)
+			self.v = str.unpack(@packstr).first
+			self
+		end
+
 	end
 
 	class Int16be < Int16
@@ -80,9 +90,16 @@ module StructFu
 			super(v,e,w=4)
 			@packstr = (self.e == :big) ? "N" : "V"
 		end
+
+		def read(str)
+			self.v = str.unpack(@packstr).first
+			self
+		end
+
 		def to_s
 			[(self.v || self.d)].pack(@packstr)
 	 	end
+
 	end
 
 	class Int32be < Int32

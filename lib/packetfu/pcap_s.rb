@@ -184,6 +184,9 @@ module PacketFu
 		# Note that this strips out pcap timestamps -- if you'd like to retain
 		# timestamps and other libpcap file information, you will want to 
 		# use read() instead.
+		#
+		# Note, invoking this requires the somewhat clumsy sytax of,
+		# PcapFile.new.file_to_array(:f => 'filename.pcap')
 		def file_to_array(args={})
 			filename = args[:filename] || args[:file] || args[:f]
 			unless (!filename.nil? || filename.kind_of?(String))

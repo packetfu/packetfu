@@ -126,20 +126,22 @@ module PacketFu
 		def initialize(args={})
 			args[:eth_dst] ||= EthMac.new
 			args[:eth_src] ||= EthMac.new
-			args[:eth_proto] ||= StructFu::Int16.new(0x0800)
+			args[:eth_proto] ||= Int16.new(0x0800)
 			args[:body] ||= StructFu::String.new
 			super(args[:eth_dst], args[:eth_src], args[:eth_proto], args[:body])
 		end
+
 
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
 		def read(str)
+			str = str.to_s
 			self[:eth_dst].read str[0,6]
 			self[:eth_src].read str[6,6]
 			self[:eth_proto].read str[12,2]
-			self[:body].read str[14,str.size-14]
+			self[:body].read str[14,str.size] if str.size > 14
 			self
 		end
 
