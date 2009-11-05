@@ -10,6 +10,13 @@ module StructFu
 	end
 
 	alias len sz
+
+	# A little metaprogramming. 
+	def typecast(i)
+		c = caller[0].match(/.*`([^']+)='/)[1]
+		self[c.intern].read i
+	end
+
 end
 
 require 'structfu/int.rb'

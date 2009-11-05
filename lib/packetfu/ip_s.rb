@@ -25,6 +25,7 @@ module PacketFu
 		end
 
 		def read(str)
+			return self if str.nil?
 			self[:o1].read str[0,1]
 			self[:o2].read str[1,1]
 			self[:o3].read str[2,1]

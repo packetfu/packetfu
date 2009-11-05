@@ -28,22 +28,16 @@ module PacketFu
 
 		def initialize(args={})
 			super( 
-			args[:arp_hw] ||= Int16.new(1),
-			args[:arp_proto] ||= Int16.new(0x0800),
-			args[:arp_hw_len] ||= Int8.new(6),
-			args[:arp_proto_len] ||= Int8.new(4),
-			args[:arp_opcode] ||= Int16.new(1),
-			args[:arp_src_mac] ||= EthMac.new,
-			args[:arp_src_ip] ||= Octets.new,
-			args[:arp_dst_mac] ||= EthMac.new,
-			args[:arp_dst_ip] ||= Octets.new,
-			args[:body] ||= StructFu::String.new)
-		end
-
-		def body=(str)
-			if str.kind_of? ::String
-				self[:body] = StructFu::String.new.read(str)
-			end
+			Int16.new(args[:arp_hw] || 1), 
+			Int16.new(args[:arp_proto] ||0x0800),
+			Int8.new(args[:arp_hw_len] || 6), 
+			Int8.new(args[:arp_proto_len] || 4), 
+			Int16.new(args[:arp_opcode]),
+			EthMac.new.read(args[:arp_src_mac]),
+			Octets.new.read(args[:arp_src_ip]), 
+			EthMac.new.read(args[:arp_dst_mac]),
+			Octets.new.read(args[:arp_dst_ip]),
+			StructFu::String.new.read(args[:body]))
 		end
 
 		def to_s
@@ -51,7 +45,7 @@ module PacketFu
 		end
 
 		def read(str)
-			str = str.to_s
+			return self if str.nil?
 			self[:arp_hw].read(str[0,2])
 			self[:arp_proto].read(str[2,2])
 			self[:arp_hw_len].read(str[4,1])
@@ -64,6 +58,18 @@ module PacketFu
 			self[:body].read(str[28,str.size])
 			self
 		end
+
+		# This bit should be easier to write, but hey.
+		def arp_hw=(i); typecast i; end
+		def arp_proto=(i); typecast i; end
+		def arp_hw_len=(i); typecast i; end
+		def arp_proto_len=(i); typecast i; end
+		def arp_opcode=(i); typecast i; end
+		def arp_src_mac=(i); typecast i; end
+		def arp_src_ip=(i); typecast i; end
+		def arp_dst_mac=(i); typecast i; end
+		def arp_dst_ip=(i); typecast i; end
+		def body=(i); typecast i; end
 
 		# Set the source MAC address in a more readable way.
 		def arp_saddr_mac=(mac)
@@ -141,7 +147,7 @@ module PacketFu
 
 		def initialize(args={})
 			@eth_header = (args[:eth] || EthHeader.new)
-			@arp_header = (args[:arp]	|| ARPHeader.new)
+			@arp_header = (args[:arp]	|| ARPHeader.new(args))
 			@eth_header.eth_proto.read("\x08\x06")
 			@eth_header.body=@arp_header
 

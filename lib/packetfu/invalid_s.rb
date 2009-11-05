@@ -16,7 +16,9 @@ module PacketFu
 		end
 
 		def read(str)
+			return self if str.nil?
 			self[:body].read str
+			self
 		end
 
 	end

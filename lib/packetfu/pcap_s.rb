@@ -21,20 +21,20 @@ module PacketFu
 
 		def initialize(args={})
 			set_endianness(args[:endian] ||= :little)
-			init_fields(args)
+			init_fields(args) 
 			super(args[:endian], args[:magic], args[:ver_major], 
 						args[:ver_minor], args[:thiszone], args[:sigfigs], 
 						args[:snaplen], args[:network])
 		end
 		
 		def init_fields(args={})
-			args[:magic] ||= @int32.new(0xa1b2c3d4)
-			args[:ver_major] ||= @int16.new(2)
-			args[:ver_minor] ||= @int16.new(4)
-			args[:thiszone] ||= @int32.new(0)
-			args[:sigfigs] ||= @int32.new(0)
-			args[:snaplen] ||= @int32.new(0xffff)
-			args[:network] ||= @int32.new(1)
+			args[:magic] = @int32.new(args[:magic] || 0xa1b2c3d4)
+			args[:ver_major] = @int16.new(args[:ver_major] || 2)
+			args[:ver_minor] ||= @int16.new(args[:ver_minor] || 4)
+			args[:thiszone] ||= @int32.new(args[:thiszone])
+			args[:sigfigs] ||= @int32.new(args[:sigfigs])
+			args[:snaplen] ||= @int32.new(args[:snaplen] || 0xffff)
+			args[:network] ||= @int32.new(args[:network] || 1)
 			return args
 		end
 
@@ -42,12 +42,12 @@ module PacketFu
 			self.to_a[1,7].map {|x| x.to_s}.join
 		end
 
-		# TODO: read() should determine endianness and switch accordingly.
-		# At the moment, the user needs to know endianness ahead of time
-		# (defaults to little). This is a bummer, will fix once I get
-		# a hold of a big-endian file to test with (not hard).
+		# TODO: Create a test case for both endian file types, and incidentally
+		# convert from one to another. Right now, if you read in a big-endian
+		# file, you'll write a big-endian file.
 		def read(str)
-			if str[0,4] == self[:magic].to_s || true # always true for now
+			return self if str.nil?
+			if str[0,4] == self[:magic].to_s || true # TODO: raise if it's not magic.
 				self[:magic].read str[0,4]
 				self[:ver_major].read str[4,2]
 				self[:ver_minor].read str[6,2]
@@ -55,8 +55,8 @@ module PacketFu
 				self[:sigfigs].read str[12,4]
 				self[:snaplen].read str[16,4]
 				self[:network].read str[20,4]
-				self
 			end
+			self
 		end
 
 	end
@@ -71,8 +71,8 @@ module PacketFu
 		end
 
 		def init_fields(args={})
-			args[:sec] ||= @int32.new(0)
-			args[:usec] ||= @int32.new(0)
+			args[:sec] = @int32.new(args[:sec])
+			args[:usec] = @int32.new(args[:usec])
 			return args
 		end
 
@@ -81,6 +81,7 @@ module PacketFu
 		end
 
 		def read(str)
+			return self if str.nil?
 			self[:sec].read str[0,4]
 			self[:usec].read str[4,4]
 			self
@@ -99,10 +100,10 @@ module PacketFu
 		end
 
 		def init_fields(args={})
-			args[:timestamp] ||= Timestamp.new(:endian => args[:endian])
-			args[:incl_len] ||= @int32.new(args[:data].to_s.size)
-			args[:orig_len] ||= @int32.new(0)
-			args[:data] ||= StructFu::String.new
+			args[:timestamp] = Timestamp.new(:endian => args[:endian]).read(args[:timestamp])
+			args[:incl_len] = args[:incl_len].nil? ? @int32.new(args[:data].to_s.size) : @int32.new(args[:incl_len])
+			args[:orig_len] = @int32.new(args[:orig_len])
+			args[:data] = StructFu::String.new.read(args[:data])
 		end
 
 		def to_s
@@ -132,6 +133,7 @@ module PacketFu
 		# Note, read takes in the whole pcap file, since we need to see
 		# the magic to know what endianness we're dealing with.
 		def read(str)
+			return self if str.nil?
 			magic = "\xa1\xb2\xc3\xd4"
 			if str[0,4] == magic
 				@endian = :big
@@ -165,8 +167,8 @@ module PacketFu
 		end
 
 		def init_fields(args={})
-			args[:head] ||= PcapHeader.new(:endian => args[:endian])
-			args[:body] ||= PcapPackets.new(:endian => args[:endian])
+			args[:head] = PcapHeader.new(:endian => args[:endian]).read(args[:head])
+			args[:body] = PcapPackets.new(:endian => args[:endian]).read(args[:body])
 			return args
 		end
 

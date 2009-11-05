@@ -33,8 +33,8 @@ module StructFu
 			super(value,endian,width,default=0)
 		end
 
-		def read(str)
-			self.v = str.unpack(@packstr).first
+		def read(i)
+			self.v = i.kind_of?(Integer) ? i.to_i : i.to_s.unpack(@packstr).first
 			self
 		end
 
@@ -51,11 +51,6 @@ module StructFu
 		 [(self.v || self.d)].pack("C")
 		end
 
-		def read(str)
-			self.v = str.unpack("C").first
-			self
-		end
-
 	end
 
 	class Int16 < Int
@@ -67,11 +62,6 @@ module StructFu
 		def to_s
 			[(self.v || self.d)].pack(@packstr)
 	 	end
-
-		def read(str)
-			self.v = str.unpack(@packstr).first
-			self
-		end
 
 	end
 
@@ -89,11 +79,6 @@ module StructFu
 		def initialize(v=nil, e=:big)
 			super(v,e,w=4)
 			@packstr = (self.e == :big) ? "N" : "V"
-		end
-
-		def read(str)
-			self.v = str.unpack(@packstr).first
-			self
 		end
 
 		def to_s

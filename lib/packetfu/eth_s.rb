@@ -15,8 +15,10 @@ module PacketFu
 	#  bit1     :local
 	#  bit1     :multicast
 	#  uint16be :oui,      :initial_value => 0x1ac5 # :)
-	class EthOui < Struct.new(:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :oui)
+	class EthOui < Struct.new(:b0, :b1, :b2, :b3, :b4, :b5, :local, :multicast, :oui)
 
+		# EthOui is unusual in that the bit values do not (currently) enjoy
+		# StructFu typing.
 		def initialize(args={})
 			args[:local] ||= 1 # Let's have it be local by default
 			args[:oui] ||= 0x1ac # :)
@@ -34,12 +36,13 @@ module PacketFu
 			byte += 0b00001000 if b3.to_i == 1
 			byte += 0b00010000 if b4.to_i == 1
 			byte += 0b00100000 if b5.to_i == 1
-			byte += 0b01000000 if b6.to_i == 1
-			byte += 0b10000000 if b7.to_i == 1
+			byte += 0b01000000 if local.to_i == 1
+			byte += 0b10000000 if multicast.to_i == 1
 			[byte,oui].pack("Cn")
 		end
 
 		def read(str)
+			return self if str.nil?
 			byte = str[0]
 			self[:b0] = byte & 0b10000000 == 0b10000000 ? 1 : 0
 			self[:b1] = byte & 0b01000000 == 0b01000000 ? 1 : 0
@@ -47,8 +50,8 @@ module PacketFu
 			self[:b3] = byte & 0b00010000 == 0b00010000 ? 1 : 0
 			self[:b4] = byte & 0b00001000 == 0b00001000 ? 1 : 0
 			self[:b5] = byte & 0b00000100 == 0b00000100 ? 1 : 0
-			self[:b6] = byte & 0b00000010 == 0b00000010 ? 1 : 0
-			self[:b7] = byte & 0b00000001 == 0b00000001 ? 1 : 0
+			self[:local] = byte & 0b00000010 == 0b00000010 ? 1 : 0
+			self[:multicast] = byte & 0b00000001 == 0b00000001 ? 1 : 0
 			self[:oui] = str[1,2].unpack("n").first
 			self
 		end
@@ -65,6 +68,7 @@ module PacketFu
 	#
 	class EthNic < Struct.new(:n0, :n1, :n2)
 
+		# EthNic does not enjoy StructFu typing.
 		def initialize(args={})
 			args.each_pair {|k,v| args[k] = 0 unless v} 
 			super(args[:n0], args[:n1], args[:n2])
@@ -75,6 +79,7 @@ module PacketFu
 		end
 		
 		def read(str)
+			return self if str.nil?
 			self[:n0], self[:n1], self[:n2] = str[0,3].unpack("C3")
 			self
 		end
@@ -90,9 +95,9 @@ module PacketFu
 	class EthMac < Struct.new(:oui, :nic)
 
 		def initialize(args={})
-			args[:oui] ||= EthOui.new
-			args[:nic] ||= EthNic.new
-			super(args[:oui], args[:nic])
+			super(
+			EthOui.new.read(args[:oui]),
+			EthNic.new.read(args[:nic]))
 		end
 
 		def to_s
@@ -100,6 +105,7 @@ module PacketFu
 		end
 
 		def read(str)
+			return self if str.nil?
 			self.oui.read str[0,3]
 			self.nic.read str[3,3]
 			self
@@ -124,11 +130,11 @@ module PacketFu
 		include StructFu
 
 		def initialize(args={})
-			args[:eth_dst] ||= EthMac.new
-			args[:eth_src] ||= EthMac.new
-			args[:eth_proto] ||= Int16.new(0x0800)
-			args[:body] ||= StructFu::String.new
-			super(args[:eth_dst], args[:eth_src], args[:eth_proto], args[:body])
+			super(
+			EthMac.new.read(args[:eth_dst]),
+			EthMac.new.read(args[:eth_src]),
+			Int16.new(args[:eth_proto] || 0x0800),
+			StructFu::String.new.read(args[:body]))
 		end
 
 
@@ -137,7 +143,7 @@ module PacketFu
 		end
 
 		def read(str)
-			str = str.to_s
+			return self if str.nil?
 			self[:eth_dst].read str[0,6]
 			self[:eth_src].read str[6,6]
 			self[:eth_proto].read str[12,2]
@@ -201,7 +207,7 @@ module PacketFu
 		attr_accessor :eth_header
 
 		def initialize(args={})
-			@eth_header = (args[:eth] || EthHeader.new)
+			@eth_header = (args[:eth] || EthHeader.new(args))
 			@headers = [@eth_header]
 			super
 		end

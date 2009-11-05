@@ -79,4 +79,45 @@ class ArpTest < Test::Unit::TestCase
 
 end
 
+class ArpCreateTest < Test::Unit::TestCase
+	include PacketFu
+
+	def setup
+		@pcaps = PcapFile.new.file_to_array(:f => 'sample.pcap')
+	end
+
+	def test_create_packet
+		ref = @pcaps[6]
+		arp = ARPPacket.new
+		assert_kind_of ARPPacket, arp
+		arp.arp_hw = 1
+		arp.arp_proto = 0x0800
+		arp.arp_hw_len = 6
+		arp.arp_proto_len = 4 
+		arp.arp_opcode = 2
+		arp.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
+		arp.arp_src_ip = "\xc0\xa8\x01\x02"
+		arp.arp_dst_mac = "\x00\x1b\x11\x51\xb7\xce"
+		arp.arp_dst_ip = "\xc0\xa8\x01\x69"
+		arp.payload = "\xc0\xa8\x01\x69"
+		assert_equal(ref[14,0xffff],arp.to_s[14,0xffff])
+	end
+	
+	def test_new
+		ref = @pcaps[6]
+		arp = ARPPacket.new(:arp_hw => 1, :arp_proto => 0x0800,
+											 :arp_opcode => 2, :arp_src_ip => "\xc0\xa8\x01\x02")
+		assert_kind_of ARPPacket, arp
+		arp.arp_hw_len = 6
+		arp.arp_proto_len = 4 
+		arp.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
+		arp.arp_dst_mac = "\x00\x1b\x11\x51\xb7\xce"
+		arp.arp_dst_ip = "\xc0\xa8\x01\x69"
+		arp.payload = "\xc0\xa8\x01\x69"
+		assert_equal(ref[14,0xffff],arp.to_s[14,0xffff])
+	end
+	
+end
+
+
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
