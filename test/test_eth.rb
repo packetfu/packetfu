@@ -60,6 +60,7 @@ class EthPacketTest < Test::Unit::TestCase
 
 	def setup
 		@pcaps = PcapFile.new.file_to_array(:f => 'sample.pcap')
+		@header = @pcaps[0][0,14]
 	end
 
 	def test_create_packet
@@ -68,7 +69,20 @@ class EthPacketTest < Test::Unit::TestCase
 		assert_kind_of EthHeader, p.headers[0]
 		assert p.is_eth?
 		assert_equal false, p.is_tcp?
+		p.eth_dst = "\x00\x03\x2f\x1a\x74\xde"
+		p.eth_src = "\x00\x1b\x11\x51\xb7\xce"
+		p.eth_proto = 0x0800
+		assert_equal @header, p.to_s[0,14]
 	end
+
+	def test_eth_new
+		p = EthPacket.new(
+		:eth_dst => "\x00\x03\x2f\x1a\x74\xde",
+		:eth_src => "\x00\x1b\x11\x51\xb7\xce",
+		:eth_proto => 0x0800)
+		assert_equal @header, p.to_s[0,14]
+	end
+
 
 	def test_eth_packet_undecoded_body
 		p = Packet.parse("A" * 100)

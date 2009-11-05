@@ -137,6 +137,11 @@ module PacketFu
 			StructFu::String.new.read(args[:body]))
 		end
 
+		def eth_dst=(i); typecast(i); end
+		def eth_src=(i); typecast(i); end
+		def eth_proto=(i); typecast(i); end
+		def body=(i); typecast(i); end
+
 
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
