@@ -4,8 +4,9 @@ require 'test_pcap'
 require 'test_invalid'
 require 'test_eth'
 require 'test_octets'
-require 'test_arp'
 require 'test_packet'
+require 'test_arp'
+require 'test_ip'
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
 

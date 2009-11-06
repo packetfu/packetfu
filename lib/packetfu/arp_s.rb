@@ -28,16 +28,17 @@ module PacketFu
 
 		def initialize(args={})
 			super( 
-			Int16.new(args[:arp_hw] || 1), 
-			Int16.new(args[:arp_proto] ||0x0800),
-			Int8.new(args[:arp_hw_len] || 6), 
-			Int8.new(args[:arp_proto_len] || 4), 
-			Int16.new(args[:arp_opcode]),
-			EthMac.new.read(args[:arp_src_mac]),
-			Octets.new.read(args[:arp_src_ip]), 
-			EthMac.new.read(args[:arp_dst_mac]),
-			Octets.new.read(args[:arp_dst_ip]),
-			StructFu::String.new.read(args[:body]))
+				Int16.new(args[:arp_hw] || 1), 
+				Int16.new(args[:arp_proto] ||0x0800),
+				Int8.new(args[:arp_hw_len] || 6), 
+				Int8.new(args[:arp_proto_len] || 4), 
+				Int16.new(args[:arp_opcode]),
+				EthMac.new.read(args[:arp_src_mac]),
+				Octets.new.read(args[:arp_src_ip]), 
+				EthMac.new.read(args[:arp_dst_mac]),
+				Octets.new.read(args[:arp_dst_ip]),
+				StructFu::String.new.read(args[:body])
+			)
 		end
 
 		def to_s
@@ -187,24 +188,24 @@ module PacketFu
 		def peek(args={})
 			peek_data = ["A "]
 			peek_data << "%-5d" % self.to_s.size
-			peek_data << self.arp_saddr_mac
-			peek_data << "(#{self.arp_saddr_ip})"
+			peek_data << arp_saddr_mac
+			peek_data << "(#{arp_saddr_ip})"
 			peek_data << "->"
-			peek_data << case self.arp_daddr_mac
+			peek_data << case arp_daddr_mac
 										when "00:00:00:00:00:00"; "Bcast00"
 										when "ff:ff:ff:ff:ff:ff"; "BcastFF"
-										else; self.arp_daddr_mac
+										else; arp_daddr_mac
 										end
-			peek_data << "(#{self.arp_daddr_ip})"
+			peek_data << "(#{arp_daddr_ip})"
 			peek_data << ":"
-			peek_data << case self.arp_opcode
+			peek_data << case arp_opcode
 										when 1; "Requ"
 										when 2; "Repl"
 										when 3; "RReq"
 										when 4; "RRpl"
 										when 5; "IReq"
 										when 6; "IRpl"
-										else; "0x%02x" % self.opcode
+										else; "0x%02x" % arp_opcode
 										end
 			peek_data.join
 		end
