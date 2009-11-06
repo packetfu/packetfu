@@ -69,7 +69,18 @@ module PacketFu
 		def arp_src_ip=(i); typecast i; end
 		def arp_dst_mac=(i); typecast i; end
 		def arp_dst_ip=(i); typecast i; end
-		def body=(i); typecast i; end
+
+		def body=(i) 
+			if i.kind_of? ::String
+				typecast(i)
+			elsif i.kind_of? StructFu
+				self[:body] = i
+			elsif i.nil?
+				self[:body] = StructFu::String.new.read("")
+			else
+				raise # TODO: Describe this
+			end
+		end
 
 		# Set the source MAC address in a more readable way.
 		def arp_saddr_mac=(mac)
@@ -146,9 +157,9 @@ module PacketFu
 		attr_accessor :eth_header, :arp_header
 
 		def initialize(args={})
-			@eth_header = (args[:eth] || EthHeader.new)
-			@arp_header = (args[:arp]	|| ARPHeader.new(args))
-			@eth_header.eth_proto.read("\x08\x06")
+			@eth_header = EthHeader.new.read(args[:eth])
+			@arp_header = ARPHeader.new.read(args[:arp])
+			@eth_header.eth_proto = "\x08\x06"
 			@eth_header.body=@arp_header
 
 			# Please send more flavors to todb-packetfu@planb-security.net.

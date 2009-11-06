@@ -20,7 +20,7 @@ module PacketFu
 		# EthOui is unusual in that the bit values do not (currently) enjoy
 		# StructFu typing.
 		def initialize(args={})
-			args[:local] ||= 1 # Let's have it be local by default
+			args[:local] ||= 0 
 			args[:oui] ||= 0x1ac # :)
 			args.each_pair {|k,v| args[k] = 0 unless v} 
 			super(args[:b0], args[:b1], args[:b2], args[:b3], 
@@ -30,28 +30,28 @@ module PacketFu
 
 		def to_s
 			byte = 0
-			byte += 0b00000001 if b0.to_i == 1
-			byte += 0b00000010 if b1.to_i == 1
-			byte += 0b00000100 if b2.to_i == 1
-			byte += 0b00001000 if b3.to_i == 1
-			byte += 0b00010000 if b4.to_i == 1
-			byte += 0b00100000 if b5.to_i == 1
-			byte += 0b01000000 if local.to_i == 1
-			byte += 0b10000000 if multicast.to_i == 1
+			byte += 0b00000001 if local.to_i == 1
+			byte += 0b00000010 if multicast.to_i == 1
+			byte += 0b00000100 if b5.to_i == 1
+			byte += 0b00001000 if b4.to_i == 1
+			byte += 0b00010000 if b3.to_i == 1
+			byte += 0b00100000 if b2.to_i == 1
+			byte += 0b01000000 if b1.to_i == 1
+			byte += 0b10000000 if b0.to_i == 1
 			[byte,oui].pack("Cn")
 		end
 
 		def read(str)
 			return self if str.nil?
 			byte = str[0]
-			self[:b0] = byte & 0b10000000 == 0b10000000 ? 1 : 0
-			self[:b1] = byte & 0b01000000 == 0b01000000 ? 1 : 0
-			self[:b2] = byte & 0b00100000 == 0b00100000 ? 1 : 0
-			self[:b3] = byte & 0b00010000 == 0b00010000 ? 1 : 0
-			self[:b4] = byte & 0b00001000 == 0b00001000 ? 1 : 0
-			self[:b5] = byte & 0b00000100 == 0b00000100 ? 1 : 0
-			self[:local] = byte & 0b00000010 == 0b00000010 ? 1 : 0
-			self[:multicast] = byte & 0b00000001 == 0b00000001 ? 1 : 0
+			self[:local] = byte & 0b10000000 == 0b10000000 ? 1 : 0
+			self[:multicast] = byte & 0b01000000 == 0b01000000 ? 1 : 0
+			self[:b5] = byte & 0b00100000 == 0b00100000 ? 1 : 0
+			self[:b4] = byte & 0b00010000 == 0b00010000 ? 1 : 0
+			self[:b3] = byte & 0b00001000 == 0b00001000 ? 1 : 0
+			self[:b2] = byte & 0b00000100 == 0b00000100 ? 1 : 0
+			self[:b1] = byte & 0b00000010 == 0b00000010 ? 1 : 0
+			self[:b0] = byte & 0b00000001 == 0b00000001 ? 1 : 0
 			self[:oui] = str[1,2].unpack("n").first
 			self
 		end
@@ -140,7 +140,18 @@ module PacketFu
 		def eth_dst=(i); typecast(i); end
 		def eth_src=(i); typecast(i); end
 		def eth_proto=(i); typecast(i); end
-		def body=(i); typecast(i); end
+
+		def body=(i) 
+			if i.kind_of? ::String
+				typecast(i)
+			elsif i.kind_of? StructFu
+				self[:body] = i
+			elsif i.nil?
+				self[:body] = StructFu::String.new.read("")
+			else
+				raise # TODO: Describe this
+			end
+		end
 
 
 		def to_s
