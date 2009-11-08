@@ -95,10 +95,23 @@ module PacketFu
 			@headers.last.body=(args)
 		end
 
-		# Put the entire packet into a libpcap file.
+		# Converts a packet to libpcap format
+		def to_pcap(args={})
+			p = PcapPacket.new(:endian => args[:endian],
+												:timestamp => Timestamp.new.to_s,
+												:incl_len => self.to_s.size,
+												:orig_len => self.to_s.size,
+												:data => self)
+		end
+
+		# Put the entire packet into a libpcap file. XXX: this is a
+		# hack for now just to confirm that packets are getting created
+		# correctly.
 		def to_f(filename=nil)
-			PacketFu::Write.a2f(:file=> filename || PacketFu::Config.new.config[:pcapfile],
-													:arr=>[@headers[0].to_s])
+			filename ||= 'out.pcap'
+			data = [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join
+			File.open(filename, 'w') {|f| f.write data}
+			return [filename, 1, data.size]
 		end
 
 		# Put the entire packet on the wire by creating a temporary PacketFu::Inject object.

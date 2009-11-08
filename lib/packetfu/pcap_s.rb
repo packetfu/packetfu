@@ -201,7 +201,7 @@ module PacketFu
 		alias_method :f2a, :file_to_array
 
 		# Prior versions of packetfu had an array_to_file function, where
-		# pcaps were story in simple arrays. This seems silly, in retrospect;
+		# pcaps were stored in simple arrays. This seems silly, in retrospect;
 		# the strategy now is to store pcaps in memory as regular PcapFile 
 		# Structs, so timestamps and what-all can be more easily preserved.
 		#
