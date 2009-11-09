@@ -69,6 +69,14 @@ class EthPacketTest < Test::Unit::TestCase
 		assert_equal header, p.to_s[0,14]
 	end
 
+	def test_eth_write
+		p = EthPacket.new(
+		:eth_dst => "\x00\x03\x2f\x1a\x74\xde",
+		:eth_src => "\x00\x1b\x11\x51\xb7\xce",
+		:eth_proto => 0x0800)
+		p.to_f('eth_test.pcap')
+	end
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

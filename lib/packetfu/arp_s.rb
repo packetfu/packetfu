@@ -26,13 +26,14 @@ module PacketFu
 															 :body)
 		include StructFu
 
+		# XXX this is a wee bit wrong, so fix and test this!
 		def initialize(args={})
 			super( 
 				Int16.new(args[:arp_hw] || 1), 
 				Int16.new(args[:arp_proto] ||0x0800),
 				Int8.new(args[:arp_hw_len] || 6), 
 				Int8.new(args[:arp_proto_len] || 4), 
-				Int16.new(args[:arp_opcode]),
+				Int16.new(args[:arp_opcode] || 1),
 				EthMac.new.read(args[:arp_src_mac]),
 				Octets.new.read(args[:arp_src_ip]), 
 				EthMac.new.read(args[:arp_dst_mac]),
@@ -208,6 +209,12 @@ module PacketFu
 										else; "0x%02x" % arp_opcode
 										end
 			peek_data.join
+		end
+
+		# While there are lengths in ARPPackets, there's not
+		# much to do with them.
+		def recalc(args={})
+			@headers[0].inspect
 		end
 
 	end # class ARPPacket

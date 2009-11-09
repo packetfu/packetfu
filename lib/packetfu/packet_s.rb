@@ -95,7 +95,9 @@ module PacketFu
 			@headers.last.body=(args)
 		end
 
-		# Converts a packet to libpcap format
+		# Converts a packet to libpcap format. Bit of a hack?
+		# TODO: Fix timestamp so they're correct!
+		# TODO: See about making incl_len more meaningful!
 		def to_pcap(args={})
 			p = PcapPacket.new(:endian => args[:endian],
 												:timestamp => Timestamp.new.to_s,
@@ -106,11 +108,13 @@ module PacketFu
 
 		# Put the entire packet into a libpcap file. XXX: this is a
 		# hack for now just to confirm that packets are getting created
-		# correctly.
-		def to_f(filename=nil)
+		# correctly. Now with append! XXX: Document this!
+		def to_f(filename=nil,mode='w')
 			filename ||= 'out.pcap'
-			data = [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join
-			File.open(filename, 'w') {|f| f.write data}
+			mode = mode.to_s[0,1]
+			raise ArgumentError, "Unknown mode: #{mode.to_s}" unless mode =~ /^[wa]/
+			data = (mode == 'w' ? [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join : self.to_pcap)
+			File.open(filename, mode) {|f| f.write data}
 			return [filename, 1, data.size]
 		end
 

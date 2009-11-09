@@ -82,7 +82,7 @@ class ArpTest < Test::Unit::TestCase
 		a.payload = ""
 		assert_equal(sample_arp,a.to_s[14,0xffff])
 	end
-	
+
 	def not_yet_test_arp_new
 		sample_arp = "000108000604000200032f1a74dec0a80102001b1151b7cec0a80169"
 		sample_arp = sample_arp.scan(/../).map {|x| x.to_i(16)}.pack("C*")
@@ -104,6 +104,25 @@ class ArpTest < Test::Unit::TestCase
 		puts "ARP Peek format: "
 		puts a.peek
 		puts "\n"
+	end
+
+	def test_arp_pcap
+		a = ARPPacket.new
+		assert_kind_of ARPPacket, a
+		a.to_f('arp_test.pcap','w')
+		a.arp_hw = 1
+		a.arp_proto = 0x0800
+		a.arp_hw_len = 6
+		a.arp_proto_len = 4 
+		a.arp_opcode = 2
+		a.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
+		a.arp_src_ip = "\xc0\xa8\x01\x02"
+		a.arp_dst_mac = "\x00\x1b\x11\x51\xb7\xce"
+		a.arp_dst_ip = "\xc0\xa8\x01\x69"
+		a.payload = ""
+		a.eth_daddr = "00:1b:11:51:b7:ce"
+		a.eth_saddr = "00:03:2f:1a:74:de"
+		a.to_f('arp_test.pcap','a')
 	end
 	
 end

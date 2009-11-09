@@ -131,10 +131,11 @@ module PacketFu
 
 		def initialize(args={})
 			super(
-			EthMac.new.read(args[:eth_dst]),
-			EthMac.new.read(args[:eth_src]),
-			Int16.new(args[:eth_proto] || 0x0800),
-			StructFu::String.new.read(args[:body]))
+				EthMac.new.read(args[:eth_dst]),
+				EthMac.new.read(args[:eth_src]),
+				Int16.new(args[:eth_proto] || 0x0800),
+				StructFu::String.new.read(args[:body])
+			)
 		end
 
 		def eth_dst=(i); typecast(i); end
@@ -194,26 +195,26 @@ module PacketFu
 		end
 
 		# Set the source MAC address in a more readable way.
-		def saddr=(mac)
+		def eth_saddr=(mac)
 			mac = EthHeader.mac2str(mac)
 			self[:eth_src].read mac
 			self[:eth_src]
 		end
 
 		# Returns a more readable source MAC address.
-		def saddr
+		def eth_saddr
 			EthHeader.str2mac(self[:eth_src].to_s)
 		end
 
 		# Set the destination MAC address in a more readable way.
-		def daddr=(mac)
+		def eth_daddr=(mac)
 			mac = EthHeader.mac2str(mac)
 			self[:eth_dst].read mac
 			self[:eth_dst]
 		end
 
 		# Returns a more readable source MAC address.
-		def daddr
+		def eth_daddr
 			EthHeader.str2mac(self[:eth_dst].to_s)
 		end
 
@@ -226,6 +227,12 @@ module PacketFu
 			@eth_header = (args[:eth] || EthHeader.new(args))
 			@headers = [@eth_header]
 			super
+		end
+
+		# Does nothing, really, since there's no length or
+		# checksum to calculate for a straight Ethernet packet.
+		def recalc(args={})
+			@headers[0].inspect
 		end
 
 	end

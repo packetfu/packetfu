@@ -69,6 +69,9 @@ module PacketFu
 	#   octets   :ip_src                                            # No value as this is a MultiValue
 	#   octets   :ip_dst                                            # Ditto.
 	#   rest     :body
+	#
+	# Note that IPPackets will always be somewhat incorrect upon initalization, and want
+	# an IPHeader#recalc() to become correct before a Packet#to_f or Packet#to_w.
 	class IPHeader < Struct.new(:ip_v, :ip_hl, :ip_tos, :ip_len,
 															:ip_id, :ip_frag, :ip_ttl, :ip_proto,
 															:ip_sum, :ip_src, :ip_dst, :body)
@@ -87,13 +90,14 @@ module PacketFu
 				Int8.new(args[:ip_proto]),
 				Int16.new(args[:ip_sum] || ip_calc_sum),
 				Octets.new.read(args[:ip_src] || "\x00\x00\x00\x00"),
-				Octets.new.read(args[:ip_dst] || "\x00\x00\x00\x00")
+				Octets.new.read(args[:ip_dst] || "\x00\x00\x00\x00"),
+				StructFu::String.new.read(args[:body])
 			)
 		end
 
 		def to_s
 			byte_v_hl = [(ip_v.to_i << 4) + ip_hl.to_i].pack("C")
-			byte_v_hl + (self.to_a[2,8].map {|x| x.to_s}.join)
+			byte_v_hl + (self.to_a[2,10].map {|x| x.to_s}.join)
 		end
 
 		def read(str)
