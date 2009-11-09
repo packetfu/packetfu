@@ -7,6 +7,7 @@ require 'test_octets'
 require 'test_packet'
 require 'test_arp' # Creates arp_test.pcap
 require 'test_ip' # Creates ip_test.pcap
+require 'test_icmp' # Creates icmp_test.pcap
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
 

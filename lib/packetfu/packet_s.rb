@@ -136,12 +136,15 @@ module PacketFu
 				case arg
 				when :ip
 					ip_recalc(:all)
+				when :icmp
+					icmp_recalc(:all)
 				when :udp
 					udp_recalc(:all)
 				when :tcp
 					tcp_recalc(:all)
 				when :all
 					ip_recalc(:all) if @ip_header
+					icmp_recalc(:all) if @icmp_header
 					udp_recalc(:all) if @udp_header
 					tcp_recalc(:all) if @tcp_header
 				else
@@ -176,10 +179,12 @@ module PacketFu
 		# So, to summarize; if you intend to alter the data, use :strip. If you don't, don't. Also,
 		# this is a horrid XXX hack. Stripping is useful (and fun!), but the default behavior really
 		# should be to create payloads correctly, and /not/ treat extra FCS data as a payload.
+		#
+		# Update: This scheme is so lame. Need to fix. Seriously.
 		def read(io,args={})
 			begin
 				if io.size >= 14
-					@eth_header.read(io[0,14])
+					@eth_header.read(io)
 					eth_proto_num = io[12,2].unpack("n")[0]
 					if eth_proto_num == 0x0800 # It's IP.
 						ip_hlen=(io[14] & 0x0f) * 4

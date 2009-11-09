@@ -154,7 +154,6 @@ module PacketFu
 			end
 		end
 
-
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
@@ -164,7 +163,7 @@ module PacketFu
 			self[:eth_dst].read str[0,6]
 			self[:eth_src].read str[6,6]
 			self[:eth_proto].read str[12,2]
-			self[:body].read str[14,str.size] if str.size > 14
+			self[:body].read str[14,str.size]
 			self
 		end
 
@@ -224,7 +223,7 @@ module PacketFu
 		attr_accessor :eth_header
 
 		def initialize(args={})
-			@eth_header = (args[:eth] || EthHeader.new(args))
+			@eth_header = EthHeader.new(args).read(args[:eth])
 			@headers = [@eth_header]
 			super
 		end

@@ -159,8 +159,8 @@ module PacketFu
 		attr_accessor :eth_header, :arp_header
 
 		def initialize(args={})
-			@eth_header = EthHeader.new.read(args[:eth])
-			@arp_header = ARPHeader.new.read(args[:arp])
+			@eth_header = EthHeader.new(args).read(args[:eth])
+			@arp_header = ARPHeader.new(args).read(args[:arp]) 
 			@eth_header.eth_proto = "\x08\x06"
 			@eth_header.body=@arp_header
 

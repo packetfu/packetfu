@@ -20,6 +20,11 @@ class OctetsTest < Test::Unit::TestCase
 		assert_equal(0x01020304, o.to_i)
 	end
 
+end
+
+class IPTest < Test::Unit::TestCase
+	include PacketFu
+
 	def test_ip_header_new
 		i = IPHeader.new
 		assert_kind_of IPHeader, i

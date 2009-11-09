@@ -103,7 +103,7 @@ module PacketFu
 		def read(str)
 			return self if str.nil?
 			self[:ip_v] = str[0,1].unpack("C").first >> 4
-			self[:ip_hl] = str[0,1].unpack("C").first.to_i(16) & 0x0f
+			self[:ip_hl] = str[0,1].unpack("C").first.to_i & 0x0f
 			self[:ip_tos].read(str[1,1])
 			self[:ip_len].read(str[2,2])
 			self[:ip_id].read(str[4,2])
@@ -113,6 +113,7 @@ module PacketFu
 			self[:ip_sum].read(str[10,2])
 			self[:ip_src].read(str[12,4])
 			self[:ip_dst].read(str[16,4])
+			self[:body].read(str[20,str.size]) if str.size > 20
 			self
 		end
 
@@ -258,8 +259,8 @@ module PacketFu
 
 		# Creates a new IPPacket object. 
 		def initialize(args={})
-			@eth_header = EthHeader.new.read(args[:eth])
-			@ip_header = IPHeader.new.read(args[:ip])
+			@eth_header = EthHeader.new(args).read(args[:eth])
+			@ip_header = IPHeader.new(args).read(args[:ip])
 			@eth_header.body=@ip_header
 
 			@headers = [@eth_header, @ip_header]

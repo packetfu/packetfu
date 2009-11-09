@@ -83,8 +83,8 @@ class ArpTest < Test::Unit::TestCase
 		assert_equal(sample_arp,a.to_s[14,0xffff])
 	end
 
-	def not_yet_test_arp_new
-		sample_arp = "000108000604000200032f1a74dec0a80102001b1151b7cec0a80169"
+	def test_arp_new
+		sample_arp = "000108000604000200032f1a74dec0a80102001b1151b7cec0a80169c0a80169"
 		sample_arp = sample_arp.scan(/../).map {|x| x.to_i(16)}.pack("C*")
 		arp = ARPPacket.new(:arp_hw => 1, :arp_proto => 0x0800,
 											 :arp_opcode => 2, :arp_src_ip => "\xc0\xa8\x01\x02")
