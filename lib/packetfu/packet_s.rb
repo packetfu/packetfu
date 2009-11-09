@@ -113,7 +113,11 @@ module PacketFu
 			filename ||= 'out.pcap'
 			mode = mode.to_s[0,1]
 			raise ArgumentError, "Unknown mode: #{mode.to_s}" unless mode =~ /^[wa]/
-			data = (mode == 'w' ? [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join : self.to_pcap)
+			if(mode == 'w' || !(File.exists?(filename)))
+				data = [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join
+			else
+				data = self.to_pcap
+			end
 			File.open(filename, mode) {|f| f.write data}
 			return [filename, 1, data.size]
 		end

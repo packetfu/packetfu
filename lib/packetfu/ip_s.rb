@@ -129,18 +129,6 @@ module PacketFu
 		def ip_src=(i); typecast i; end
 		def ip_dst=(i); typecast i; end
 
-		def body=(i) 
-			if i.kind_of? ::String
-				typecast(i)
-			elsif i.kind_of? StructFu
-				self[:body] = i
-			elsif i.nil?
-				self[:body] = StructFu::String.new.read("")
-			else
-				raise # TODO: Describe this
-			end
-		end
-
 		# Calulcate the true length of the packet.
 		def ip_calc_len
 			(ip_hl.to_i * 4) + body.to_s.length

@@ -9,6 +9,7 @@ require "packetfu/eth_s"
 require "packetfu/ip_s" 
 require "packetfu/arp_s"
 require "packetfu/icmp_s"
+require "packetfu/udp_s"
 
 module PacketFu
 end

@@ -72,18 +72,6 @@ module PacketFu
 		def arp_dst_mac=(i); typecast i; end
 		def arp_dst_ip=(i); typecast i; end
 
-		def body=(i) 
-			if i.kind_of? ::String
-				typecast(i)
-			elsif i.kind_of? StructFu
-				self[:body] = i
-			elsif i.nil?
-				self[:body] = StructFu::String.new.read("")
-			else
-				raise # TODO: Describe this
-			end
-		end
-
 		# Set the source MAC address in a more readable way.
 		def arp_saddr_mac=(mac)
 			mac = EthHeader.mac2str(mac)

@@ -17,6 +17,18 @@ module StructFu
 		self[c.intern].read i
 	end
 
+	def body=(i)
+		if i.kind_of? ::String
+			typecast(i)
+		elsif i.kind_of? StructFu
+			self[:body] = i
+		elsif i.nil?
+			self[:body] = StructFu::String.new.read("")
+		else
+			raise ArgumentError, "Can't cram a #{i.class} into a StructFu :body"
+		end
+	end
+
 end
 
 require 'structfu/int.rb'

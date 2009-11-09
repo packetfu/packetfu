@@ -142,18 +142,6 @@ module PacketFu
 		def eth_src=(i); typecast(i); end
 		def eth_proto=(i); typecast(i); end
 
-		def body=(i) 
-			if i.kind_of? ::String
-				typecast(i)
-			elsif i.kind_of? StructFu
-				self[:body] = i
-			elsif i.nil?
-				self[:body] = StructFu::String.new.read("")
-			else
-				raise # TODO: Describe this
-			end
-		end
-
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end

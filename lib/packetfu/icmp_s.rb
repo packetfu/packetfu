@@ -42,18 +42,6 @@ module PacketFu
 		def icmp_code=(i); typecast i; end
 		def icmp_sum=(i); typecast i; end
 
-		def body=(i) 
-			if i.kind_of? ::String
-				typecast(i)
-			elsif i.kind_of? StructFu
-				self[:body] = i
-			elsif i.nil?
-				self[:body] = StructFu::String.new.read("")
-			else
-				raise # TODO: Describe this
-			end
-		end
-
 		def icmp_calc_sum
 			checksum = (icmp_type.to_i << 8)	+ icmp_code.to_i
 			chk_body = (body.to_s.size % 2 == 0 ? body.to_s : body.to_s + "\x00")
