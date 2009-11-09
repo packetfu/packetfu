@@ -10,6 +10,8 @@ require "packetfu/ip_s"
 require "packetfu/arp_s"
 require "packetfu/icmp_s"
 require "packetfu/udp_s"
+require "packetfu/tcpopts_s"
+require "packetfu/tcp_s"
 
 module PacketFu
 end

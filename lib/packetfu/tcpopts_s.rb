@@ -1,8 +1,9 @@
+require 'singleton'
 module PacketFu
 
 	# TcpOpts handles the translation of TCP option strings to human-readable form,
-	# and vice versa. It is nearly certain to be completely rewritten, though the
-	# syntax will remain the same.
+	# and vice versa. It is certain to be completely rewritten, though the
+	# API syntax will remain the same.
 	#
 	# == Example
 	#
@@ -21,7 +22,7 @@ module PacketFu
 		# Like decode, encode requires fairly strict adherance to the various
 		# RFCs when it comes to lengths and expected data types. If you're
 		# trying to enter well-formed data, it should all work fine. If you're
-		# trying to something like fuzzing, then you'll probably have better
+		# trying to do something like fuzzing, then you'll probably have better
 		# luck using tcp_opts= instead.
 		#
 		# There are a few opportunities for attackers get get bad data passed
@@ -29,6 +30,9 @@ module PacketFu
 		# and timestamp manipulation seeming to be the most disasterous).
 		# So don't make any life-critical decisions based on these options
 		# remaining the same between the decode and encode functions.
+		#
+		# Note, this will all get migrated over to StructFu, now that that's
+		# written.
 		def self.encode(str)
 			opts = str.split(/\s*,\s*/)
 			binary_opts = ''
