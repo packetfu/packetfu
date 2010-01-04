@@ -40,9 +40,13 @@ module PacketFu
 		end
 
 		def udp_src=(i); typecast i; end
+		def udp_src; self[:udp_src].to_i; end
 		def udp_dst=(i); typecast i; end
+		def udp_dst; self[:udp_dst].to_i; end
 		def udp_len=(i); typecast i; end
+		def udp_len; self[:udp_len].to_i; end
 		def udp_sum=(i); typecast i; end
+		def udp_sum; self[:udp_sum].to_i; end
 
 		# Returns the true length of the UDP packet.
 		def udp_calc_len
@@ -64,7 +68,7 @@ module PacketFu
 
 		# Equivalent to udp_src.to_i
 		def udp_sport
-			self.udp_src.to_i
+			self.udp_src
 		end
 
 		# Equivalent to udp_src=
@@ -74,7 +78,7 @@ module PacketFu
 
 		# Equivalent to udp_dst
 		def udp_dport
-			self.udp_dst.to_i
+			self.udp_dst
 		end
 		
 		# Equivalent to udp_dst=

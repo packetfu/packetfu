@@ -30,7 +30,7 @@ class IPTest < Test::Unit::TestCase
 		assert_kind_of IPHeader, i
 		i.ip_id = 0x1234
 		i.ip_recalc :ip_sum
-		assert_equal("E\000\000\000\0224\000\000\000\000\250\313\000\000\000\000\000\000\000\000", i.to_s)
+		assert_equal("E\000\000\024\0224\000\000 \000\210\267\000\000\000\000\000\000\000\000", i.to_s)
 	end
 
 	def test_ip_packet_new

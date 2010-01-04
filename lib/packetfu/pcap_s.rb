@@ -11,6 +11,10 @@ module StructFu
 		return e
 	end
 
+	def sz
+		self.to_s.size
+	end
+
 end
 
 module PacketFu

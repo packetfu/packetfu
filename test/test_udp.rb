@@ -31,14 +31,14 @@ class UDPTest < Test::Unit::TestCase
 		u = UDPPacket.new
 		assert_kind_of UDPPacket, u
 		u.recalc
-		#u.to_f('udp_test.pcap')
+		# u.to_f('udp_test.pcap','a')
 		u.ip_saddr = "10.20.30.40"
 		u.ip_daddr = "50.60.70.80"
 		u.payload = "+some fakey-fake udp packet"
 		u.udp_src = 1205
 		u.udp_dst = 13013
 		u.recalc
-		#u.to_f('udp_test.pcap','a')
+		# u.to_f('udp_test.pcap','a')
 	end
 
 	def test_udp_read
@@ -46,19 +46,19 @@ class UDPTest < Test::Unit::TestCase
 		pkt = Packet.parse(sample_packet)
 		assert_kind_of UDPPacket, pkt
 		assert_equal(0x8bf8, pkt.udp_sum.to_i)
-		#pkt.to_f('udp_test.pcap','a') if File.exists? 'udp_text.pcap'
+		pkt.to_f('udp_test.pcap','a')
 	end
 
 	# This checksum doesn't come out right, but test_udp_pcap's does.
 	# Also, this doesn't write to the file correctly, either. Need to
 	# invesitagate both.
-	def not_yet_test_udp_alter
+	def test_udp_alter
 		sample_packet = PcapFile.new.file_to_array(:f => 'sample.pcap')[0]
 		pkt = Packet.parse(sample_packet)
 		assert_kind_of UDPPacket, pkt
 		pkt.payload = pkt.payload.gsub(/metasploit/,"MeatPistol")
 		pkt.recalc
-		pkt.to_f('udp_test.pcap','a') if File.exists? 'udp_text.pcap'
+		pkt.to_f('udp_test.pcap','a')
 	end
 
 end

@@ -205,21 +205,11 @@ module PacketFu
 								end
 								tcp_hlen =  ((tcp_all[12,1].unpack("C")[0]) >> 4) * 4
 								if tcp_hlen.to_i >= 20
-									tcp_opts = tcp_all[20,tcp_hlen-20]
-									tcp_body = tcp_all[tcp_hlen,0xffff]
-									@tcp_header.read(tcp_all[0,20])
-									@tcp_header.tcp_opts=tcp_opts
-									@tcp_header.body=tcp_body
+									@tcp_header.read(tcp_all)
 									@ip_header.body = @tcp_header
 								else # It's a TCP packet with an impossibly small hlen, so it can't be real TCP. Abort! Abort!
 									@ip_header.body = io[16,io.size-16]
 								end
-								tcp_opts = tcp_all[20,tcp_hlen-20]
-								tcp_body = tcp_all[tcp_hlen,0xffff]
-								@tcp_header.read(tcp_all[0,20])
-								@tcp_header.tcp_opts=tcp_opts
-								@tcp_header.body=tcp_body
-								@ip_header.body = @tcp_header
 							elsif ip_proto_num == 0x11 # It's UDP.
 								udp_len = io[16,2].unpack("n")[0] - 20
 								if args[:strip] # Same deal as with TCP. We might have stuff at the end of the packet that's not part of the payload.

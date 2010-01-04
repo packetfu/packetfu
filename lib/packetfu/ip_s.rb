@@ -83,10 +83,10 @@ module PacketFu
 				(args[:ip_v] || 4),
 				(args[:ip_hl] || 5),
 				Int8.new(args[:ip_tos]),
-				Int16.new(args[:ip_len] || ip_calc_len),
+				Int16.new(args[:ip_len] || 20),
 				Int16.new(args[:ip_id] || ip_calc_id),
 				Int16.new(args[:ip_frag]),
-				Int8.new(args[:ip_ttl]),
+				Int8.new(args[:ip_ttl] || 32),
 				Int8.new(args[:ip_proto]),
 				Int16.new(args[:ip_sum] || ip_calc_sum),
 				Octets.new.read(args[:ip_src] || "\x00\x00\x00\x00"),
@@ -96,7 +96,7 @@ module PacketFu
 		end
 
 		def to_s
-			byte_v_hl = [(ip_v.to_i << 4) + ip_hl.to_i].pack("C")
+			byte_v_hl = [(self.ip_v << 4) + self.ip_hl].pack("C")
 			byte_v_hl + (self.to_a[2,10].map {|x| x.to_s}.join)
 		end
 
@@ -118,34 +118,45 @@ module PacketFu
 		end
 
 		def ip_v=(i); self[:ip_v] = i.to_i; end
+		def ip_v; self[:ip_v].to_i; end
 		def ip_hl=(i); self[:ip_hl] = i.to_i; end
+		def ip_hl; self[:ip_hl].to_i; end
 		def ip_tos=(i); typecast i; end
+		def ip_tos; self[:ip_tos].to_i; end
 		def ip_len=(i); typecast i; end
+		def ip_len; self[:ip_len].to_i; end
 		def ip_id=(i); typecast i; end
+		def ip_id; self[:ip_id].to_i; end
 		def ip_frag=(i); typecast i; end
+		def ip_frag; self[:ip_frag].to_i; end
 		def ip_ttl=(i); typecast i; end
+		def ip_ttl; self[:ip_ttl].to_i; end
 		def ip_proto=(i); typecast i; end
+		def ip_proto; self[:ip_proto].to_i; end
 		def ip_sum=(i); typecast i; end
+		def ip_sum; self[:ip_sum].to_i; end
 		def ip_src=(i); typecast i; end
+		def ip_src; self[:ip_src].to_i; end
 		def ip_dst=(i); typecast i; end
+		def ip_dst; self[:ip_dst].to_i; end
 
 		# Calulcate the true length of the packet.
 		def ip_calc_len
-			(ip_hl.to_i * 4) + body.to_s.length
+			(ip_hl * 4) + body.to_s.length
 		end
 
 		# Calculate the true checksum of the packet.
 		# (Yes, this is the long way to do it, but it's e-z-2-read for mathtards like me.)
 		def ip_calc_sum
-			checksum =  (((ip_v.to_i  <<  4) + ip_hl.to_i) << 8) + ip_tos.to_i
-			checksum += ip_len.to_i
-			checksum +=	ip_id.to_i
-			checksum += ip_frag.to_i
-			checksum +=	(ip_ttl.to_i << 8) + ip_proto.to_i
-			checksum += (ip_src.to_i >> 16)
-			checksum += (ip_src.to_i & 0xffff)
-			checksum += (ip_dst.to_i >> 16)
-			checksum += (ip_dst.to_i & 0xffff)
+			checksum =  (((self.ip_v  <<  4) + self.ip_hl) << 8) + self.ip_tos
+			checksum += self.ip_len
+			checksum +=	self.ip_id
+			checksum += self.ip_frag
+			checksum +=	(self.ip_ttl << 8) + self.ip_proto
+			checksum += (self.ip_src >> 16)
+			checksum += (self.ip_src & 0xffff)
+			checksum += (self.ip_dst >> 16)
+			checksum += (self.ip_dst & 0xffff)
 			checksum = checksum % 0xffff 
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum
@@ -160,22 +171,22 @@ module PacketFu
 		# (eg, for host scanning in one network), it would be better use ip_src.o1 through 
 		# ip_src.o4 instead. 
 		def ip_saddr=(addr)
-			ip_src.read_quad(addr)
+			self[:ip_src].read_quad(addr)
 		end
 
 		# Returns a more readable IP source address. 
 		def ip_saddr
-			ip_src.to_x
+			self[:ip_src].to_x
 		end
 
 		# Sets a more readable IP address.
 		def ip_daddr=(addr)
-			ip_dst.read_quad(addr)
+			self[:ip_dst].read_quad(addr)
 		end
 
 		# Returns a more readable IP destination address.
 		def ip_daddr
-			ip_dst.to_x
+			self[:ip_dst].to_x
 		end
 
 		# Translate various formats of IPv4 Addresses to an array of digits.

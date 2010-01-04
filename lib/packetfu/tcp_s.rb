@@ -1,79 +1,8 @@
+$: << File.expand_path(File.dirname(__FILE__))
+require 'tcp/bitfields'
+require 'tcp/options'
+
 module PacketFu
-
-	# Implements the Explict Congestion Notification for TCPHeader.
-	#
-	# ==== Header Definition
-	#
-	#
-	#  bit1  :n
-	#  bit1  :c
-	#  bit1  :e
-	class TcpEcn < Struct.new(:n, :c, :e)
-
-		def initialize(args={})
-			super(args[:n], args[:c], args[:e])
-		end
-
-		# Returns the TcpEcn field as an integer... even though it's going
-		# to be split across a byte boundary.
-		def to_i
-			(n.to_i << 2) + (c.to_i << 1) + e.to_i
-		end
-
-		def read(str)
-			return self if str.nil? || str.size < 2
-			byte1 = str[0]
-			byte2 = str[1]
-			self[:n] = byte1 & 0b00000001 == 0b00000001 ? 1 : 0
-			self[:c] = byte2 & 0b10000000 == 0b10000000 ? 1 : 0
-			self[:e] = byte2 & 0b01000000 == 0b01000000 ? 1 : 0
-			self
-		end
-
-	end
-
-end
-	# Implements flags for TCPHeader.
-	#
-	# ==== Header Definition
-	#
-	#  bit1  :urg
-	#  bit1  :ack
-	#  bit1  :psh
-	#  bit1  :rst
-	#  bit1  :syn
-	#  bit1  :fin
-	class TcpFlags < Struct.new(:urg, :ack, :psh, :rst, :syn, :fin)
-
-		def initialize(args={})
-			super(
-				args[:urg], args[:ack], args[:psh], 
-				args[:rst], args[:syn], args[:fin]
-			)
-		end
-
-		# Returns the TcpFlags as an integer.
-		# Also not a great candidate for to_s due to the short bitspace.
-		def to_i
-			(urg.to_i << 5) + (ack.to_i << 4) + (psh.to_i << 3) + 
-			(rst.to_i << 2) + (syn.to_i << 1) + fin.to_i
-		end
-
-		def read(str)
-			return self if str.nil?
-			byte = str[0]
-			self[:urg] = byte & 0b00100000 == 0b00100000 ? 1 : 0
-			self[:ack] = byte & 0b00010000 == 0b00010000 ? 1 : 0
-			self[:psh] = byte & 0b00001000 == 0b00001000 ? 1 : 0
-			self[:rst] = byte & 0b00000100 == 0b00000100 ? 1 : 0
-			self[:syn] = byte & 0b00000010 == 0b00000010 ? 1 : 0
-			self[:fin] = byte & 0b00000001 == 0b00000001 ? 1 : 0
-			self
-		end
-
-	end
-
-=begin
 
 	# TCPHeader is a complete TCP struct, used in TCPPacket. Most IP traffic is TCP-based, by
 	# volume.
@@ -96,60 +25,144 @@ end
 	#   string    :tcp_opts
 	#   rest      :body
 	#
-	# See also TcpEcn, TcpFlags, TcpOpts
-	class TCPHeader < BinData::MultiValue
+	# See also TcpHlen, TcpReserved, TcpEcn, TcpFlags, TcpOpts
+	class TCPHeader < Struct.new(:tcp_src, :tcp_dst,
+															 :tcp_seq,
+															 :tcp_ack,
+															 :tcp_hlen, :tcp_reserved, :tcp_ecn, :tcp_flags, :tcp_win, 
+															 :tcp_sum, :tcp_urg, 
+															 :tcp_opts, :body)
+		include StructFu
 
-		uint16be	:tcp_src,		:initial_value => lambda {tcp_calc_src} 
-		uint16be	:tcp_dst
-		uint32be	:tcp_seq,		:initial_value => lambda {tcp_calc_seq}
-		uint32be	:tcp_ack
-		bit4			:tcp_hlen,	:initial_value => 5 # Must recalc as options are set. 
-		bit3			:tcp_reserved
-		tcp_ecn		:tcp_ecn
-		tcp_flags	:tcp_flags
-		uint16be	:tcp_win,		:initial_value => 0x4000 # WinXP's default syn packet
-		uint16be	:tcp_sum, 	:initial_value =>	0 # Must set this upon generation.
-		uint16be	:tcp_urg
-		string		:tcp_opts
-		rest			:body
-
-		# Create a new TCPHeader object, and intialize with a random sequence number. 
 		def initialize(args={})
 			@random_seq = rand(0xffffffff)
 			@random_src = rand_port
-			super
+			super(
+				Int16.new(args[:tcp_src] || tcp_calc_src),
+				Int16.new(args[:tcp_dst]),
+				Int32.new(args[:tcp_seq] || tcp_calc_seq),
+				Int32.new(args[:tcp_ack]),
+				TcpHlen.new(:hlen => (args[:tcp_hlen] || 5)),
+				TcpReserved.new(args[:tcp_reserved] || 0),
+				TcpEcn.new(args[:tcp_ecn]),
+				TcpFlags.new(args[:tcp_flags]),
+				Int16.new(args[:tcp_win] || 0x4000),
+				Int16.new(args[:tcp_sum] || 0),
+				Int16.new(args[:tcp_urg]),
+				TcpOptions.new.read(args[:tcp_opts]),
+				StructFu::String.new.read(args[:body])
+			)
 		end
 
 		attr_accessor :flavor
 
-		# tcp_calc_hlen adjusts the header length to account for tcp_opts. Note
-		# that if tcp_opts does not fall on a 32-bit boundry, tcp_calc_hlen will
-		# additionally pad the option string with nulls. Most stacks avoid this 
-		# eventuality by padding with NOP options at OS-specific points in the 
-		# option field. The practical effect of this is, you should tcp_calc_hlen
-		# only when all the options are already set; otherwise, additional options
-		# will be lost to the receiver as \x00 is an EOL option. Additionally,
-		# (and this is almost certainly a bug), there is no sanity checking to
-		# ensure the final tcp_opts value is 44 bytes or less (any more will bleed
-		# over into the tcp payload). You are forewarned!
-		#
-		# If you would like to craft specifically malformed packets with 
-		# nonsense lengths of opts fields, you should avoid tcp_calc_hlen 
-		# altogether, and simply set the values for tcp_hlen and tcp_opts manually.
-		def tcp_calc_hlen
-			pad = (self.tcp_opts.to_s.size % 4)
-			if (pad > 0)
-				self.tcp_opts += ("\x00" * pad)
+		def bits_to_s
+			bytes = []
+			bytes[0] = (self[:tcp_hlen].to_i << 4) +
+				(self[:tcp_reserved].to_i << 1) +
+				self[:tcp_ecn].n.to_i
+			bytes[1] = (self[:tcp_ecn].c.to_i << 7) +
+				(self[:tcp_ecn].e.to_i << 6) +
+				self[:tcp_flags].to_i
+			bytes.pack("CC")
+		end
+
+		def to_s
+			hdr = self.to_a.map do |x|
+				if x.kind_of? TcpHlen
+					bits_to_s
+				elsif x.kind_of? TcpReserved
+					next
+				elsif x.kind_of? TcpEcn
+					next
+				elsif x.kind_of? TcpFlags
+					next
+				else
+					x.to_s
+				end
 			end
-			self.tcp_hlen = ((20 + self.tcp_opts.to_s.size) / 4)
+			hdr.flatten.join
 		end
 
-		def tcp_calc_seq
-			@random_seq
+		def read(str)
+			return self if str.nil?
+			self[:tcp_src].read(str[0,2])
+			self[:tcp_dst].read(str[2,2])
+			self[:tcp_seq].read(str[4,4])
+			self[:tcp_ack].read(str[8,4])
+			self[:tcp_hlen].read(str[12,1])
+			self[:tcp_reserved].read(str[12,1])
+			self[:tcp_ecn].read(str[12,2])
+			self[:tcp_flags].read(str[13,1])
+			self[:tcp_win].read(str[14,2])
+			self[:tcp_sum].read(str[16,2])
+			self[:tcp_urg].read(str[18,2])
+			self[:tcp_opts].read(str[20,((self[:tcp_hlen].to_i * 4) - 20)])
+			self[:body].read(str[(self[:tcp_hlen].to_i * 4),str.size])
+			self
 		end
 
-		def tcp_calc_src
-			@random_src
+		def tcp_src=(i); typecast i; end
+		def tcp_src; self[:tcp_src].to_i; end
+		def tcp_dst=(i); typecast i; end
+		def tcp_dst; self[:tcp_dst].to_i; end
+		def tcp_seq=(i); typecast i; end
+		def tcp_seq; self[:tcp_seq].to_i; end
+		def tcp_ack=(i); typecast i; end
+		def tcp_ack; self[:tcp_ack].to_i; end
+		def tcp_win=(i); typecast i; end
+		def tcp_win; self[:tcp_win].to_i; end
+		def tcp_sum=(i); typecast i; end
+		def tcp_sum; self[:tcp_sum].to_i; end
+		def tcp_urg=(i); typecast i; end
+		def tcp_urg; self[:tcp_urg].to_i; end
+
+		def tcp_hlen; self[:tcp_hlen].to_i; end
+		def tcp_hlen=(i)
+			if i.kind_of? PacketFu::TcpHlen
+				self[:tcp_hlen]=i
+			else
+				self[:tcp_hlen].read(i)
+			end
+		end
+
+		def tcp_reserved; self[:tcp_reserved].to_i; end
+		def tcp_reserved=(i)
+			if i.kind_of? PacketFu::TcpReserved
+				self[:tcp_reserved]=i
+			else
+				self[:tcp_reserved].read(i)
+			end
+		end
+
+		def tcp_ecn; self[:tcp_ecn].to_i; end
+		def tcp_ecn=(i)
+			if i.kind_of? PacketFu::TcpEcn
+				self[:tcp_ecn]=i
+			else
+				self[:tcp_ecn].read(i)
+			end
+		end
+
+		def tcp_opts; self[:tcp_opts].to_s; end
+		def tcp_opts=(i)
+			if i.kind_of? PacketFu::TcpOptions
+				self[:tcp_opts]=i
+			else
+				self[:tcp_opts].read(i)
+			end
+		end
+
+		def tcp_calc_seq; @random_seq; end
+		def tcp_calc_src; @random_src; end
+
+		def tcp_opts_len
+			self[:tcp_opts].to_s.size
+		end
+
+		# Sets and returns the true length of the TCP Header. 
+		def tcp_calc_hlen
+			tcp_hlen = (20 + tcp_opts_len) / 4
 		end
 
 		# Generates a random high port. This is affected by packet flavor.
@@ -157,39 +170,32 @@ end
 			rand(0xffff - 1025) + 1025
 		end
 
-		# Returns the actual length of the TCP options.
-		def tcp_opts_len
-			tcp_opts.to_s.size * 4
-		end
-
-		# Returns a more readable option list. Note, it can lack fidelity on bad option strings.
-		# For more on TCP options, see the TcpOpts class.
+		# Gets a more readable option list.
 		def tcp_options
-			TcpOpts.decode(self.tcp_opts)
+		 self[:tcp_opts].decode
 		end
 
-		# Allows a more writable version of TCP options. 
-		# For more on TCP options, see the TcpOpts class.
+		# Sets a more readable option list.
 		def tcp_options=(arg)
-			self.tcp_opts=TcpOpts.encode(arg) 
+			self[:tcp_opts].encode arg
 		end
 
-		# Equivalent to tcp_src
+		# Equivalent to tcp_src.
 		def tcp_sport
-			self.tcp_src
+			self.tcp_src.to_i
 		end
 
-		# Equivalent to tcp_src=
+		# Equivalent to tcp_src=.
 		def tcp_sport=(arg)
 			self.tcp_src=(arg)
 		end
 
-		# Equivalent to tcp_dst
+		# Equivalent to tcp_dst.
 		def tcp_dport
-			self.tcp_dst
+			self.tcp_dst.to_i
 		end
 		
-		# Equivalent to tcp_dst=
+		# Equivalent to tcp_dst=.
 		def tcp_dport=(arg)
 			self.tcp_dst=(arg)
 		end
@@ -276,20 +282,20 @@ end
 			case @tcp_header.flavor = str.to_s.downcase
 			when "windows" # WinXP's default syn
 				@tcp_header.tcp_win = 0x4000
-				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACK.OK"
+				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACKOK"
 				@tcp_header.tcp_src = rand(5000 - 1026) + 1026
 				@ip_header.ip_ttl = 64
 			when "linux" # Ubuntu Linux 2.6.24-19-generic default syn
 				@tcp_header.tcp_win = 5840
-				@tcp_header.tcp_options="MSS:1460,SACK.OK,TS:#{ts_val};0,NOP,WS:7"
+				@tcp_header.tcp_options="MSS:1460,SACKOK,TS:#{ts_val};0,NOP,WS:7"
 				@tcp_header.tcp_src = rand(61_000 - 32_000) + 32_000
 				@ip_header.ip_ttl = 64
 			when "freebsd" # Freebsd
 				@tcp_header.tcp_win = 0xffff
-				@tcp_header.tcp_options="MSS:1460,NOP,WS:3,NOP,NOP,TS:#{ts_val};#{ts_sec},SACK.OK,EOL,EOL"
+				@tcp_header.tcp_options="MSS:1460,NOP,WS:3,NOP,NOP,TS:#{ts_val};#{ts_sec},SACKOK,EOL,EOL"
 				@ip_header.ip_ttl = 64
 			else
-				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACK.OK"
+				@tcp_header.tcp_options="MSS:1460,NOP,NOP,SACKOK"
 			end
 			tcp_calc_sum
 		end
@@ -322,14 +328,14 @@ end
 			checksum += tcp_urg
 
 			chk_tcp_opts = (tcp_opts.to_s.size % 2 == 0 ? tcp_opts.to_s : tcp_opts.to_s + "\x00") 
-			chk_tcp_opts.scan(/[\x00-\xff]{2}/).collect { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_tcp_opts.scan(/[\x00-\xff]{2}/).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
 			if (ip_len - ((ip_hl + tcp_hlen) * 4)) >= 0
 				real_tcp_payload = payload[0,( ip_len - ((ip_hl + tcp_hlen) * 4) )] # Can't forget those pesky FCSes!
 			else
 				real_tcp_payload = payload # Something's amiss here so don't bother figuring out where the real payload is.
 			end
 			chk_payload = (real_tcp_payload.size % 2 == 0 ? real_tcp_payload : real_tcp_payload + "\x00") # Null pad if it's odd.
-			chk_payload.scan(/[\x00-\xff]{2}/).collect { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_payload.scan(/[\x00-\xff]{2}/).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum
@@ -386,4 +392,3 @@ end
 	end
 
 end # module PacketFu
-=end
