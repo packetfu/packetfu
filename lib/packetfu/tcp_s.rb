@@ -328,14 +328,14 @@ module PacketFu
 			checksum += tcp_urg
 
 			chk_tcp_opts = (tcp_opts.to_s.size % 2 == 0 ? tcp_opts.to_s : tcp_opts.to_s + "\x00") 
-			chk_tcp_opts.scan(/[\x00-\xff]{2}/).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_tcp_opts.unpack("n*").each {|x| checksum = checksum + x }
 			if (ip_len - ((ip_hl + tcp_hlen) * 4)) >= 0
 				real_tcp_payload = payload[0,( ip_len - ((ip_hl + tcp_hlen) * 4) )] # Can't forget those pesky FCSes!
 			else
 				real_tcp_payload = payload # Something's amiss here so don't bother figuring out where the real payload is.
 			end
 			chk_payload = (real_tcp_payload.size % 2 == 0 ? real_tcp_payload : real_tcp_payload + "\x00") # Null pad if it's odd.
-			chk_payload.scan(/[\x00-\xff]{2}/).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_payload.unpack("n*").each {|x| checksum = checksum+x }
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum

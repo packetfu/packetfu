@@ -136,7 +136,7 @@ module PacketFu
 		# TODO: Is there a better way to ensure I get the correct checksum?
 		# This way is pretty easy; third time is, indeed, the charm.
 		def recalc(arg=:all)
-			3.times do # XXX: This is a silly fix, surely there's a better way.
+			# 3.times do # XXX: This is a silly fix, surely there's a better way.
 				case arg
 				when :ip
 					ip_recalc(:all)
@@ -154,7 +154,7 @@ module PacketFu
 				else
 					raise ArgumentError, "Recalculating `#{arg}' unsupported. Try :all"
 				end
-			end
+			#end
 			@headers[0]
 		end
 

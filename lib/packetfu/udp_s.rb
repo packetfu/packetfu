@@ -145,13 +145,13 @@ module PacketFu
 			checksum += udp_len.to_i
 			if udp_len.to_i >= 8
 				# For IP trailers. This isn't very reliable. :/
-				real_udp_payload = self.payload.to_s[0,(udp_len.to_i-8)] 
+				real_udp_payload = payload.to_s[0,(udp_len.to_i-8)] 
 			else
 				# I'm not going to mess with this right now.
-				real_udp_payload = self.payload 
+				real_udp_payload = payload 
 			end
 			chk_payload = (real_udp_payload.size % 2 == 0 ? real_udp_payload : real_udp_payload + "\x00")
-			chk_payload.scan(/../).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_payload.unpack("n*").each {|x| checksum = checksum+x}
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum
@@ -196,3 +196,5 @@ module PacketFu
 	end
 
 end # module PacketFu
+
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

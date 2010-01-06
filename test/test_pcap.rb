@@ -128,6 +128,7 @@ class PcapFileTest < Test::Unit::TestCase
 	end
 
 	def test_pcapfile_read_and_write
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
 		p = PcapFile.new.read @file
 		p.to_file(:filename => 'out.pcap')
 		@newfile = File.open('out.pcap') {|f| f.read}
@@ -138,6 +139,7 @@ class PcapFileTest < Test::Unit::TestCase
 	end
 
 	def test_pcapfile_write_again
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
 		p = PcapFile.new.read @file
 		p.write('out.pcap')
 		@newfile = File.open('out.pcap') {|f| f.read}
@@ -149,6 +151,7 @@ class PcapFileTest < Test::Unit::TestCase
 	end
 
 	def test_pcapfile_write_yet_again
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
 		p = PcapFile.new.read @file
 		p.write(:filename => 'out.pcap')
 		@newfile = File.open('out.pcap') {|f| f.read}
@@ -160,6 +163,7 @@ class PcapFileTest < Test::Unit::TestCase
 	end
 
 	def test_pcapfile_write_default
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
 		p = PcapFile.new.read @file
 		p.write
 		@newfile = File.open('out.pcap') {|f| f.read}
@@ -167,6 +171,19 @@ class PcapFileTest < Test::Unit::TestCase
 		p.append
 		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
 		assert_equal(22, packet_array.size)
+		File.unlink('out.pcap')
+	end
+
+	def test_pcapfile_write_after_recalc
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
+		pcaps = PcapFile.new.file_to_array(:filename => 'sample.pcap')
+		pcaps.each {|pkt|
+			p = Packet.parse pkt
+			p.recalc
+			p.to_f('out.pcap','a')
+		}
+		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+		assert_equal(11, packet_array.size)
 		File.unlink('out.pcap')
 	end
 
