@@ -17,6 +17,7 @@ module PacketFu
 	# PacketFu works best with Pcaprub version 0.8-dev, now made available
 	# with this distribution. Say, can Mac users give me some idea of how
 	# to install on your hipster youth-oriented Bay Area grunge OS?
+	# http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
   def self.pcaprub_platform_require
     if File.directory?("C:\\")
 			require 'pcaprub_win32/pcaprub'
@@ -40,8 +41,8 @@ module PacketFu
 end
 
 require "packetfu/pcap_s"
-# require "packetfu/write" # Need to reimplement
-# require "packetfu/read" # Need to reimplement
+# require "packetfu/write" # Reimplemented in pcap_s
+# require "packetfu/read" # Reimplemented in pcap_s 
 require "packetfu/packet_s"
 require "packetfu/invalid_s"
 # This order is desperately important. Should fix this so everyone

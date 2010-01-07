@@ -129,49 +129,14 @@ class PcapFileTest < Test::Unit::TestCase
 
 	def test_pcapfile_read_and_write
 		File.unlink('out.pcap') if File.exists? 'out.pcap'
-		p = PcapFile.new.read @file
+		p = PcapFile.new
+		p.read @file
 		p.to_file(:filename => 'out.pcap')
 		@newfile = File.open('out.pcap') {|f| f.read}
 		assert_equal(@file, @newfile)
 		p.to_file(:filename => 'out.pcap', :append => true)
 		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
 		assert_equal(22, packet_array.size)
-	end
-
-	def test_pcapfile_write_again
-		File.unlink('out.pcap') if File.exists? 'out.pcap'
-		p = PcapFile.new.read @file
-		p.write('out.pcap')
-		@newfile = File.open('out.pcap') {|f| f.read}
-		assert_equal(@file, @newfile)
-		p.append('out.pcap')
-		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
-		assert_equal(22, packet_array.size)
-		File.unlink('out.pcap')
-	end
-
-	def test_pcapfile_write_yet_again
-		File.unlink('out.pcap') if File.exists? 'out.pcap'
-		p = PcapFile.new.read @file
-		p.write(:filename => 'out.pcap')
-		@newfile = File.open('out.pcap') {|f| f.read}
-		assert_equal(@file, @newfile)
-		p.append(:filename => 'out.pcap')
-		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
-		assert_equal(22, packet_array.size)
-		File.unlink('out.pcap')
-	end
-
-	def test_pcapfile_write_default
-		File.unlink('out.pcap') if File.exists? 'out.pcap'
-		p = PcapFile.new.read @file
-		p.write
-		@newfile = File.open('out.pcap') {|f| f.read}
-		assert_equal(@file, @newfile)
-		p.append
-		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
-		assert_equal(22, packet_array.size)
-		File.unlink('out.pcap')
 	end
 
 	def test_pcapfile_write_after_recalc
@@ -185,6 +150,56 @@ class PcapFileTest < Test::Unit::TestCase
 		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
 		assert_equal(11, packet_array.size)
 		File.unlink('out.pcap')
+	end
+
+	def test_pcapfile_read_and_write_timestamps
+		File.unlink('out.pcap') if File.exists? 'out.pcap'
+		pf = PcapFile.new
+		arr = pf.file_to_array(:filename => 'sample.pcap')
+		assert_equal(11, arr.size)
+		pf = PcapFile.new
+		pf.a2f(:array => arr, :f => 'out.pcap', :ts_inc => 4, 
+					 :timestamp => Time.now.to_i - 1_000_000)
+		diff_time = pf.body[0].timestamp.sec.to_i - pf.body[1].timestamp.sec.to_i
+		assert_equal(-4, diff_time)
+		File.unlink('out.pcap')
+	end
+
+end
+	
+# Test the legacy Read objects.
+class ReadTest < Test::Unit::TestCase
+
+	include PacketFu
+
+	def test_read_string
+		pkts = Read.file_to_array(:file => 'sample.pcap')
+		assert_kind_of Array, pkts
+		assert_equal 11, pkts.size
+		this_packet = Packet.parse pkts[0]
+		assert_kind_of UDPPacket, this_packet
+		that_packet = Packet.parse pkts[3]
+		assert_kind_of ICMPPacket, that_packet
+	end
+
+	def test_read_hash
+		pkts = Read.file_to_array(:file => 'sample.pcap', :ts => true)
+		assert_kind_of Array, pkts
+		assert_equal 11, pkts.size
+		this_packet = Packet.parse pkts[0].values.first
+		assert_kind_of UDPPacket, this_packet
+		that_packet = Packet.parse pkts[3].values.first
+		assert_kind_of ICMPPacket, that_packet
+	end
+
+end
+
+class WriteTest < Test::Unit::TestCase
+
+	include PacketFu
+
+	def test_write
+
 	end
 
 end

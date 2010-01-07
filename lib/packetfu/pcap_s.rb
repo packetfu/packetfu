@@ -180,10 +180,24 @@ module PacketFu
 			self.to_a[1,2].map {|x| x.to_s}.join
 		end
 
+		def clear
+			self[:body].clear
+		end
+
 		def read(str)
 			self[:head].read str[0,24]
 			self[:body].read str
 			self
+		end
+
+		def read!(str)
+			clear	
+			self.read str
+		end
+
+		def readfile(file)
+			f = File.open(file) {|f| f.read}
+			self.read! f
 		end
 
 		# file_to_array() translates a libpcap file into an array of packets.
@@ -195,21 +209,70 @@ module PacketFu
 		# PcapFile.new.file_to_array(:f => 'filename.pcap')
 		def file_to_array(args={})
 			filename = args[:filename] || args[:file] || args[:f]
-			unless (!filename.nil? || filename.kind_of?(String))
-				raise ArgumentError, "Need a :filename for #{self.class}"
+			if filename
+				self.read! File.open(filename) {|f| f.read}
 			end
-			self.read File.open(filename) {|f| f.read}
-			self[:body].map {|x| x.data.to_s}
+			if args[:keep_timestamps] || args[:keep_ts] || args[:ts]
+				self[:body].map {|x| {x.timestamp.to_s => x.data.to_s} }
+			else
+				self[:body].map {|x| x.data.to_s}
+			end
 		end
 
 		alias_method :f2a, :file_to_array
 
-		# Prior versions of packetfu had an array_to_file function, where
-		# pcaps were stored in simple arrays. This seems silly, in retrospect;
-		# the strategy now is to store pcaps in memory as regular PcapFile 
-		# Structs, so timestamps and what-all can be more easily preserved.
-		#
-		# Short story is, array_to_file() is out, and to_file() is in.
+		def array_to_file(args={})
+			if args.kind_of? Hash
+				filename = args[:filename] || args[:file] || args[:f]
+				arr = args[:array] || args[:arr] || args[:a]
+				ts = args[:timestamp] || args[:ts] || Time.now.to_i
+				ts_inc = args[:timestamp_increment] || args[:ts_inc] || 1
+				append = !!args[:append]
+			elsif args.kind_of? Array
+				arr = args
+				filename = append = nil
+			else
+				raise ArgumentError, "Unknown argument. Need either a Hash or Array."
+			end
+			unless arr.kind_of? Array
+				raise ArgumentError, "Need an array to read packets from"
+			end
+			arr.each_with_index do |p,i|
+				if p.kind_of? Hash # Binary timestamps are included
+					this_ts = p.keys.first
+					this_incl_len = p.values.first.size
+					this_orig_len = this_incl_len
+					this_data = p.values.first
+				else # it's an array
+					this_ts = Timestamp.new(:endian => self[:endian], :sec => ts + (ts_inc * i)).to_s
+					this_incl_len = p.to_s.size
+					this_orig_len = this_incl_len
+					this_data = p.to_s
+				end
+				this_pkt = PcapPacket.new({:endian => self[:endian],
+																  :timestamp => this_ts,
+																	:incl_len => this_incl_len,
+																	:orig_len => this_orig_len,
+																	:data => this_data }
+																 )
+				self[:body] << this_pkt
+			end
+			if filename
+				self.to_f(:filename => filename, :append => append)
+			else
+				self
+			end
+		end
+
+		alias_method :a2f, :array_to_file
+
+		def array_to_file!(arr)
+			clear
+			array_to_file(arr)
+		end
+
+		alias_method :a2f!, :array_to_file!
+
 		def to_file(args={})
 			filename = args[:filename] || args[:file] || args[:f]
 			unless (!filename.nil? || filename.kind_of?(String))
@@ -224,6 +287,8 @@ module PacketFu
 			[filename, self.body.sz, self.body.size]
 		end
 
+		alias_method :to_f, :to_file
+
 		# Shorthand method for writing a file with a filename argument.
 		def write(filename='out.pcap')
 			if filename.kind_of?(Hash)
@@ -234,9 +299,6 @@ module PacketFu
 			self.to_file(:filename => f.to_s, :append => false)
 		end
 
-		# Shorthand method for appending to a file by filename. Note, this should
-		# remain compatable with http://trac.metasploit.com/changeset/6213/framework3/trunk/lib/packetfu 
-		# since that append() wants a hash argument. 
 		def append(filename='out.pcap')
 			if filename.kind_of?(Hash)
 				f = filename[:filename] || filename[:file] || filename[:f] || 'out.pcap'
@@ -249,5 +311,105 @@ module PacketFu
 	end
 
 end
+
+module PacketFu
+
+	# Read is largely deprecated. It was current in PacketFu 0.2.0, but isn't all that useful
+	# in 0.3.0 and beyond. Expect it to go away completely by version 1.0. So, the main use
+	# of this class is to learn how to do exactly the same things using the PcapFile object.
+	class Read
+
+		class << self
+
+			# get_byte_order() reads the magic string of a pcap file, and determines
+			# if it's :little or :big endian.
+			def get_byte_order(pcap_file)
+				byte_order = ((pcap_file[0,4] == "\xd4\xc3\xb2\xa1") ? :little : :big)
+				return byte_order
+			end
+
+			# set_byte_order: pretty much totally deprecated.
+			def set_byte_order(byte_order)
+				PacketFu.instance_variable_set("@byte_order",byte_order)
+				return true
+			end
+
+			# A wrapper for PcapFile#file_to_array, but only returns the array. Actually
+			# using the PcapFile object is going to be more useful.
+			def file_to_array(args={})
+				filename = args[:filename] || args[:file] || args[:out]
+				raise ArgumentError, "Need a :filename in string form to read from." if (filename.nil? || filename.class != String)
+				PcapFile.new.file_to_array(args)
+			end
+
+			alias_method :f2a, :file_to_array
+
+		end
+
+	end
+
+end
+
+module PacketFu
+
+	# Write is largely deprecated. It was current in PacketFu 0.2.0, but isn't all that useful
+	# in 0.3.0 and beyond. Expect it to go away completely by version 1.0, as working with
+	# PacketFu::PcapFile directly is generally going to be more rewarding.
+	class Write
+
+		class << self
+
+			# format_packets: Pretty much totally deprecated.
+			def format_packets(args={})
+				arr = args[:arr] || args[:array] || []
+				ts = args[:ts] || args[:timestamp] || Time.now.to_i
+				ts_inc = args[:ts_inc] || args[:timestamp_increment]
+				pkts = PcapFile.new.array_to_file(:endian => PacketFu.instance_variable_get("@byte_order"),
+																					:arr => arr,
+																					:ts => ts,
+																					:ts_inc => ts_inc)
+				pkts.body
+			end
+
+			# array_to_file is a largely deprecated function for writing arrays of pcaps to a file.
+			# Use PcapFile#array_to_file instead.
+			def array_to_file(args={})
+				filename = args[:filename] || args[:file] || args[:out] || :nowrite
+				arr = args[:arr] || args[:array] || []
+				ts = args[:ts] || args[:timestamp] || args[:time_stamp] || Time.now.to_f
+				ts_inc = args[:ts_inc] || args[:timestamp_increment] || args[:time_stamp_increment]
+				byte_order = args[:byte_order] || args[:byteorder] || args[:endian] || args[:endianness] || :little
+				append = args[:append]
+				Read.set_byte_order(byte_order) if [:big, :little].include? byte_order
+				pf = PcapFile.new
+				pf.array_to_file(:endian => PacketFu.instance_variable_get("@byte_order"),
+												 :arr => arr,
+												 :ts => ts,
+												 :ts_inc => ts_inc)
+				if filename && filename != :nowrite
+					if append
+						pf.append(filename)
+					else
+						pf.write(filename)
+					end
+					return [filename,pf.to_s.size,arr.size,ts,ts_inc]
+				else
+					return [nil,pf.to_s.size,arr.size,ts,ts_inc]
+				end
+
+			end
+
+			alias_method :a2f, :array_to_file
+
+			def append(args={})
+				array_to_file(args.merge(:append => true))
+			end
+
+		end
+
+	end
+
+end
+
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
