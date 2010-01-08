@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'packetfu_s'
+require 'packetfu'
 
 #Note that the Ruby stock unit tester runs this all out
 #of order, does funny things with class variables, etc.

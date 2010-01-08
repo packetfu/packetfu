@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'packetfu_s'
+require 'packetfu'
 
 class IPv6AddrTest < Test::Unit::TestCase
 	include PacketFu

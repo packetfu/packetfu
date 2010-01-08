@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'packetfu_s'
+require 'packetfu'
 
 class OctetsTest < Test::Unit::TestCase
 	include PacketFu

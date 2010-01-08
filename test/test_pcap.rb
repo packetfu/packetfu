@@ -2,7 +2,7 @@
 
 require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'packetfu_s'
+require 'packetfu'
 
 class PcapHeaderTest < Test::Unit::TestCase
 	include PacketFu

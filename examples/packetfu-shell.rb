@@ -44,7 +44,7 @@
 #  => nil
 
 require 'examples'
-require 'packetfu_s'
+require 'packetfu'
 
 module PacketFu
 	def whoami?(args={})

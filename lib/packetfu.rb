@@ -1,5 +1,5 @@
 $: << File.expand_path(File.dirname(__FILE__))
-require "packetfu/structfu_s"
+require "packetfu/structfu"
 require "ipaddr"
 require "singleton"
 
@@ -34,24 +34,24 @@ module PacketFu
       @@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
-		require 'packetfu/capture_s' 
-		require 'packetfu/inject_s'
+		require "packetfu/capture" 
+		require "packetfu/inject"
 	rescue LoadError
 	end
 end
 
-require "packetfu/pcap_s"
-require "packetfu/packet_s"
-require "packetfu/invalid_s"
-require "packetfu/eth_s"
-require "packetfu/ip_s" 
-require "packetfu/arp_s"
-require "packetfu/icmp_s"
-require "packetfu/udp_s"
-require "packetfu/tcp_s"
-require "packetfu/ipv6_s" # This is pretty minimal.
-require "packetfu/utils_s"
-require "packetfu/config_s"
+require "packetfu/pcap"
+require "packetfu/packet"
+require "packetfu/invalid"
+require "packetfu/eth"
+require "packetfu/ip" 
+require "packetfu/arp"
+require "packetfu/icmp"
+require "packetfu/udp"
+require "packetfu/tcp"
+require "packetfu/ipv6" # This is pretty minimal.
+require "packetfu/utils"
+require "packetfu/config"
 
 module PacketFu
 

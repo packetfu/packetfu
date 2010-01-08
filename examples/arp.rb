@@ -5,7 +5,7 @@
 # MAC address of a target IP turns out to be pretty useful day-to-day.
 
 require 'examples' # For path setting slight-of-hand
-require 'packetfu_s'
+require 'packetfu'
 
 def usage
 	if ARGV[0].nil?
