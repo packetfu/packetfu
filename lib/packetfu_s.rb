@@ -1,5 +1,5 @@
 $: << File.expand_path(File.dirname(__FILE__))
-require "structfu"
+require "packetfu/structfu_s"
 require "ipaddr"
 require "singleton"
 
@@ -14,9 +14,9 @@ module PacketFu
 	# Checks if pcaprub is loaded correctly.
 	@@pcaprub_loaded = false
 	
-	# PacketFu works best with Pcaprub version 0.8-dev, now made available
-	# with this distribution. Say, can Mac users give me some idea of how
-	# to install on your hipster youth-oriented Bay Area grunge OS?
+	# PacketFu works best with Pcaprub version 0.8-dev (at least)
+	#
+	# TODO: Could this be better? See:
 	# http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
   def self.pcaprub_platform_require
     if File.directory?("C:\\")
@@ -34,28 +34,24 @@ module PacketFu
       @@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
-		# require 'packetfu/capture' 
-		# require 'packetfu/inject'
+		require 'packetfu/capture_s' 
+		require 'packetfu/inject_s'
 	rescue LoadError
 	end
 end
 
 require "packetfu/pcap_s"
-# require "packetfu/write" # Reimplemented in pcap_s
-# require "packetfu/read" # Reimplemented in pcap_s 
 require "packetfu/packet_s"
 require "packetfu/invalid_s"
-# This order is desperately important. Should fix this so everyone
-# has a chance to require the stuff they need.
 require "packetfu/eth_s"
 require "packetfu/ip_s" 
 require "packetfu/arp_s"
 require "packetfu/icmp_s"
 require "packetfu/udp_s"
 require "packetfu/tcp_s"
-# require 'packetfu/ipv6'
-# require 'packetfu/utils'
-# require 'packetfu/config'
+require "packetfu/ipv6_s" # This is pretty minimal.
+require "packetfu/utils_s"
+require "packetfu/config_s"
 
 module PacketFu
 

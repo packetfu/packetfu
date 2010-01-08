@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'structfu'
+require 'packetfu_s'
 
 # Whee unit testing.
 class IntStringTest < Test::Unit::TestCase
