@@ -7,11 +7,10 @@ module PacketFu
 	# 
 	# ==== Header Definition
 	#
-	#   uint8     :icmp_type
-	#   uint8     :icmp_code
-	#   uint16be  :icmp_sum,  :initial_value => lambda { icmp_calc_sum }
-	#   rest      :body
-		
+	#   Int8    :icmp_type                        # Type
+	#   Int8    :icmp_code                        # Code
+	#   Int16   :icmp_sum    Default: calculated  # Checksum
+	#   String  :body
 	class ICMPHeader < Struct.new(:icmp_type, :icmp_code, :icmp_sum, :body)
 
 		include StructFu
@@ -25,10 +24,12 @@ module PacketFu
 			)
 		end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:icmp_type].read(str[0,1])
@@ -38,10 +39,21 @@ module PacketFu
 			self
 		end
 
+		# Setter for the type.
 		def icmp_type=(i); typecast i; end
+		# Getter for the type.
+		def icmp_type; self[:icmp_type].to_i; end
+		# Setter for the code.
 		def icmp_code=(i); typecast i; end
+		# Getter for the code.
+		def icmp_code; self[:icmp_code].to_i; end
+		# Setter for the checksum. Note, this is calculated automatically with 
+		# icmp_calc_sum.
 		def icmp_sum=(i); typecast i; end
+		# Getter for the checksum.
+		def icmp_sum; self[:icmp_sum].to_i; end
 
+		# Calculates and sets the checksum for the object.
 		def icmp_calc_sum
 			checksum = (icmp_type.to_i << 8)	+ icmp_code.to_i
 			chk_body = (body.to_s.size % 2 == 0 ? body.to_s : body.to_s + "\x00")
@@ -51,6 +63,7 @@ module PacketFu
 			checksum == 0 ? 0xffff : checksum
 		end
 		
+		# Recalculates the calculatable fields for ICMP.
 		def icmp_recalc(arg=:all)
 			# How silly is this, you can't intern a symbol in ruby 1.8.7pl72?
 			# I'm this close to monkey patching Symbol so you can force it...
@@ -129,6 +142,7 @@ module PacketFu
 			peek_data << "%04x" % self.ip_id
 			peek_data.join
 		end
+
 	end
 
-end # module PacketFu
+end

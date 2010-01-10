@@ -6,19 +6,18 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#  bit1     :b0
-	#  bit1     :b1
-	#  bit1     :b2
-	#  bit1     :b3
-	#  bit1     :b4
-	#  bit1     :b5
-	#  bit1     :local
-	#  bit1     :multicast
-	#  uint16be :oui,      :initial_value => 0x1ac5 # :)
+	#  Fixnum   :b0
+	#  Fixnum   :b1
+	#  Fixnum   :b2
+	#  Fixnum   :b3
+	#  Fixnum   :b4
+	#  Fixnum   :b5
+	#  Fixnum   :local
+	#  Fixnum   :multicast
+	#  Int16    :oui,       Default: 0x1ac5 :)
 	class EthOui < Struct.new(:b0, :b1, :b2, :b3, :b4, :b5, :local, :multicast, :oui)
 
-		# EthOui is unusual in that the bit values do not (currently) enjoy
-		# StructFu typing.
+		# EthOui is unusual in that the bit values do not enjoy StructFu typing.
 		def initialize(args={})
 			args[:local] ||= 0 
 			args[:oui] ||= 0x1ac # :)
@@ -28,6 +27,7 @@ module PacketFu
 						args[:oui])
 		end
 
+		# Returns the object in string form.
 		def to_s
 			byte = 0
 			byte += 0b00000001 if local.to_i == 1
@@ -41,6 +41,7 @@ module PacketFu
 			[byte,oui].pack("Cn")
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			byte = str[0]
@@ -62,9 +63,9 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#   uint8 :n1
-	#   uint8 :n2
-	#   uint8 :n3
+	#  Fixnum :n1
+	#  Fixnum :n2
+	#  Fixnum :n3
 	#
 	class EthNic < Struct.new(:n0, :n1, :n2)
 
@@ -74,10 +75,12 @@ module PacketFu
 			super(args[:n0], args[:n1], args[:n2])
 		end
 
+		# Returns the object in string form.
 		def to_s
 			[n0,n1,n2].map {|x| x.to_i}.pack("C3")
 		end
 		
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:n0], self[:n1], self[:n2] = str[0,3].unpack("C3")
@@ -90,8 +93,8 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#   eth_oui :oui  # See EthOui
-	#   eth_nic :nic  # See EthOui
+	#   EthOui :oui  # See EthOui
+	#   EthNic :nic  # See EthNic
 	class EthMac < Struct.new(:oui, :nic)
 
 		def initialize(args={})
@@ -100,10 +103,12 @@ module PacketFu
 			EthNic.new.read(args[:nic]))
 		end
 
+		# Returns the object in string form.
 		def to_s
 			"#{self[:oui]}#{self[:nic]}"
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self.oui.read str[0,3]
@@ -122,10 +127,10 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#  eth_mac  :eth_dst                             # See EthMac
-	#  eth_mac  :eth_src                             # See EthMac
-	#  uint16be :eth_proto, :initial_value => 0x0800 # IP 0x0800, Arp 0x0806
-	#  rest     :body
+	#  EthMac  :eth_dst                     # See EthMac
+	#  EthMac  :eth_src                     # See EthMac
+	#  Int16   :eth_proto, Default: 0x8000  # IP 0x0800, Arp 0x0806
+	#  String  :body
 	class EthHeader < Struct.new(:eth_dst, :eth_src, :eth_proto, :body)
 		include StructFu
 
@@ -138,14 +143,25 @@ module PacketFu
 			)
 		end
 
+		# Setter for the Ethernet destination address.
 		def eth_dst=(i); typecast(i); end
+		# Getter for the Ethernet destination address.
+		def eth_dst; self[:eth_dst].to_s; end
+		# Setter for the Ethernet source address.
 		def eth_src=(i); typecast(i); end
+		# Getter for the Ethernet source address.
+		def eth_src; self[:eth_src].to_s; end
+		# Setter for the Ethernet protocol number.
 		def eth_proto=(i); typecast(i); end
+		# Getter for the Ethernet protocol number.
+		def eth_proto; self[:eth_proto].to_i; end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:eth_dst].read str[0,6]
@@ -155,8 +171,8 @@ module PacketFu
 			self
 		end
 
-		# Converts a readable MAC (11:22:33:44:55:66) to a binary string. Readable MAC's may be split on colons, dots, 
-		# spaces, or underscores.
+		# Converts a readable MAC (11:22:33:44:55:66) to a binary string. 
+		# Readable MAC's may be split on colons, dots, spaces, or underscores.
 		#
 		# irb> PacketFu::EthHeader.mac2str("11:22:33:44:55:66")
 		#
@@ -181,14 +197,14 @@ module PacketFu
 			end
 		end
 
-		# Set the source MAC address in a more readable way.
+		# Sets the source MAC address in a more readable way.
 		def eth_saddr=(mac)
 			mac = EthHeader.mac2str(mac)
 			self[:eth_src].read mac
 			self[:eth_src]
 		end
 
-		# Returns a more readable source MAC address.
+		# Gets the source MAC address in a more readable way. 
 		def eth_saddr
 			EthHeader.str2mac(self[:eth_src].to_s)
 		end
@@ -200,13 +216,24 @@ module PacketFu
 			self[:eth_dst]
 		end
 
-		# Returns a more readable source MAC address.
+		# Gets the destination MAC address in a more readable way. 
 		def eth_daddr
 			EthHeader.str2mac(self[:eth_dst].to_s)
 		end
 
 	end
 
+	# EthPacket is used to construct Ethernet packets. They contain an
+	# Ethernet header, and that's about it.
+	#
+	# == Example
+	#
+	#   require 'packetfu'
+	#   eth_pkt = PacketFu::EthPacket.new
+	#   eth_pkt.eth_saddr="00:1c:23:44:55:66"
+	#   eth_pkt.eth_daddr="00:1c:24:aa:bb:cc"
+	#
+	#   eth_pkt.to_w('eth0') # Inject on the wire. (require root)
 	class	EthPacket < Packet
 		attr_accessor :eth_header
 
