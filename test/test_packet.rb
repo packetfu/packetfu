@@ -24,7 +24,7 @@ class EthPacketTest < Test::Unit::TestCase
 		assert p.is_arp?
 		assert_equal(p.to_s, pcaps[5])
 		assert_equal(1, p.arp_opcode.to_i)
-		assert_equal("\x00\x01", p.arp_opcode.to_s)
+		assert_equal("\x00\x01", p.headers.last[:arp_opcode].to_s)
 	end
 
 	def test_parse_arp_reply
@@ -32,7 +32,7 @@ class EthPacketTest < Test::Unit::TestCase
 		p = Packet.parse(pcaps[6]) # Really ARP reply.
 		assert_equal(p.to_s, pcaps[6])
 		assert_equal(2, p.arp_opcode.to_i)
-		assert_equal("\x00\x02", p.arp_opcode.to_s)
+		assert_equal("\x00\x02", p.headers.last[:arp_opcode].to_s)
 	end
 
 end
