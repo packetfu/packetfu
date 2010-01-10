@@ -8,9 +8,12 @@ class ArpTest < Test::Unit::TestCase
 	def test_arp_header
 		a = ARPHeader.new
 		assert_kind_of ARPHeader, a 
-		assert_kind_of StructFu::Int16, a.arp_hw
-		assert_kind_of Octets, a.arp_src_ip
-		assert_kind_of EthMac, a.arp_dst_mac
+		assert_kind_of StructFu::Int16, a[:arp_hw]
+		assert_kind_of Fixnum, a.arp_hw
+		assert_kind_of Octets, a[:arp_src_ip]
+		assert_kind_of String, a.arp_src_ip
+		assert_kind_of EthMac, a[:arp_dst_mac]
+		assert_kind_of String, a.arp_dst_mac
 		assert_kind_of StructFu::String, a.body 
 	end
 
@@ -38,10 +41,10 @@ class ArpTest < Test::Unit::TestCase
 		a = ARPPacket.new
 		a.arp_saddr_ip="1.2.3.4"
 		a.arp_daddr_ip="5.6.7.8"
-		assert_equal("5.6.7.8",a.arp_daddr_ip)
 		assert_equal("1.2.3.4",a.arp_saddr_ip)
-		assert_equal("\x01\x02\x03\x04",a.arp_src_ip.to_s)
-		assert_equal("\x05\x06\x07\x08",a.arp_dst_ip.to_s)
+		assert_equal("5.6.7.8",a.arp_daddr_ip)
+		assert_equal("\x01\x02\x03\x04",a.arp_src_ip)
+		assert_equal("\x05\x06\x07\x08",a.arp_dst_ip)
 	end
 
 	def test_write_mac
@@ -50,19 +53,19 @@ class ArpTest < Test::Unit::TestCase
 		a.arp_daddr_mac = "00:06:07:08:09:0a"
 		assert_equal("00:01:02:03:04:05",a.arp_saddr_mac)
 		assert_equal("00:06:07:08:09:0a",a.arp_daddr_mac)
-		assert_equal("\x00\x01\x02\x03\x04\x05",a.arp_src_mac.to_s)
-		assert_equal("\x00\x06\x07\x08\x09\x0a",a.arp_dst_mac.to_s)
+		assert_equal("\x00\x01\x02\x03\x04\x05",a.arp_src_mac)
+		assert_equal("\x00\x06\x07\x08\x09\x0a",a.arp_dst_mac)
 	end
 
-	def test_arp_flavors_windows
+	def test_arp_flavors
 		a = ARPPacket.new(:flavor => "Windows")
-		assert_equal("\x00" * 64, a.payload.to_s)
+		assert_equal("\x00" * 64, a.payload)
 		a = ARPPacket.new(:flavor => "Linux")
 		assert_equal(32, a.payload.size)
 		a = ARPPacket.new(:flavor => :hp_deskjet)
 		assert_equal(18, a.payload.size)
 		a = ARPPacket.new
-		assert_equal("\x00" * 18, a.payload.to_s)
+		assert_equal("\x00" * 18, a.payload)
 	end
 
 	def test_arp_create
@@ -104,6 +107,7 @@ class ArpTest < Test::Unit::TestCase
 		puts "ARP Peek format: "
 		puts a.peek
 		puts "\n"
+		assert_equal(66,a.peek.size)
 	end
 
 	def test_arp_pcap

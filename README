@@ -3,26 +3,20 @@
 A library for reading a writing packets to an interface or to a libpcap-formatted file.
 It is maintained at http://code.google.com/p/packetfu
 
-== Installation
+== Documentation
 
-PacketFu should live somewhere in your path. I haven't decided yet on packaging, will probably succumb to gems; your best bet is to just drop it into /usr/local/lib/site_ruby/1.8 or where ever you install bindata to.
+PacketFu is rdoc-compatable. In the same directory as this file, run "rdoc" by itself, and then view doc/index.html with your favored browser. Once that's done, navigate at the top, and read up on how to create a Packet or Capture from an interface with show_live or whatever.
 
 == Requirements
 
-BinData: http://bindata.rubyforge.org
-
-Dion Mendel's BinData is absolutely critical for PacketFu. Specifically, BinData's subversion r99 or later is required, in order to make use of the :eof patch. So, BinData r101 is included in this distribution until 0.9.3 or later is released.
-
 PcapRub: www.metasploit.com/svn/framework3/trunk/external/pcaprub
 
-Marshall Beddoe's PcapRub is required only for packet reading and writing from a network interfaces (which is a pretty big only). PcapRub itself relies on libpcap 0.9.8 or later for packet injection. It also requires root privilieges to access the interface directly. PcapRub is provided with this package, but sadly, little support is offered, as network cards, libpcap drivers, and PcapRub combinations can vary wildly from machine to machine. 
+Marshall Beddoe's PcapRub is required only for packet reading and writing from a network interfaces (which is a pretty big only). PcapRub itself relies on libpcap 0.9.8 or later for packet injection. PcapRub also requires root privilieges to access the interface directly. PcapRub is provided with this package, but sadly, little support is offered, as network cards, libpcap drivers, and PcapRub combinations can vary wildly from machine to machine. 
 
 == Examples
 
-Wouldn't that be nice? The best way to learn right now is to pore over the documentation, and mess around with packetfu-shell.rb
+PacketFu ships with dozens and dozens of tests, built on Test::Unit. These should give good pointers on how you're expected to use it. See the /tests directory. Furthermore, PacketFu also ships with packetfu-shell.rb, which should be run via IRB (as root, if you intend to use your interfaces).
 
 == Author
 
 PacketFu is maintained primarily by Tod Beardsley <todb@planb-security.net>
-
-== License

@@ -39,6 +39,7 @@ module PacketFu
 			setup_params(args)
 		end
 
+		# Used by new().
 		def setup_params(args={})
 			filter = args[:filter] # Not global; filter criteria can change.
 			start = args[:start] || false
@@ -164,5 +165,5 @@ module PacketFu
 			end
 		end
 
-	end # class Capture
-end # module PacketFu
+	end
+end

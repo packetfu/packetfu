@@ -8,17 +8,16 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#	 uint16be :arp_hw,        :initial_value => 1      # Ethernet
-	#	 uint16be :arp_proto,     :initial_value => 0x0800 # IP
-	#	 uint8    :arp_hw_len,    :initial_value => 6
-	#	 uint8    :arp_proto_len, :initial_value => 4
-	#	 uint16be :arp_opcode,    :initial_value => 1      # 1: Request, 2: Reply, 3: Request-Reverse, 4: Reply-Reverse
-	#	 eth_mac  :arp_src_mac                             # From eth.rb
-	#	 octets   :arp_src_ip                              # From ip.rb
-	#	 eth_mac  :arp_dst_mac                             # From eth.rb
-	#	 octets   :arp_dst_ip                              # From ip.rb
-	#	 rest     :body
-	#
+	#	 Int16   :arp_hw          Default: 1       # Ethernet
+	#	 Int16   :arp_proto,      Default: 0x8000  # IP
+	#	 Int8    :arp_hw_len,     Default: 6
+	#	 Int8    :arp_proto_len,  Default: 4
+	#	 Int16   :arp_opcode,     Default: 1       # 1: Request, 2: Reply, 3: Request-Reverse, 4: Reply-Reverse
+	#	 EthMac  :arp_src_mac                      # From eth.rb
+	#	 Octets  :arp_src_ip                       # From ip.rb
+	#	 EthMac  :arp_dst_mac                      # From eth.rb
+	#	 Octets  :arp_dst_ip                       # From ip.rb
+	#	 String  :body
 	class ARPHeader < Struct.new(:arp_hw, :arp_proto, :arp_hw_len,
 															 :arp_proto_len, :arp_opcode,
 															 :arp_src_mac, :arp_src_ip,
@@ -26,7 +25,6 @@ module PacketFu
 															 :body)
 		include StructFu
 
-		# XXX this is a wee bit wrong, so fix and test this!
 		def initialize(args={})
 			super( 
 				Int16.new(args[:arp_hw] || 1), 
@@ -42,10 +40,12 @@ module PacketFu
 			)
 		end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:arp_hw].read(str[0,2])
@@ -61,59 +61,85 @@ module PacketFu
 			self
 		end
 
-		# This bit should be easier to write, but hey.
+		# Setter for the ARP hardware type.
 		def arp_hw=(i); typecast i; end
+		# Getter for the ARP hardware type.
+		def arp_hw; self[:arp_hw].to_i; end
+		# Setter for the ARP protocol.
 		def arp_proto=(i); typecast i; end
+		# Getter for the ARP protocol.
+		def arp_proto; self[:arp_proto].to_i; end
+		# Setter for the ARP hardware type length.
 		def arp_hw_len=(i); typecast i; end
+		# Getter for the ARP hardware type length.
+		def arp_hw_len; self[:arp_hw_len].to_i; end
+		# Setter for the ARP protocol length.
 		def arp_proto_len=(i); typecast i; end
+		# Getter for the ARP protocol length.
+		def arp_proto; self[:arp_proto].to_i; end
+		# Setter for the ARP opcode. 
 		def arp_opcode=(i); typecast i; end
+		# Getter for the ARP opcode. 
+		def arp_opcode; self[:arp_opcode].to_i; end
+		# Setter for the ARP source MAC address.
 		def arp_src_mac=(i); typecast i; end
+		# Getter for the ARP source MAC address.
+		def arp_src_mac; self[:arp_src_mac].to_s; end
+		# Getter for the ARP source IP address.
 		def arp_src_ip=(i); typecast i; end
+		# Setter for the ARP source IP address.
+		def arp_src_ip; self[:arp_src_ip].to_s; end
+		# Setter for the ARP destination MAC address.
 		def arp_dst_mac=(i); typecast i; end
+		# Setter for the ARP destination MAC address.
+		def arp_dst_mac; self[:arp_dst_mac].to_s; end
+		# Setter for the ARP destination IP address.
 		def arp_dst_ip=(i); typecast i; end
+		# Getter for the ARP destination IP address.
+		def arp_dst_ip; self[:arp_dst_ip].to_s; end
 
 		# Set the source MAC address in a more readable way.
 		def arp_saddr_mac=(mac)
 			mac = EthHeader.mac2str(mac)
-			self.arp_src_mac.read(mac)
+			self[:arp_src_mac].read(mac)
 			self.arp_src_mac
 		end
 
-		# Returns a more readable source MAC address.
+		# Get a more readable source MAC address.
 		def arp_saddr_mac
-			EthHeader.str2mac(self.arp_src_mac.to_s)
+			EthHeader.str2mac(self[:arp_src_mac].to_s)
 		end
 
 		# Set the destination MAC address in a more readable way.
 		def arp_daddr_mac=(mac)
 			mac = EthHeader.mac2str(mac)
-			self.arp_dst_mac.read(mac)
+			self[:arp_dst_mac].read(mac)
 			self.arp_dst_mac
 		end
 
-		# Returns a more readable source MAC address.
+		# Get a more readable source MAC address.
 		def arp_daddr_mac
-			EthHeader.str2mac(self.arp_dst_mac.to_s)
+			EthHeader.str2mac(self[:arp_dst_mac].to_s)
 		end
 
-		# Sets a more readable source IP address. 
+		# Set a more readable source IP address. 
 		def arp_saddr_ip=(addr)
-			arp_src_ip.read_quad(addr)
+			self[:arp_src_ip].read_quad(addr)
 		end
 
-		# Returns a more readable source IP address. 
+		# Get a more readable source IP address. 
 		def arp_saddr_ip
-			arp_src_ip.to_x
+			self[:arp_src_ip].to_x
 		end
 
-		# Sets a more readable destination IP address.
+		# Set a more readable destination IP address.
 		def arp_daddr_ip=(addr)
-			arp_dst_ip.read_quad(addr)
+			self[:arp_dst_ip].read_quad(addr)
 		end
 		
-		# Returns a more readable destination IP address.
+		# Get a more readable destination IP address.
 		def arp_daddr_ip
-			arp_dst_ip.to_x
+			self[:arp_dst_ip].to_x
 		end
 
 	end # class ARPHeader
@@ -173,7 +199,7 @@ module PacketFu
 
 		end
 
-		# Used to generate summary data for ARP packets.
+		# Generates summary data for ARP packets.
 		def peek(args={})
 			peek_data = ["A "]
 			peek_data << "%-5d" % self.to_s.size
@@ -205,8 +231,8 @@ module PacketFu
 			@headers[0].inspect
 		end
 
-	end # class ARPPacket
+	end
 
-end # module PacketFu
+end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

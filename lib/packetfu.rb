@@ -1,10 +1,12 @@
+
+# :title: PacketFu Documentation
+# :include: ../README
+# :include: ../INSTALL
+# :include: ../LICENSE
+
 $: << File.expand_path(File.dirname(__FILE__))
 require "packetfu/structfu"
 require "ipaddr"
-require "singleton"
-
-# require "rubygems"
-# require "ruby-prof"
 
 module PacketFu
 
@@ -55,6 +57,7 @@ require "packetfu/config"
 
 module PacketFu
 
+	# Returns the current version of PacketFu. Incremented every once in a while.
 	def self.version
 		"0.3.0" # Jan 5, 2010
 	end

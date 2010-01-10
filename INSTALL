@@ -1,4 +1,4 @@
-INSTALLATION
+== INSTALL
 
 Installation is pretty straightforward.
 
@@ -21,7 +21,7 @@ For PacketFu proper, simply run
 
 from the toplevel directory to install.
 
-TESTING
+== Testing
 
 The easiest way to test the installation is to run PacketFu via
 irb, using the example shell in the "examples" directory:
@@ -42,7 +42,7 @@ with PacketFu), or you have a very, very old version of libpcap (version
 0.9.4 is the oldest tested version, and there's really no reason to not
 be at least on 1.0.0).
 
-COMPLAINTS
+== Complaints
 
 If things don't work out, please contact todb@planb-security.net, and I'll
 try to get you all sorted out.
