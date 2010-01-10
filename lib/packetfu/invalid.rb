@@ -11,10 +11,12 @@ module PacketFu
 			super(args[:body])
 		end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:body].read str

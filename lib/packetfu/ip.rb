@@ -5,10 +5,10 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#  uint8 :o1
-	#  uint8 :o2
-	#  uint8 :o3
-	#  uint8 :o4
+	#  Int8 :o1
+	#  Int8 :o2
+	#  Int8 :o3
+	#  Int8 :o4
 	class Octets < Struct.new(:o1, :o2, :o3, :o4)
 		include StructFu
 
@@ -20,10 +20,12 @@ module PacketFu
 			Int8.new(args[:o4]))
 		end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:o1].read str[0,1]
@@ -45,6 +47,7 @@ module PacketFu
 			IPAddr.new(ip_str).to_i
 		end
 
+		# Set the IP Address by reading a dotted-quad address.
 		def read_quad(str)
 			read([IPAddr.new(str).to_i].pack("N"))
 		end
@@ -57,21 +60,22 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#   bit4     :ip_v,     :initial_value => 4
-	#   bit4     :ip_hl,    :initial_value => 5
-	#   uint8    :ip_tos,   :initial_value => 0                     # TODO: Break out the bits
-	#   uint16be :ip_len,   :initial_value => lambda { ip_calc_len } 
-	#   uint16be :ip_id,    :initial_value => lambda { ip_calc_id } # IRL, hardly random. 
-	#   uint16be :ip_frag,  :initial_value => 0                     # TODO: Break out the bits
-	#   uint8    :ip_ttl,   :initial_value => 0xff                  # Changes per flavor
-	#   uint8    :ip_proto, :initial_value => 0x01                  # TCP: 0x06, UDP 0x11, ICMP 0x01
-	#   uint16be :ip_sum,   :initial_value => lambda { ip_calc_sum }
-	#   octets   :ip_src                                            # No value as this is a MultiValue
-	#   octets   :ip_dst                                            # Ditto.
-	#   rest     :body
+	#   Fixnum (4 bits)  :ip_v,     Default: 4
+	#   Fixnum (4 bits)  :ip_hl,    Default: 5
+	#   Int8             :ip_tos,   Default: 0           # TODO: Break out the bits
+	#   Int16            :ip_len,   Default: calculated 
+	#   Int16            :ip_id,    Default: calculated  # IRL, hardly random. 
+	#   Int16            :ip_frag,  Default: 0           # TODO: Break out the bits
+	#   Int8             :ip_ttl,   Default: 0xff        # Changes per flavor
+	#   Int8             :ip_proto, Default: 0x01        # TCP: 0x06, UDP 0x11, ICMP 0x01
+	#   Int16            :ip_sum,   Default: calculated 
+	#   Octets           :ip_src                       
+	#   Octets           :ip_dst                      
+	#   String           :body
 	#
-	# Note that IPPackets will always be somewhat incorrect upon initalization, and want
-	# an IPHeader#recalc() to become correct before a Packet#to_f or Packet#to_w.
+	# Note that IPPackets will always be somewhat incorrect upon initalization, 
+	# and want an IPHeader#recalc() to become correct before a 
+	# Packet#to_f or Packet#to_w.
 	class IPHeader < Struct.new(:ip_v, :ip_hl, :ip_tos, :ip_len,
 															:ip_id, :ip_frag, :ip_ttl, :ip_proto,
 															:ip_sum, :ip_src, :ip_dst, :body)
@@ -95,11 +99,13 @@ module PacketFu
 			)
 		end
 
+		# Returns the object in string form.
 		def to_s
 			byte_v_hl = [(self.ip_v << 4) + self.ip_hl].pack("C")
 			byte_v_hl + (self.to_a[2,10].map {|x| x.to_s}.join)
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:ip_v] = str[0,1].unpack("C").first >> 4
@@ -117,27 +123,49 @@ module PacketFu
 			self
 		end
 
+		# Setter for the version.
 		def ip_v=(i); self[:ip_v] = i.to_i; end
+		# Getter for the version.
 		def ip_v; self[:ip_v].to_i; end
+		# Setter for the header length (divide by 4)
 		def ip_hl=(i); self[:ip_hl] = i.to_i; end
+		# Getter for the header length (multiply by 4)
 		def ip_hl; self[:ip_hl].to_i; end
+		# Setter for the differentiated services
 		def ip_tos=(i); typecast i; end
+		# Getter for the differentiated services
 		def ip_tos; self[:ip_tos].to_i; end
+		# Setter for total length.
 		def ip_len=(i); typecast i; end
+		# Getter for total length.
 		def ip_len; self[:ip_len].to_i; end
+		# Setter for the identication number.
 		def ip_id=(i); typecast i; end
+		# Getter for the identication number.
 		def ip_id; self[:ip_id].to_i; end
+		# Setter for the fragmentation ID.
 		def ip_frag=(i); typecast i; end
+		# Getter for the fragmentation ID.
 		def ip_frag; self[:ip_frag].to_i; end
+		# Setter for the time to live.
 		def ip_ttl=(i); typecast i; end
+		# Getter for the time to live.
 		def ip_ttl; self[:ip_ttl].to_i; end
+		# Setter for the protocol number.
 		def ip_proto=(i); typecast i; end
+		# Getter for the protocol number.
 		def ip_proto; self[:ip_proto].to_i; end
+		# Setter for the checksum.
 		def ip_sum=(i); typecast i; end
+		# Getter for the checksum.
 		def ip_sum; self[:ip_sum].to_i; end
+		# Setter for the source IP address.
 		def ip_src=(i); typecast i; end
+		# Getter for the source IP address.
 		def ip_src; self[:ip_src].to_i; end
+		# Setter for the destination IP address.
 		def ip_dst=(i); typecast i; end
+		# Getter for the destination IP address.
 		def ip_dst; self[:ip_dst].to_i; end
 
 		# Calulcate the true length of the packet.
@@ -205,7 +233,10 @@ module PacketFu
 		end
 
 		# Recalculate the calculated IP fields. Valid arguments are:
-		#   :all :ip_len :ip_sum :ip_id
+		#   :all 
+		#   :ip_len 
+		#   :ip_sum 
+		#   :ip_id
 		def ip_recalc(arg=:all)
 			case arg
 			when :ip_len
@@ -223,7 +254,7 @@ module PacketFu
 			end
 		end
 
-	end # class IPHeader
+	end
 
 	# IPPacket is used to construct IP packets. They contain an EthHeader, an IPHeader, and usually
 	# a transport-layer protocol such as UDPHeader, TCPHeader, or ICMPHeader.
@@ -280,6 +311,6 @@ module PacketFu
 
 	end
 
-end # module PacketFu
+end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
