@@ -6,11 +6,11 @@ module PacketFu
 	# For more on UDP packets, see http://www.networksorcery.com/enp/protocol/udp.htm
 	#
 	# ==== Header Definition
-	#  uint16be  :udp_src
-	#  uint16be  :udp_dst
-	#  uint16be  :udp_len,  :initial_value => lambda {udp_calc_len}
-	#  uint16be  :udp_sum,  :initial_value =>  0                    # Checksum off
-	#  rest      :body
+	#  Int16   :udp_src
+	#  Int16   :udp_dst
+	#  Int16   :udp_len  Default: calculated
+	#  Int16   :udp_sum  Default: 0. Often calculated. 
+	#  String  :body
 	class UDPHeader < Struct.new(:udp_src, :udp_dst, :udp_len, :udp_sum, :body)
 
 		include StructFu
@@ -25,10 +25,12 @@ module PacketFu
 			)
 		end
 
+		# Returns the object in string form.
 		def to_s
 			self.to_a.map {|x| x.to_s}.join
 		end
 
+		# Reads a string to populate the object.
 		def read(str)
 			return self if str.nil?
 			self[:udp_src].read(str[0,2])
@@ -39,13 +41,21 @@ module PacketFu
 			self
 		end
 
+		# Setter for the UDP source port.
 		def udp_src=(i); typecast i; end
+		# Getter for the UDP source port.
 		def udp_src; self[:udp_src].to_i; end
+		# Setter for the UDP destination port.
 		def udp_dst=(i); typecast i; end
+		# Getter for the UDP destination port.
 		def udp_dst; self[:udp_dst].to_i; end
+		# Setter for the length field. Usually should be recalc()'ed instead.
 		def udp_len=(i); typecast i; end
+		# Getter for the length field.
 		def udp_len; self[:udp_len].to_i; end
+		# Setter for the checksum. Usually should be recalc()'ed instad.
 		def udp_sum=(i); typecast i; end
+		# Getter for the checksum.
 		def udp_sum; self[:udp_sum].to_i; end
 
 		# Returns the true length of the UDP packet.
@@ -180,7 +190,6 @@ module PacketFu
 			end
 		end
 
-
 		# Peek provides summary data on packet contents.
 		def peek(args={})
 			peek_data = ["U "]
@@ -195,6 +204,6 @@ module PacketFu
 
 	end
 
-end # module PacketFu
+end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

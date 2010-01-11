@@ -52,7 +52,7 @@ module PacketFu
 				target_mac
 			end # cap_thread
 			cap_thread.value
-		end # def self.arp
+		end
 
 		# Discovers the local IP and Ethernet address, which is useful for writing
 		# packets you expect to get a response to. Note, this is a noisy
@@ -121,6 +121,8 @@ module PacketFu
 		end
 
 
-	end # class Utils
+	end
 
-end # module PacketFu
+end
+
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
