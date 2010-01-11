@@ -1,5 +1,9 @@
 #include "ruby.h"
+
+#ifndef RUBY_19
 #include "rubysig.h"
+#endif
+
 
 #include <pcap.h>
 
@@ -8,15 +12,18 @@
  #include <arpa/inet.h>
 #endif
 
+#include <sys/time.h>
+
 static VALUE rb_cPcap;
 
-#define PCAPRUB_VERSION "0.8-dev"
+#define PCAPRUB_VERSION "0.9-dev"
 
 #define OFFLINE 1
 #define LIVE 2
 
 typedef struct rbpcap {
     pcap_t *pd;
+    pcap_dumper_t *pdt;
     char iface[256];
     char type;
 } rbpcap_t;
@@ -24,7 +31,7 @@ typedef struct rbpcap {
 
 typedef struct rbpcapjob {
 	struct pcap_pkthdr hdr;
-    char *pkt;
+    unsigned char *pkt;
 	int wtf;
 } rbpcapjob_t;
 
@@ -68,7 +75,7 @@ rbpcap_s_lookupdev(VALUE self)
     dev = pcap_lookupdev(eb);
     if (dev == NULL) {
 		rb_raise(rb_eRuntimeError, "%s", eb);
-    }
+   }
     ret_dev = rb_str_new2(dev);
 #endif
     return ret_dev;
@@ -104,11 +111,15 @@ static int rbpcap_ready(rbpcap_t *rbp) {
 	return 1;
 }
 
-static void rbpcap_close(rbpcap_t *rbp) {
+static void rbpcap_free(rbpcap_t *rbp) {
 	if (rbp->pd)
 		pcap_close(rbp->pd);
+	
+	if (rbp->pdt)
+		pcap_dump_close(rbp->pdt);
 
 	rbp->pd = NULL;
+	rbp->pdt = NULL;
 	free(rbp);
 }
 
@@ -119,7 +130,7 @@ rbpcap_new_s(VALUE class)
     rbpcap_t *rbp;
 
     // need to make destructor do a pcap_close later
-    self = Data_Make_Struct(class, rbpcap_t, 0, rbpcap_close, rbp);
+    self = Data_Make_Struct(class, rbpcap_t, 0, rbpcap_free, rbp);
     rb_obj_call_init(self, 0, 0);
 
     memset(rbp, 0, sizeof(rbpcap_t));
@@ -146,7 +157,7 @@ rbpcap_setfilter(VALUE self, VALUE filter)
     	if(pcap_lookupnet(rbp->iface, &netid, &mask, eb) < 0)
     		rb_raise(rb_eRuntimeError, "%s", eb);
 
-    if(pcap_compile(rbp->pd, &bpf, RSTRING(filter)->ptr, 0, mask) < 0)
+    if(pcap_compile(rbp->pd, &bpf, RSTRING_PTR(filter), 0, mask) < 0)
     	rb_raise(rb_eRuntimeError, "invalid bpf filter");
 
     if(pcap_setfilter(rbp->pd, &bpf) < 0)
@@ -183,12 +194,18 @@ rbpcap_open_live(VALUE self, VALUE iface,VALUE snaplen,VALUE promisc, VALUE time
 
     Data_Get_Struct(self, rbpcap_t, rbp);
 
+	
     rbp->type = LIVE;
     memset(rbp->iface, 0, sizeof(rbp->iface));
-    strncpy(rbp->iface, RSTRING(iface)->ptr, sizeof(rbp->iface) - 1);
+    strncpy(rbp->iface, RSTRING_PTR(iface), sizeof(rbp->iface) - 1);
 
+	
+    if(rbp->pd) {
+        pcap_close(rbp->pd);	
+    }
+	
     rbp->pd = pcap_open_live(
-    	RSTRING(iface)->ptr,
+    	RSTRING_PTR(iface),
     	NUM2INT(snaplen),
     	promisc_value,
     	NUM2INT(timeout),
@@ -223,7 +240,7 @@ rbpcap_open_offline(VALUE self, VALUE filename)
     rbp->type = OFFLINE;
 
     rbp->pd = pcap_open_offline(
-    	RSTRING(filename)->ptr,
+    	RSTRING_PTR(filename),
     	eb
     );
 
@@ -243,6 +260,85 @@ rbpcap_open_offline_s(VALUE class, VALUE filename)
 }
 
 static VALUE
+rbpcap_open_dead(VALUE self, VALUE linktype, VALUE snaplen)
+{
+    rbpcap_t *rbp;
+
+
+    if(TYPE(linktype) != T_FIXNUM)
+        rb_raise(rb_eArgError, "linktype must be a fixnum");
+    if(TYPE(snaplen) != T_FIXNUM)
+        rb_raise(rb_eArgError, "snaplen must be a fixnum");
+
+    Data_Get_Struct(self, rbpcap_t, rbp);
+
+    memset(rbp->iface, 0, sizeof(rbp->iface));
+    rbp->type = OFFLINE;
+
+    rbp->pd = pcap_open_dead(
+        NUM2INT(linktype),
+        NUM2INT(snaplen)
+     );
+	
+    return self;
+}
+
+static VALUE
+rbpcap_open_dead_s(VALUE class, VALUE linktype, VALUE snaplen)
+{
+    VALUE iPcap = rb_funcall(rb_cPcap, rb_intern("new"), 0);
+
+    return rbpcap_open_dead(iPcap, linktype, snaplen);
+}
+
+
+static VALUE
+rbpcap_dump_open(VALUE self, VALUE filename)
+{
+    rbpcap_t *rbp;
+
+    if(TYPE(filename) != T_STRING)
+       rb_raise(rb_eArgError, "filename must be a string");
+
+    Data_Get_Struct(self, rbpcap_t, rbp);
+    rbp->pdt = pcap_dump_open(
+        rbp->pd,
+        RSTRING_PTR(filename)
+    );
+
+    return self;
+}
+
+//not sure if this deviates too much from the way the rest of this class works?
+static VALUE
+rbpcap_dump(VALUE self, VALUE caplen, VALUE pktlen, VALUE packet)
+{
+    rbpcap_t *rbp;
+    struct pcap_pkthdr pcap_hdr;
+
+    if(TYPE(packet) != T_STRING)
+        rb_raise(rb_eArgError, "packet data must be a string");
+    if(TYPE(caplen) != T_FIXNUM)
+        rb_raise(rb_eArgError, "caplen must be a fixnum");
+    if(TYPE(pktlen) != T_FIXNUM)
+        rb_raise(rb_eArgError, "pktlen must be a fixnum");
+
+    Data_Get_Struct(self, rbpcap_t, rbp);
+    
+    gettimeofday(&pcap_hdr.ts, NULL);
+    pcap_hdr.caplen = NUM2UINT(caplen);
+    pcap_hdr.len = NUM2UINT(pktlen);
+
+    pcap_dump(
+        (u_char*)rbp->pdt,        
+        &pcap_hdr,
+        (unsigned char *)RSTRING_PTR(packet)
+    );
+
+    return self;
+}
+
+static VALUE
 rbpcap_inject(VALUE self, VALUE payload)
 {
     rbpcap_t *rbp;
@@ -257,68 +353,65 @@ rbpcap_inject(VALUE self, VALUE payload)
     /* WinPcap does not have a pcap_inject call we use pcap_sendpacket, if it suceedes 
      * we simply return the amount of packets request to inject, else we fail.
      */
-    if(pcap_sendpacket(rbp->pd, RSTRING(payload)->ptr, RSTRING(payload)->len) != 0) {
+    if(pcap_sendpacket(rbp->pd, RSTRING_PTR(payload), RSTRING_LEN(payload)) != 0) {
     	rb_raise(rb_eRuntimeError, "%s", pcap_geterr(rbp->pd));
     }
-    return INT2NUM(RSTRING(payload)->len);
+    return INT2NUM(RSTRING_LEN(payload));
 #else
-    return INT2NUM(pcap_inject(rbp->pd, RSTRING(payload)->ptr, RSTRING(payload)->len));
+    return INT2NUM(pcap_inject(rbp->pd, RSTRING_PTR(payload), RSTRING_LEN(payload)));
 #endif
 }
 
 
 static void rbpcap_handler(rbpcapjob_t *job, struct pcap_pkthdr *hdr, u_char *pkt){
-	job->pkt = pkt;
+	job->pkt = (unsigned char *)pkt;
 	job->hdr = *hdr;
 }
 
 static VALUE
 rbpcap_next(VALUE self)
 {
-    rbpcap_t *rbp;
+	rbpcap_t *rbp;
 	rbpcapjob_t job;
 	char eb[PCAP_ERRBUF_SIZE];
 	int ret;	
 	
-    Data_Get_Struct(self, rbpcap_t, rbp);
+	Data_Get_Struct(self, rbpcap_t, rbp);
 	if(! rbpcap_ready(rbp)) return self; 
 	pcap_setnonblock(rbp->pd, 1, eb);
 
-    TRAP_BEG;
-	
-	while(! (ret = pcap_dispatch(rbp->pd, 1, (pcap_handler) rbpcap_handler, (u_char *)&job))) {
-		if(rbp->type = OFFLINE) break;
-		rb_thread_schedule();
-	}
-    
-    TRAP_END;
+#ifndef RUBY_19
+	TRAP_BEG;
+#endif
+	ret = pcap_dispatch(rbp->pd, 1, (pcap_handler) rbpcap_handler, (u_char *)&job);
+#ifndef RUBY_19
+	TRAP_END;
+#endif
 
-	if(rbp->type = OFFLINE && ret <= 0) return Qnil;
+	if(rbp->type == OFFLINE && ret <= 0) return Qnil;
 
-    if(job.hdr.caplen > 0)
-    	return rb_str_new(job.pkt, job.hdr.caplen);
+	if(ret > 0 && job.hdr.caplen > 0)
+             return rb_str_new((char *) job.pkt, job.hdr.caplen);
 
-    return Qnil;
+	return Qnil;
 }
 
 static VALUE
 rbpcap_capture(VALUE self)
 {
     rbpcap_t *rbp;
-
+	int fno = -1;
+	
     Data_Get_Struct(self, rbpcap_t, rbp);
 
 	if(! rbpcap_ready(rbp)) return self; 
 	
+	fno = pcap_get_selectable_fd(rbp->pd);
+
     for(;;) {
-
     	VALUE packet = rbpcap_next(self);
-
-    	if(packet == Qnil && rbp->type == OFFLINE)
-    		break;
-
-    	if(packet != Qnil)
-    		rb_yield(packet);
+    	if(packet == Qnil && rbp->type == OFFLINE) break;
+		packet == Qnil ? rb_thread_wait_fd(fno) : rb_yield(packet);
     }
 
     return self;
@@ -405,6 +498,10 @@ Init_pcaprub()
 
     rb_define_singleton_method(rb_cPcap, "open_live", rbpcap_open_live_s, 4);
     rb_define_singleton_method(rb_cPcap, "open_offline", rbpcap_open_offline_s, 1);
+    rb_define_singleton_method(rb_cPcap, "open_dead", rbpcap_open_dead_s, 2);
+    rb_define_singleton_method(rb_cPcap, "dump_open", rbpcap_dump_open, 1);
+	
+    rb_define_method(rb_cPcap, "dump", rbpcap_dump, 3);
 
     rb_define_method(rb_cPcap, "each", rbpcap_capture, 0);
     rb_define_method(rb_cPcap, "next", rbpcap_next, 0);

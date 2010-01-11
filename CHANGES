@@ -19,3 +19,12 @@
 
 == Verison 0.0.3 # September 3, 2008 # r25
   First tagged version. Naturally, bugs were found that moment.
+
+== Version 0.3.0 # January 11, 2010 # r129
+  Rewrote pretty much everything using Struct instead of BinData. Huge success.
+  Start to get back in the habit of documentation changes.
+
+== Version 0.3.1 # FUTURE
+  r130: Add convenience methods for checking the version.
+  r131: Fix TCP option setting.
+

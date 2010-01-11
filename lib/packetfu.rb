@@ -59,7 +59,7 @@ module PacketFu
 
 	# Returns the current version of PacketFu. Incremented every once in a while.
 	def self.version
-		"0.3.0" # Jan 5, 2010
+		"0.3.1" # Jan 11, 2010
 	end
 
 	# Returns the version in a binary format for easy comparisons.
