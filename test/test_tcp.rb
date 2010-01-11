@@ -304,6 +304,22 @@ class TCPPacketTest < Test::Unit::TestCase
 	
 end
 
+class TCPPacketTest < Test::Unit::TestCase
+	include PacketFu
+
+	def test_tcp_edit_opts
+		t = TCPPacket.new
+		assert_equal(0, t.tcp_options.size)
+		assert_equal(0, t.tcp_opts_len)
+		assert_equal(5, t.tcp_hlen)
+		t.tcp_options = "NOP,NOP,NOP,NOP"
+		assert_equal(4, t.tcp_opts_len)
+		t.recalc
+		assert_equal(6, t.tcp_hlen)
+	end
+
+end
+
 
 
 

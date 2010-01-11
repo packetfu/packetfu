@@ -798,9 +798,10 @@ module PacketFu
 			self[:tcp_opts].to_s.size
 		end
 
-		# Sets and returns the true length of the TCP Header. 
+		# Sets and returns the true length of the TCP Header.
+		# TODO: Think about making all the option stuff safer. 
 		def tcp_calc_hlen
-			tcp_hlen = (20 + tcp_opts_len) / 4
+			self[:tcp_hlen] = TcpHlen.new(:hlen => ((20 + tcp_opts_len) / 4))
 		end
 
 		# Generates a random high port. This is affected by packet flavor.

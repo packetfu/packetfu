@@ -9,10 +9,7 @@ class String
 	end
 end
 
-@p = PcapFile.new
-# @p.readfile 'sample.pcap'
-@a = Packet.parse(@p.file_to_array(:file => "sample.pcap")[5])
-# @a = Packet.parse(@p[5])
+@t = TCPPacket.new
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
 
