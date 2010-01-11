@@ -31,7 +31,7 @@ module PacketFu
 	
 		def initialize(args={})
 			if Process.euid.zero?
-				@iface = Pcap.lookupdev || "lo" # In case there aren't any...
+				@iface = args[:iface] || Pcap.lookupdev || "lo" # In case there aren't any...
 			end	
 			@pcapfile = "/tmp/out.pcap"
 			args.each_pair { |k,v| self.instance_variable_set(("@" + k.to_s).intern,v) }

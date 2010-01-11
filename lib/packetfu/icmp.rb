@@ -7,28 +7,68 @@ module PacketFu
 	# 
 	# ==== Header Definition
 	#
-	#   uint8     :icmp_type
-	#   uint8     :icmp_code
-	#   uint16be  :icmp_sum,  :initial_value => lambda { icmp_calc_sum }
-	#   rest      :body
-		
-	class ICMPHeader < BinData::MultiValue
-		uint8			:icmp_type
-		uint8			:icmp_code
-		uint16be	:icmp_sum,	:initial_value => lambda { icmp_calc_sum }
-		rest			:body
-		
+	#   Int8    :icmp_type                        # Type
+	#   Int8    :icmp_code                        # Code
+	#   Int16   :icmp_sum    Default: calculated  # Checksum
+	#   String  :body
+	class ICMPHeader < Struct.new(:icmp_type, :icmp_code, :icmp_sum, :body)
+
+		include StructFu
+
+		def initialize(args={})
+			super(
+				Int8.new(args[:icmp_type]),
+				Int8.new(args[:icmp_code]),
+				Int16.new(args[:icmp_sum] || icmp_calc_sum),
+				StructFu::String.new.read(args[:body])
+			)
+		end
+
+		# Returns the object in string form.
+		def to_s
+			self.to_a.map {|x| x.to_s}.join
+		end
+
+		# Reads a string to populate the object.
+		def read(str)
+			return self if str.nil?
+			self[:icmp_type].read(str[0,1])
+			self[:icmp_code].read(str[1,1])
+			self[:icmp_sum].read(str[2,2])
+			self[:body].read(str[4,str.size])
+			self
+		end
+
+		# Setter for the type.
+		def icmp_type=(i); typecast i; end
+		# Getter for the type.
+		def icmp_type; self[:icmp_type].to_i; end
+		# Setter for the code.
+		def icmp_code=(i); typecast i; end
+		# Getter for the code.
+		def icmp_code; self[:icmp_code].to_i; end
+		# Setter for the checksum. Note, this is calculated automatically with 
+		# icmp_calc_sum.
+		def icmp_sum=(i); typecast i; end
+		# Getter for the checksum.
+		def icmp_sum; self[:icmp_sum].to_i; end
+
+		# Calculates and sets the checksum for the object.
 		def icmp_calc_sum
-			checksum = (icmp_type << 8)	+ icmp_code
-			chk_body = (body.size % 2 == 0 ? body : body + "\x00")
-			chk_body.scan(/[\x00-\xff]{2}/).collect { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y }
+			checksum = (icmp_type.to_i << 8)	+ icmp_code.to_i
+			chk_body = (body.to_s.size % 2 == 0 ? body.to_s : body.to_s + "\x00")
+			chk_body.scan(/../).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y }
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum
 		end
 		
+		# Recalculates the calculatable fields for ICMP.
 		def icmp_recalc(arg=:all)
-			case arg.intern
+			# How silly is this, you can't intern a symbol in ruby 1.8.7pl72?
+			# I'm this close to monkey patching Symbol so you can force it...
+			arg = arg.intern if arg.respond_to? :intern
+			case arg
 			when :icmp_sum
 				self.icmp_sum=icmp_calc_sum
 			when :all
@@ -71,9 +111,10 @@ module PacketFu
 		attr_accessor :eth_header, :ip_header, :icmp_header
 		
 		def initialize(args={})
-			@eth_header = 	(args[:eth] || EthHeader.new)
-			@ip_header 	= 	(args[:ip]	|| IPHeader.new)
-			@icmp_header = 	(args[:icmp] || ICMPHeader.new)
+			@eth_header = EthHeader.new(args).read(args[:eth])
+			@ip_header = IPHeader.new(args).read(args[:ip])
+			@ip_header.ip_proto = 1
+			@icmp_header = ICMPHeader.new(args).read(args[:icmp])
 
 			@ip_header.body = @icmp_header
 			@eth_header.body = @ip_header
@@ -86,7 +127,7 @@ module PacketFu
 		def peek(args={})
 			peek_data = ["C "] # I is taken by IP
 			peek_data << "%-5d" % self.to_s.size
-			type = case self.icmp_type
+			type = case self.icmp_type.to_i
 						 when 8
 							 "ping"
 						 when 0
@@ -101,6 +142,7 @@ module PacketFu
 			peek_data << "%04x" % self.ip_id
 			peek_data.join
 		end
+
 	end
 
-end # module PacketFu
+end

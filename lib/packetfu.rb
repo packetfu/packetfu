@@ -1,19 +1,12 @@
-if VERSION < "1.8.6"
-	$stderr.puts "[*] WARNING: Ruby not at a minimum version of 1.8.6" 
-end
 
-require 'bindata'
+# :title: PacketFu Documentation
+# :include: ../README
+# :include: ../INSTALL
+# :include: ../LICENSE
 
-# Happy day, unforking BinData.
-if BinData::VERSION < "0.9.3"
-	raise LoadError, "BinData not at version 0.9.3 or later."
-end
-
-require 'ipaddr'
-require 'singleton'
-
-#	require 'rubygems'
-#	require 'ruby-prof'
+$: << File.expand_path(File.dirname(__FILE__))
+require "packetfu/structfu"
+require "ipaddr"
 
 module PacketFu
 
@@ -23,9 +16,10 @@ module PacketFu
 	# Checks if pcaprub is loaded correctly.
 	@@pcaprub_loaded = false
 	
-	# PacketFu works best with Pcaprub version 0.8-dev, now made available
-	# with this distribution. Say, can Mac users give me some idea of how
-	# to install on your hipster youth-oriented Bay Area grunge OS?
+	# PacketFu works best with Pcaprub version 0.8-dev (at least)
+	#
+	# TODO: Could this be better? See:
+	# http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
   def self.pcaprub_platform_require
     if File.directory?("C:\\")
 			require 'pcaprub_win32/pcaprub'
@@ -42,43 +36,32 @@ module PacketFu
       @@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
-		require 'packetfu/capture' 
-		require 'packetfu/inject'
+		require "packetfu/capture" 
+		require "packetfu/inject"
 	rescue LoadError
 	end
 end
-# Doesn't require PcapRub
-require 'packetfu/pcap'
-require 'packetfu/write' 
-require 'packetfu/read' 	
 
-# Packet crafting/parsing goodness.
-require 'packetfu/packet'
-require 'packetfu/invalid'
-require 'packetfu/eth'
-require 'packetfu/ip'
-require 'packetfu/arp'
-require 'packetfu/icmp'
-require 'packetfu/udp'
-require 'packetfu/tcp'
-require 'packetfu/ipv6'
-
-# Various often-used utilities.
-require 'packetfu/utils'
-
-# A place to keep defaults.
-require 'packetfu/config'
-
-#:main:PacketFu
-#
-#:include:../README
-#:include:../LICENSE
+require "packetfu/pcap"
+require "packetfu/packet"
+require "packetfu/invalid"
+require "packetfu/eth"
+require "packetfu/ip" 
+require "packetfu/arp"
+require "packetfu/icmp"
+require "packetfu/udp"
+require "packetfu/tcp"
+require "packetfu/ipv6" # This is pretty minimal.
+require "packetfu/utils"
+require "packetfu/config"
 
 module PacketFu
 
-	# Returns the version.
+	# Returns the current version of PacketFu. Incremented every once in a while.
 	def self.version
-		"0.2.0" # June 13, 2009
+		"0.3.0" # Jan 5, 2010
 	end
 
 end
+
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

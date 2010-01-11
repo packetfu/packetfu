@@ -6,17 +6,57 @@ module PacketFu
 	# For more on UDP packets, see http://www.networksorcery.com/enp/protocol/udp.htm
 	#
 	# ==== Header Definition
-	#  uint16be  :udp_src
-	#  uint16be  :udp_dst
-	#  uint16be  :udp_len,  :initial_value => lambda {udp_calc_len}
-	#  uint16be  :udp_sum,  :initial_value =>  0                    # Checksum off
-	#  rest      :body
- class UDPHeader < BinData::MultiValue
-		uint16be	:udp_src
-		uint16be	:udp_dst
-		uint16be	:udp_len,	:initial_value => lambda {udp_calc_len}
-		uint16be	:udp_sum,	:initial_value =>  0 # Checksum off
-		rest			:body
+	#  Int16   :udp_src
+	#  Int16   :udp_dst
+	#  Int16   :udp_len  Default: calculated
+	#  Int16   :udp_sum  Default: 0. Often calculated. 
+	#  String  :body
+	class UDPHeader < Struct.new(:udp_src, :udp_dst, :udp_len, :udp_sum, :body)
+
+		include StructFu
+
+		def initialize(args={})
+			super(
+				Int16.new(args[:udp_src]),
+				Int16.new(args[:udp_dst]),
+				Int16.new(args[:udp_len] || udp_calc_len),
+				Int16.new(args[:udp_sum]),
+				StructFu::String.new.read(args[:body])
+			)
+		end
+
+		# Returns the object in string form.
+		def to_s
+			self.to_a.map {|x| x.to_s}.join
+		end
+
+		# Reads a string to populate the object.
+		def read(str)
+			return self if str.nil?
+			self[:udp_src].read(str[0,2])
+			self[:udp_dst].read(str[2,2])
+			self[:udp_len].read(str[4,2])
+			self[:udp_sum].read(str[6,2])
+			self[:body].read(str[8,str.size])
+			self
+		end
+
+		# Setter for the UDP source port.
+		def udp_src=(i); typecast i; end
+		# Getter for the UDP source port.
+		def udp_src; self[:udp_src].to_i; end
+		# Setter for the UDP destination port.
+		def udp_dst=(i); typecast i; end
+		# Getter for the UDP destination port.
+		def udp_dst; self[:udp_dst].to_i; end
+		# Setter for the length field. Usually should be recalc()'ed instead.
+		def udp_len=(i); typecast i; end
+		# Getter for the length field.
+		def udp_len; self[:udp_len].to_i; end
+		# Setter for the checksum. Usually should be recalc()'ed instad.
+		def udp_sum=(i); typecast i; end
+		# Getter for the checksum.
+		def udp_sum; self[:udp_sum].to_i; end
 
 		# Returns the true length of the UDP packet.
 		def udp_calc_len
@@ -25,6 +65,7 @@ module PacketFu
 
 		# Recalculates calculated fields for UDP.
 		def udp_recalc(args=:all)
+			arg = arg.intern if arg.respond_to? :intern
 			case args
 			when :udp_len
 				self.udp_len = udp_calc_len
@@ -35,7 +76,7 @@ module PacketFu
 			end
 		end
 
-		# Equivalent to udp_src
+		# Equivalent to udp_src.to_i
 		def udp_sport
 			self.udp_src
 		end
@@ -87,20 +128,18 @@ module PacketFu
 		attr_accessor :eth_header, :ip_header, :udp_header
 		
 		def initialize(args={})
-			@eth_header = 	(args[:eth] || EthHeader.new)
-			@ip_header 	= 	(args[:ip]	|| IPHeader.new)
-			@udp_header = 	(args[:udp] || UDPHeader.new)
-
+			@eth_header = EthHeader.new(args).read(args[:eth])
+			@ip_header = IPHeader.new(args).read(args[:ip])
+			@ip_header.ip_proto=0x11
+			@udp_header = UDPHeader.new(args).read(args[:icmp])
 			@ip_header.body = @udp_header
 			@eth_header.body = @ip_header
 			@headers = [@eth_header, @ip_header, @udp_header]
-
-			@ip_header.ip_proto=0x11
 			super
 			udp_calc_sum
 		end
 
-		# udp_calc_sum() computes the TCP checksum, and is called upon intialization. 
+		# udp_calc_sum() computes the UDP checksum, and is called upon intialization. 
 		# It usually should be called just prior to dropping packets to a file or on the wire. 
 		def udp_calc_sum
 			# This is /not/ delegated down to @udp_header since we need info
@@ -110,24 +149,26 @@ module PacketFu
 			checksum += (ip_dst.to_i >> 16)
 			checksum += (ip_dst.to_i & 0xffff)
 			checksum += 0x11
-			checksum += udp_len
-			checksum += udp_src
-			checksum += udp_dst
-			checksum += udp_len
-			if udp_len >= 8
-				real_udp_payload = payload[0,(udp_len-8)] # For IP trailers. This isn't very reliable, though. :/
+			checksum += udp_len.to_i
+			checksum += udp_src.to_i
+			checksum += udp_dst.to_i
+			checksum += udp_len.to_i
+			if udp_len.to_i >= 8
+				# For IP trailers. This isn't very reliable. :/
+				real_udp_payload = payload.to_s[0,(udp_len.to_i-8)] 
 			else
-				real_udp_payload = payload # I'm not going to mess with this right now.
+				# I'm not going to mess with this right now.
+				real_udp_payload = payload 
 			end
 			chk_payload = (real_udp_payload.size % 2 == 0 ? real_udp_payload : real_udp_payload + "\x00")
-			chk_payload.scan(/[\x00-\xff]{2}/).collect { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y}
+			chk_payload.unpack("n*").each {|x| checksum = checksum+x}
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum
 			@udp_header.udp_sum = checksum
 		end
 
-		# udp_recalc() recalculates various fields of the TCP packet. Valid arguments are:
+		# udp_recalc() recalculates various fields of the UDP packet. Valid arguments are:
 		#
 		#   :all
 		#     Recomputes all calculated fields.
@@ -153,9 +194,9 @@ module PacketFu
 		def peek(args={})
 			peek_data = ["U "]
 			peek_data << "%-5d" % self.to_s.size
-			peek_data << "%-21s" % "#{self.ip_saddr}:#{self.udp_src}"
+			peek_data << "%-21s" % "#{self.ip_saddr}:#{self.udp_sport}"
 			peek_data << "->"
-			peek_data << "%21s" % "#{self.ip_daddr}:#{self.udp_dst}"
+			peek_data << "%21s" % "#{self.ip_daddr}:#{self.udp_dport}"
 			peek_data << "%23s" % "I:"
 			peek_data << "%04x" % self.ip_id
 			peek_data.join
@@ -163,4 +204,6 @@ module PacketFu
 
 	end
 
-end # module PacketFu
+end
+
+# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
