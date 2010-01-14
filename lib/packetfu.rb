@@ -4,7 +4,7 @@
 # :include: ../INSTALL
 # :include: ../LICENSE
 
-$: << File.expand_path(File.dirname(__FILE__))
+# $: << File.expand_path(File.dirname(__FILE__))
 require "packetfu/structfu"
 require "ipaddr"
 
@@ -57,9 +57,11 @@ require "packetfu/config"
 
 module PacketFu
 
+VERSION = "0.3.1" # Jan 11, 2010
+
 	# Returns the current version of PacketFu. Incremented every once in a while.
 	def self.version
-		"0.3.1" # Jan 11, 2010
+		PacketFu::VERSION
 	end
 
 	# Returns the version in a binary format for easy comparisons.
