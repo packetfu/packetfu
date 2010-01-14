@@ -120,6 +120,60 @@ module PacketFu
 			# method that returns an array rather than just the first candidate.
 		end
 
+		# Handles ifconfig for various (okay, one) platforms. Mac guys, fix this and submit a patch! 
+		# Will have Windows done shortly.
+		#
+		# Takes an argument (either string or symbol) of the interface to look up, and 
+		# returns a hash which contains at least the :iface element, and if configured, 
+		# these additional elements:
+		#
+		#   :eth_saddr  # A human readable MAC address
+		#   :eth_src    # A packed MAC address
+		#   :ip_saddr   # A dotted-quad string IPv4 address
+		#   :ip_src     # A packed IPv4 address
+		#   :ip4_obj    # An IPAddr object with bitmask
+		#   :ip6_saddr  # A colon-delimited hex IPv6 address, with bitmask
+		#   :ip6_obj    # An IPAddr object with bitmask
+		#
+		# === Example
+		#   PacketFu::Utils.ifconfig :wlan0 # Not associated yet
+		#   #=> {:eth_saddr=>"00:1d:e0:73:9d:ff", :eth_src=>"\000\035\340s\235\377", :iface=>"wlan0"}
+		#   PacketFu::Utils.ifconfig("eth0") # Takes 'eth0' as default
+		#   #=> {:eth_saddr=>"00:1c:23:35:70:3b", :eth_src=>"\000\034#5p;", :ip_saddr=>"10.10.10.9", :ip4_obj=>#<IPAddr: IPv4:10.10.10.0/255.255.254.0>, :ip_src=>"\n\n\n\t", :iface=>"eth0", :ip6_saddr=>"fe80::21c:23ff:fe35:703b/64", :ip6_obj=>#<IPAddr: IPv6:fe80:0000:0000:0000:0000:0000:0000:0000/ffff:ffff:ffff:ffff:0000:0000:0000:0000>}  
+		#   PacketFu::Utils.ifconfig :lo
+		#   #=> {:ip_saddr=>"127.0.0.1", :ip4_obj=>#<IPAddr: IPv4:127.0.0.0/255.0.0.0>, :ip_src=>"\177\000\000\001", :iface=>"lo", :ip6_saddr=>"::1/128", :ip6_obj=>#<IPAddr: IPv6:0000:0000:0000:0000:0000:0000:0000:0001/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff>}
+		def self.ifconfig(iface='eth0')
+			ret = {}
+			iface = iface.to_s.scan(/[0-9A-Za-z]/).join # Sanitizing input, no spaces, semicolons, etc.
+			case RUBY_PLATFORM
+			when /linux/i
+				ifconfig_data = %x[ifconfig #{iface}]
+				if ifconfig_data =~ /#{iface}/i
+					ifconfig_data = ifconfig_data.split(/[\s]*\n[\s]*/)
+				else
+					raise ArgumentError, "Cannot ifconfig #{iface}"
+				end
+				real_iface = ifconfig_data.first
+				ret[:iface] = real_iface.split.first.downcase
+				if real_iface =~ /[\s]HWaddr[\s]+([0-9a-fA-F:]{17})/i
+					ret[:eth_saddr] = $1.downcase
+					ret[:eth_src] = EthHeader.mac2str(ret[:eth_saddr])
+				end
+				ifconfig_data.each do |s|
+					case s
+					when /inet addr:[\s]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9])(.*Mask:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]))?/i
+						ret[:ip_saddr] = $1
+						ret[:ip_src] = [IPAddr.new($1).to_i].pack("N")
+						ret[:ip4_obj] = IPAddr.new($1)
+						ret[:ip4_obj] = ret[:ip4_obj].mask($3) if $3
+					when /inet6 addr:[\s]*([0-9a-fA-F:\x2f]+)/
+						ret[:ip6_saddr] = $1
+						ret[:ip6_obj] = IPAddr.new($1)
+					end
+				end
+			end # linux 
+			ret
+		end
 
 	end
 
