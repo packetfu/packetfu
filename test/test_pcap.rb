@@ -8,6 +8,7 @@ class PcapHeaderTest < Test::Unit::TestCase
 	include PacketFu
 	def setup
 		@file = File.open('sample.pcap') {|f| f.read}
+		@file.force_encoding "binary" if @file.respond_to? :force_encoding
 		@file_magic = @file[0,4]
 		@file_header = @file[0,24]
 	end
@@ -69,6 +70,7 @@ class PcapPacketTest < Test::Unit::TestCase
 	include PacketFu
 	def setup
 		@file = File.open('sample.pcap') {|f| f.read}
+		@file.force_encoding "binary" if @file.respond_to? :force_encoding
 		@header = @file[0,24]
 		@packet = @file[24,100] # pkt is 78 bytes + 16 bytes pcap hdr == 94
 	end
@@ -132,7 +134,8 @@ class PcapFileTest < Test::Unit::TestCase
 		p = PcapFile.new
 		p.read @file
 		p.to_file(:filename => 'out.pcap')
-		@newfile = File.open('out.pcap') {|f| f.read}
+		@newfile = File.open('out.pcap') {|f| f.read(f.stat.size)}
+		@newfile.force_encoding "binary" if @newfile.respond_to? :force_encoding
 		assert_equal(@file, @newfile)
 		p.to_file(:filename => 'out.pcap', :append => true)
 		packet_array = PcapFile.new.f2a(:filename => 'out.pcap')

@@ -18,6 +18,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:body].read str
 			self

@@ -43,8 +43,9 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
-			byte = str[0]
+			byte = str[0].ord
 			self[:local] = byte & 0b10000000 == 0b10000000 ? 1 : 0
 			self[:multicast] = byte & 0b01000000 == 0b01000000 ? 1 : 0
 			self[:b5] = byte & 0b00100000 == 0b00100000 ? 1 : 0
@@ -82,6 +83,7 @@ module PacketFu
 		
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:n0], self[:n1], self[:n2] = str[0,3].unpack("C3")
 			self
@@ -110,6 +112,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self.oui.read str[0,3]
 			self.nic.read str[3,3]
@@ -163,6 +166,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:eth_dst].read str[0,6]
 			self[:eth_src].read str[6,6]

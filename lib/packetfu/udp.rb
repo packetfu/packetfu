@@ -32,6 +32,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:udp_src].read(str[0,2])
 			self[:udp_dst].read(str[2,2])

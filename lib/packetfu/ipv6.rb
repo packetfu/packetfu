@@ -37,6 +37,7 @@ module PacketFu
 
 		# Reads in a string and casts it as an IPv6 address
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:a1].read str[0,4]
 			self[:a2].read str[4,4]
@@ -99,6 +100,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:ipv6_v] = str[0,1].unpack("C").first >> 4
 			self[:ipv6_class] = (str[0,2].unpack("n").first & 0x0ff0) >> 4

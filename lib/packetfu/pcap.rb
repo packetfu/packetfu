@@ -73,7 +73,9 @@ module PacketFu
 		# TODO: Need to test this by getting a hold of a big endian pcap file.
 		# Conversion from big to little shouldn't be that big of a deal.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
+			str.force_encoding("binary") if str.respond_to? :force_encoding
 			if str[0,4] == self[:magic].to_s || true # TODO: raise if it's not magic.
 				self[:magic].read str[0,4]
 				self[:ver_major].read str[4,2]
@@ -118,6 +120,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:sec].read str[0,4]
 			self[:usec].read str[4,4]
@@ -160,6 +163,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			self[:timestamp].read str[0,8]
 			self[:incl_len].read str[8,4]
 			self[:orig_len].read str[12,4]
@@ -180,10 +184,15 @@ module PacketFu
 			@endian = args[:endian] || :little
 		end
 
+		def force_binary(str)
+			str.force_encoding "binary" if str.respond_to? :force_encoding
+		end
+
 		# Reads a string to populate the object. Note, this read takes in the 
 		# whole pcap file, since we need to see the magic to know what 
 		# endianness we're dealing with.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			magic = "\xa1\xb2\xc3\xd4"
 			if str[0,4] == magic
@@ -201,6 +210,10 @@ module PacketFu
 				body = body[p.sz,body.size]
 			end
 		self
+		end
+
+		def to_s
+			self.join
 		end
 
 	end
@@ -226,7 +239,7 @@ module PacketFu
 
 		# Returns the object in string form.
 		def to_s
-			self.to_a[1,2].map {|x| x.to_s}.join
+			self[:head].to_s + self[:body].map {|p| p.to_s}.join
 		end
 
 		# Clears the contents of the PcapFile.
@@ -237,6 +250,7 @@ module PacketFu
 		# Reads a string to populate the object. Note that this appends new packets to
 		# any existing packets in the PcapFile.
 		def read(str)
+			force_binary(str)
 			self[:head].read str[0,24]
 			self[:body].read str
 			self

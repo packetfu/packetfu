@@ -31,6 +31,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:icmp_type].read(str[0,1])
 			self[:icmp_code].read(str[1,1])
@@ -57,7 +58,7 @@ module PacketFu
 		def icmp_calc_sum
 			checksum = (icmp_type.to_i << 8)	+ icmp_code.to_i
 			chk_body = (body.to_s.size % 2 == 0 ? body.to_s : body.to_s + "\x00")
-			chk_body.scan(/../).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y }
+			chk_body.scan(/../).map { |x| (x[0].ord << 8) + x[1].ord }.each { |y| checksum += y }
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum

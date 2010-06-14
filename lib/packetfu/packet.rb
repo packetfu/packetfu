@@ -6,6 +6,11 @@ module PacketFu
 		attr_reader :flavor # Packet Headers are responsible for their own specific flavor methods.
 		attr_accessor :headers # All packets have a header collection, useful for determining protocol trees.
 
+		# Force strings into binary.
+		def self.force_binary(str)
+			str.force_encoding "binary" if str.respond_to? :force_encoding
+		end
+
 		# Parse() creates the correct packet type based on the data, and returns the apporpiate
 		# Packet subclass. 
 		#
@@ -14,10 +19,11 @@ module PacketFu
 		#
 		# New packet types should get an entry here. 
 		def self.parse(packet,args={})
+			force_binary(packet)
 			if packet.size >= 14													# Min size for Ethernet. No check for max size, yet.
 				case packet[12,2]														# Check the Eth protocol field.
 				when "\x08\x00"															# It's IP.
-					case (packet[14,1][0] >> 4)								# Check the IP version field.
+					case (packet[14,1][0].ord >> 4)						# Check the IP version field.
 					when 4;				 														# It's IPv4.
 						case packet[23,1]												# Check the IP protocol field.
 						when "\x06"; p = TCPPacket.new					# Returns a TCPPacket.
@@ -186,8 +192,8 @@ module PacketFu
 					@eth_header.read(io)
 					eth_proto_num = io[12,2].unpack("n")[0]
 					if eth_proto_num == 0x0800 # It's IP.
-						ip_hlen=(io[14] & 0x0f) * 4
-						ip_ver=(io[14] >> 4) # It's IPv4. Other versions, all bets are off!
+						ip_hlen=(io[14].ord & 0x0f) * 4
+						ip_ver=(io[14].ord >> 4) # It's IPv4. Other versions, all bets are off!
 						if ip_ver == 4
 							ip_proto_num = io[23,1].unpack("C")[0]
 							@ip_header.read(io[14,ip_hlen])

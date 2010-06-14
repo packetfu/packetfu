@@ -47,6 +47,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:arp_hw].read(str[0,2])
 			self[:arp_proto].read(str[2,2])

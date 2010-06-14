@@ -24,9 +24,10 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil? || str.size < 2
-			byte1 = str[0]
-			byte2 = str[1]
+			byte1 = str[0].ord
+			byte2 = str[1].ord
 			self[:n] = byte1 & 0b00000001 == 0b00000001 ? 1 : 0
 			self[:c] = byte2 & 0b10000000 == 0b10000000 ? 1 : 0
 			self[:e] = byte2 & 0b01000000 == 0b01000000 ? 1 : 0
@@ -57,8 +58,9 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil? || str.size.zero?
-			self[:hlen] = (str[0] & 0b11110000) >> 4
+			self[:hlen] = (str[0].ord & 0b11110000) >> 4
 			self
 		end
 
@@ -85,7 +87,7 @@ module PacketFu
 			super(
 				args[:r1] || 0,
 				args[:r2] || 0,
-				args[:r3] || 0) if args
+				args[:r3] || 0) if args.kind_of? Hash
 		end
 
 		# Returns the Reserved field as an integer.
@@ -95,8 +97,9 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil? || str.size.zero?
-			byte = str[0]
+			byte = str[0].ord
 			self[:r1] = byte & 0b00000100 == 0b00000100 ? 1 : 0
 			self[:r2] = byte & 0b00000010 == 0b00000010 ? 1 : 0
 			self[:r3] = byte & 0b00000001 == 0b00000001 ? 1 : 0
@@ -169,8 +172,9 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
-			byte = str[0]
+			byte = str[0].ord
 			self[:urg] = byte & 0b00100000 == 0b00100000 ? 1 : 0
 			self[:ack] = byte & 0b00010000 == 0b00010000 ? 1 : 0
 			self[:psh] = byte & 0b00001000 == 0b00001000 ? 1 : 0
@@ -230,6 +234,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:kind].read(str[0,1])
 			if str[1,1]
@@ -524,9 +529,14 @@ module PacketFu
 			opts
 		end
 
+		def force_binary(str)
+			str.force_encoding "binary" if str.respond_to? :force_encoding
+		end
+
 		# Reads a string to populate the object.
 		def read(str)
 			self.clear if self.size > 0
+			force_binary(str)
 			return self if(!str.respond_to? :to_s || str.nil?)
 			i = 0
 			while i < str.to_s.size
@@ -698,6 +708,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:tcp_src].read(str[0,2])
 			self[:tcp_dst].read(str[2,2])

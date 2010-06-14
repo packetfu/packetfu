@@ -27,6 +27,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:o1].read str[0,1]
 			self[:o2].read str[1,1]
@@ -107,6 +108,7 @@ module PacketFu
 
 		# Reads a string to populate the object.
 		def read(str)
+			force_binary(str)
 			return self if str.nil?
 			self[:ip_v] = str[0,1].unpack("C").first >> 4
 			self[:ip_hl] = str[0,1].unpack("C").first.to_i & 0x0f
