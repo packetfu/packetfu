@@ -59,9 +59,7 @@ require "packetfu/config"
 
 module PacketFu
 
-# Pre-marking version numbers in trunk so I stop
-# forgetting to update it right before exporting a tagged version
-VERSION = "0.3.3" # Version 0.3.2 released Jun 19, 2010
+VERSION = "0.3.3" # Version 0.3.3 released Jun 19, 2010
 
 	# Returns the current version of PacketFu. Incremented every once 
 	# in a while, when I remember
