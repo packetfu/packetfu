@@ -15,6 +15,14 @@ class EthTest < Test::Unit::TestCase
 		assert_equal(222, e.nic.n2)
 	end
 
+	def test_ethmac_ipad
+		dst = "\x7c\x6d\x62\x01\x02\x03"
+		e = PacketFu::EthMac.new
+		e.read dst
+		assert_equal(dst, e.to_s)
+		assert_equal(0x7c6d62, e.oui.oui)
+	end
+
 	def test_ethmac_class
 		src = "\x00\x1b\x11\x51\xb7\xce"
 		e = PacketFu::EthMac.new
