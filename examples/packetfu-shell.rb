@@ -76,7 +76,7 @@ def packetfu_ascii_art
 | 01000001 00101101 01001000 )( )( )( )( )( 00101101 01000001 00100001 |
 |                            )( )( )( )( )(                            |
 (____________________________)            (____________________________)
-                               パケットフ
+                               PacketFu
              a mid-level packet manipulation library for ruby
 
 EOM
