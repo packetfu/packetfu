@@ -18,28 +18,30 @@ module PacketFu
 	
 	# PacketFu works best with Pcaprub version 0.8-dev (at least)
 	#
-	# TODO: Could this be better? See:
-	# http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
+	# TODO: I still don't know the best way to ensure that I'm using a 
+	# sensible version of PcapRub, and it seems wrong to provide it
+	# directly.
   def self.pcaprub_platform_require
-    if File.directory?("C:\\")
-			require 'pcaprub_win32/pcaprub'
+		begin
+			require 'pcaprub'
+		rescue LoadError
+			return false
+		end
       @@pcaprub_loaded = true 
-    else
-			require 'pcaprub' # Linux and Mac (Apple uses pcaprub.bundle, Linux uses pcaprub.so)
-      @@pcaprub_loaded = true if($".grep(/pcaprub\./).size > 0)
-    end
   end
 
-	begin
-		pcaprub_platform_require
+	pcaprub_platform_require
+	if @@pcaprub_loaded
 		if Pcap.version !~ /[0-9]\.[7-9][0-9]?(-dev)?/ # Regex for 0.7-dev and beyond.
-      @@pcaprub_loaded = false # Don't bother with broken versions
+			@@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
 		require "packetfu/capture" 
 		require "packetfu/inject"
-	rescue LoadError
+	else
+		warn "Warning: Cannot load PacketFu::Capture or PacketFu::Inject"
 	end
+
 end
 
 require "packetfu/pcap"
@@ -57,9 +59,12 @@ require "packetfu/config"
 
 module PacketFu
 
-VERSION = "0.3.1" # Jan 11, 2010
+# Pre-marking version numbers in trunk so I stop
+# forgetting to update it right before exporting a tagged version
+VERSION = "0.3.3" # Version 0.3.2 released Jun 19, 2010
 
-	# Returns the current version of PacketFu. Incremented every once in a while.
+	# Returns the current version of PacketFu. Incremented every once 
+	# in a while, when I remember
 	def self.version
 		PacketFu::VERSION
 	end
