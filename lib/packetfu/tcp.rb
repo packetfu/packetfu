@@ -26,8 +26,13 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil? || str.size < 2
-			byte1 = str[0].ord
-			byte2 = str[1].ord
+			if 1.respond_to? :ord
+				byte1 = str[0].ord
+				byte2 = str[1].ord
+			else
+				byte1 = str[0]
+				byte2 = str[1]
+			end
 			self[:n] = byte1 & 0b00000001 == 0b00000001 ? 1 : 0
 			self[:c] = byte2 & 0b10000000 == 0b10000000 ? 1 : 0
 			self[:e] = byte2 & 0b01000000 == 0b01000000 ? 1 : 0
@@ -60,7 +65,11 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil? || str.size.zero?
-			self[:hlen] = (str[0].ord & 0b11110000) >> 4
+			if 1.respond_to? :ord
+				self[:hlen] = (str[0].ord & 0b11110000) >> 4
+			else
+				self[:hlen] = (str[0] & 0b11110000) >> 4
+			end
 			self
 		end
 
@@ -99,7 +108,11 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil? || str.size.zero?
-			byte = str[0].ord
+			if 1.respond_to? :ord
+				byte = str[0].ord
+			else
+				byte = str[0]
+			end
 			self[:r1] = byte & 0b00000100 == 0b00000100 ? 1 : 0
 			self[:r2] = byte & 0b00000010 == 0b00000010 ? 1 : 0
 			self[:r3] = byte & 0b00000001 == 0b00000001 ? 1 : 0
@@ -174,7 +187,11 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil?
-			byte = str[0].ord
+			if 1.respond_to? :ord
+				byte = str[0].ord
+			else
+				byte = str[0]
+			end
 			self[:urg] = byte & 0b00100000 == 0b00100000 ? 1 : 0
 			self[:ack] = byte & 0b00010000 == 0b00010000 ? 1 : 0
 			self[:psh] = byte & 0b00001000 == 0b00001000 ? 1 : 0

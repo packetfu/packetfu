@@ -58,7 +58,11 @@ module PacketFu
 		def icmp_calc_sum
 			checksum = (icmp_type.to_i << 8)	+ icmp_code.to_i
 			chk_body = (body.to_s.size % 2 == 0 ? body.to_s : body.to_s + "\x00")
-			chk_body.scan(/../).map { |x| (x[0].ord << 8) + x[1].ord }.each { |y| checksum += y }
+			if 1.respond_to? :ord
+				chk_body.scan(/../).map { |x| (x[0].ord << 8) + x[1].ord }.each { |y| checksum += y }
+			else
+				chk_body.scan(/../).map { |x| (x[0] << 8) + x[1] }.each { |y| checksum += y }
+			end
 			checksum = checksum % 0xffff
 			checksum = 0xffff - checksum
 			checksum == 0 ? 0xffff : checksum

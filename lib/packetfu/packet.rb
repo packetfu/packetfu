@@ -23,7 +23,12 @@ module PacketFu
 			if packet.size >= 14													# Min size for Ethernet. No check for max size, yet.
 				case packet[12,2]														# Check the Eth protocol field.
 				when "\x08\x00"															# It's IP.
-					case (packet[14,1][0].ord >> 4)						# Check the IP version field.
+					if 1.respond_to? :ord
+						ipv = packet[14,1][0].ord >> 4
+					else
+						ipv = packet[14,1][0] >> 4
+					end
+					case ipv																	# Check the IP version field.
 					when 4;				 														# It's IPv4.
 						case packet[23,1]												# Check the IP protocol field.
 						when "\x06"; p = TCPPacket.new					# Returns a TCPPacket.
@@ -192,8 +197,13 @@ module PacketFu
 					@eth_header.read(io)
 					eth_proto_num = io[12,2].unpack("n")[0]
 					if eth_proto_num == 0x0800 # It's IP.
-						ip_hlen=(io[14].ord & 0x0f) * 4
-						ip_ver=(io[14].ord >> 4) # It's IPv4. Other versions, all bets are off!
+						if 1.respond_to? :ord
+							ipv = io[14].ord 
+						else
+							ipv = io[14] 
+						end
+						ip_hlen=(ipv & 0x0f) * 4
+						ip_ver=(ipv >> 4) # It's IPv4. Other versions, all bets are off!
 						if ip_ver == 4
 							ip_proto_num = io[23,1].unpack("C")[0]
 							@ip_header.read(io[14,ip_hlen])

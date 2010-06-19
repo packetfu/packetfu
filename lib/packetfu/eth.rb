@@ -45,7 +45,11 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil?
-			byte = str[0].ord
+			if 1.respond_to? :ord
+				byte = str[0].ord
+			else
+				byte = str[0]
+			end
 			self[:b5] =        byte & 0b10000000 == 0b10000000 ? 1 : 0
 			self[:b4] =        byte & 0b01000000 == 0b01000000 ? 1 : 0
 			self[:b3] =        byte & 0b00100000 == 0b00100000 ? 1 : 0
