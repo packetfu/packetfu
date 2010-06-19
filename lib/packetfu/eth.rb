@@ -15,29 +15,29 @@ module PacketFu
 	#  Fixnum   :local
 	#  Fixnum   :multicast
 	#  Int16    :oui,       Default: 0x1ac5 :)
-	class EthOui < Struct.new(:b0, :b1, :b2, :b3, :b4, :b5, :local, :multicast, :oui)
+	class EthOui < Struct.new(:b5, :b4, :b3, :b2, :b1, :b0, :local, :multicast, :oui)
 
 		# EthOui is unusual in that the bit values do not enjoy StructFu typing.
 		def initialize(args={})
 			args[:local] ||= 0 
 			args[:oui] ||= 0x1ac # :)
 			args.each_pair {|k,v| args[k] = 0 unless v} 
-			super(args[:b0], args[:b1], args[:b2], args[:b3], 
-						args[:b4], args[:b5], args[:local], args[:multicast], 
+			super(args[:b5], args[:b4], args[:b3], args[:b2], 
+						args[:b1], args[:b0], args[:local], args[:multicast], 
 						args[:oui])
 		end
 
 		# Returns the object in string form.
 		def to_s
 			byte = 0
-			byte += 0b00000001 if local.to_i == 1
-			byte += 0b00000010 if multicast.to_i == 1
-			byte += 0b00000100 if b5.to_i == 1
-			byte += 0b00001000 if b4.to_i == 1
-			byte += 0b00010000 if b3.to_i == 1
-			byte += 0b00100000 if b2.to_i == 1
-			byte += 0b01000000 if b1.to_i == 1
-			byte += 0b10000000 if b0.to_i == 1
+			byte += 0b10000000 if b5.to_i == 1
+			byte += 0b01000000 if b4.to_i == 1
+			byte += 0b00100000 if b3.to_i == 1
+			byte += 0b00010000 if b2.to_i == 1
+			byte += 0b00001000 if b1.to_i == 1
+			byte += 0b00000100 if b0.to_i == 1
+			byte += 0b00000010 if local.to_i == 1
+			byte += 0b00000001 if multicast.to_i == 1
 			[byte,oui].pack("Cn")
 		end
 
@@ -46,15 +46,15 @@ module PacketFu
 			force_binary(str)
 			return self if str.nil?
 			byte = str[0].ord
-			self[:local] = byte & 0b10000000 == 0b10000000 ? 1 : 0
-			self[:multicast] = byte & 0b01000000 == 0b01000000 ? 1 : 0
-			self[:b5] = byte & 0b00100000 == 0b00100000 ? 1 : 0
-			self[:b4] = byte & 0b00010000 == 0b00010000 ? 1 : 0
-			self[:b3] = byte & 0b00001000 == 0b00001000 ? 1 : 0
-			self[:b2] = byte & 0b00000100 == 0b00000100 ? 1 : 0
-			self[:b1] = byte & 0b00000010 == 0b00000010 ? 1 : 0
-			self[:b0] = byte & 0b00000001 == 0b00000001 ? 1 : 0
-			self[:oui] = str[1,2].unpack("n").first
+			self[:b5] =        byte & 0b10000000 == 0b10000000 ? 1 : 0
+			self[:b4] =        byte & 0b01000000 == 0b01000000 ? 1 : 0
+			self[:b3] =        byte & 0b00100000 == 0b00100000 ? 1 : 0
+			self[:b2] =        byte & 0b00010000 == 0b00010000 ? 1 : 0
+			self[:b1] =        byte & 0b00001000 == 0b00001000 ? 1 : 0
+			self[:b0] =        byte & 0b00000100 == 0b00000100 ? 1 : 0
+			self[:local] =     byte & 0b00000010 == 0b00000010 ? 1 : 0
+			self[:multicast] = byte & 0b00000001 == 0b00000001 ? 1 : 0
+			self[:oui] =       str[1,2].unpack("n").first
 			self
 		end
 

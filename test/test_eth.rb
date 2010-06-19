@@ -20,7 +20,7 @@ class EthTest < Test::Unit::TestCase
 		e = PacketFu::EthMac.new
 		e.read dst
 		assert_equal(dst, e.to_s)
-		assert_equal(0x7c6d62, e.oui.oui)
+		assert_equal(0x6d62, e.oui.oui)
 	end
 
 	def test_ethmac_class
