@@ -5,6 +5,7 @@ module PacketFu
 	class Packet
 		attr_reader :flavor # Packet Headers are responsible for their own specific flavor methods.
 		attr_accessor :headers # All packets have a header collection, useful for determining protocol trees.
+		attr_accessor :iface # Default inferface to send packets to
 
 		# Force strings into binary.
 		def self.force_binary(str)
@@ -134,7 +135,8 @@ module PacketFu
 		# Put the entire packet on the wire by creating a temporary PacketFu::Inject object.
 		# TODO: Do something with auto-checksumming?
 		def to_w(iface=nil)
-			inj = PacketFu::Inject.new(:iface => (iface || PacketFu::Config.new.config[:iface]))
+			iface = iface || self.iface || PacketFu::Config.new.config[:iface]
+			inj = PacketFu::Inject.new(:iface => iface)
 			inj.array = [@headers[0].to_s]
 			inj.inject
 		end
@@ -437,6 +439,7 @@ module PacketFu
 					when :eth_daddr; @eth_header.eth_daddr=v if @eth_header
 					when :eth_saddr; @eth_header.eth_saddr=v if @eth_header
 					when :ip_saddr; @ip_header.ip_saddr=v		 if @ip_header
+					when :iface; @iface = v
 					end
 				end
 			end

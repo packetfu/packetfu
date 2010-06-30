@@ -19,5 +19,10 @@ require 'test_udp' # Creates udp_test.pcap
 require 'test_tcp'
 require 'test_ip6'
 
+# Tests below here require root access.
+if Process.euid == 0
+	require 'test_inject'
+end
+
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
 
