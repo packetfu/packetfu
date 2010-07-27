@@ -10,7 +10,7 @@ module PacketFu
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
 			@stream = [] # Where the stream goes.
-			@iface = args[:iface] || Pcap.lookupdev || 'lo' 
+			@iface = args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo" 
 			@snaplen = args[:snaplen] || 0xffff
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1

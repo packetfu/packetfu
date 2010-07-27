@@ -1,7 +1,11 @@
 = Changelog
 
-== Version x # In the future
-	
+== Version 1.0.0 # to be released July 29, 2010
+	Missed a bunch of updates in the Changelog. Mea culpa.
+	Squashed all Ruby version bugs -- works now on 1.8.6, 1.8.7, 1.9.1, and 1.9.2-head.
+	Added ENV['IFACE'] parsing for interface selection. Sadly, rvmsudo doesn't preserve ENV by default, but system ruby should work fine. 
+	Removed my own distros of pcaprub. You're on your own, now, but shadowbq's or Metasploit's versions should do just fine.
+
 == Version 0.1.1 # February 18, 2009
 	Added .is_proto? functions, self.proto function, Packet.headers attr_accessor across the board.
 	Removed dependency on pcaprub to read pcap-formatted files. (r54)

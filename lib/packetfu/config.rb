@@ -1,8 +1,10 @@
 module PacketFu
 
-	# The Config class holds various bits of useful default information for packet creation.
-	# If initialized without arguments, the @iface and @pcapfile instance variables are
-	# set to the (pcaprub-believed) default interface and "/tmp/out.pcap", respectively.
+	# The Config class holds various bits of useful default information 
+	# for packet creation. If initialized without arguments, @iface will be 
+	# set to ENV['IFACE'] or Pcap.lookupdev (or lo), and the @pcapfile will
+	# be set to "/tmp/out.pcap" # (yes, it's Linux-biased, sorry, fixing 
+	# this is a TODO.)
 	#
 	# Any number of instance variables can be passed in to the intialize function (as a
 	# hash), though only the expected network-related variables will be readable and
@@ -31,7 +33,7 @@ module PacketFu
 	
 		def initialize(args={})
 			if Process.euid.zero?
-				@iface = args[:iface] || Pcap.lookupdev || "lo" # In case there aren't any...
+				@iface = args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo" 
 			end	
 			@pcapfile = "/tmp/out.pcap"
 			args.each_pair { |k,v| self.instance_variable_set(("@" + k.to_s).intern,v) }

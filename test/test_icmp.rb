@@ -38,7 +38,7 @@ class ICMPTest < Test::Unit::TestCase
 		i.icmp_code = 8
 		i.recalc
 		i.to_f('icmp_test.pcap','a')
-		assert File.exists? 'icmp_test.pcap'
+		assert File.exists?('icmp_test.pcap')
 	end
 
 	def test_icmp_read

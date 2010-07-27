@@ -4,7 +4,7 @@
 # :include: ../INSTALL
 # :include: ../LICENSE
 
-# $: << File.expand_path(File.dirname(__FILE__))
+$: << File.expand_path(File.dirname(__FILE__))
 require "packetfu/structfu"
 require "ipaddr"
 
@@ -17,10 +17,6 @@ module PacketFu
 	@@pcaprub_loaded = false
 	
 	# PacketFu works best with Pcaprub version 0.8-dev (at least)
-	#
-	# TODO: I still don't know the best way to ensure that I'm using a 
-	# sensible version of PcapRub, and it seems wrong to provide it
-	# directly.
   def self.pcaprub_platform_require
 		begin
 			require 'pcaprub'
@@ -39,7 +35,7 @@ module PacketFu
 		require "packetfu/capture" 
 		require "packetfu/inject"
 	else
-		warn "Warning: Cannot load PacketFu::Capture or PacketFu::Inject"
+		warn "Warning: Missing pcaprub, cannot load PacketFu::Capture or PacketFu::Inject"
 	end
 
 end
@@ -59,7 +55,7 @@ require "packetfu/config"
 
 module PacketFu
 
-VERSION = "0.3.3" # Version 0.3.3 released Jun 19, 2010
+VERSION = "0.3.4" # Version 1.0.0 to be released Jul 29, 2010
 
 	# Returns the current version of PacketFu. Incremented every once 
 	# in a while, when I remember
@@ -83,8 +79,9 @@ VERSION = "0.3.3" # Version 0.3.3 released Jun 19, 2010
 	#   PacketFu.at_least? "0"     # => true 
 	#   PacketFu.at_least? "0.2.9" # => true 
 	#   PacketFu.at_least? "0.3"   # => true 
-	#   PacketFu.at_least? "0.3.2" # => false 
-	#   PacketFu.at_least? "1"     # => false 
+	#   PacketFu.at_least? "1"     # => true after 1.0's release
+	#   PacketFu.at_least? "1.12"  # => false
+	#   PacketFu.at_least? "2"     # => false 
 	def self.at_least?(str)
 		this_version = binarize_version(self.version)
 		ask_version = binarize_version(str)

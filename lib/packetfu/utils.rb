@@ -80,7 +80,7 @@ module PacketFu
 
 			dst_port = rand(0xffff-1024)+1024
 			msg = "PacketFu whoami? packet #{(Time.now.to_i + rand(0xffffff)+1)}"
-			cap = Capture.new(:iface => (args[:iface] || Pcap.lookupdev), :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
+			cap = Capture.new(:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo" ), :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
 			UDPSocket.open.send(msg,0,dst_host,dst_port)
 			cap.save
 			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
@@ -90,7 +90,7 @@ module PacketFu
 					timeout = 1.1 # Cancel the timeout
 					if pkt.payload == msg
 					my_data =	{
-						:iface => args[:iface] || Pcap.lookupdev || 'lo',
+						:iface => args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo",
 						:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
 						:eth_saddr => pkt.eth_saddr,
 						:eth_src => pkt.eth_src.to_s,

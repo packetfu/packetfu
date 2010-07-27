@@ -6,9 +6,13 @@ require 'packetfu'
 class EthPacketTest < Test::Unit::TestCase
 	include PacketFu
 
+	def test_whoami
+		assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
+	end
+
 	def test_to_w
 		assert_equal(Process.euid, 0, "TEST FAIL: This test must be run as root")
-		conf = PacketFu::Utils.whoami?(:iface => 'eth0') # Gotta have eth0
+		conf = PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo'))
 		p = UDPPacket.new(:config => conf)
 		p.udp_dport = 12345
 		p.udp_sport = 12345
