@@ -1,10 +1,16 @@
 #!/usr/bin/env ruby
+$:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib/")
+
 require 'test/unit'
-$: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
+
+# Needed if you're using the gem version of pcaprub. Obviated in 1.9.
 require 'packetfu'
 
-class EthPacketTest < Test::Unit::TestCase
-	include PacketFu
+class InjectTest < Test::Unit::TestCase
+
+	def test_cap
+		assert_nothing_raised { PacketFu::Capture }
+	end
 
 	def test_whoami
 		assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
@@ -13,7 +19,7 @@ class EthPacketTest < Test::Unit::TestCase
 	def test_to_w
 		assert_equal(Process.euid, 0, "TEST FAIL: This test must be run as root")
 		conf = PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo'))
-		p = UDPPacket.new(:config => conf)
+		p = PacketFu::UDPPacket.new(:config => conf)
 		p.udp_dport = 12345
 		p.udp_sport = 12345
 		p.payload = "PacketFu test packet"

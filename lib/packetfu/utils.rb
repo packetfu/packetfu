@@ -80,7 +80,7 @@ module PacketFu
 
 			dst_port = rand(0xffff-1024)+1024
 			msg = "PacketFu whoami? packet #{(Time.now.to_i + rand(0xffffff)+1)}"
-			cap = Capture.new(:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo" ), :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
+			cap = PacketFu::Capture.new(:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo" ), :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
 			UDPSocket.open.send(msg,0,dst_host,dst_port)
 			cap.save
 			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?

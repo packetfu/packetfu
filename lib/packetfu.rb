@@ -7,6 +7,7 @@
 $: << File.expand_path(File.dirname(__FILE__))
 require "packetfu/structfu"
 require "ipaddr"
+require 'rubygems' if RUBY_VERSION =~ /^1\.[0-8]/
 
 module PacketFu
 
