@@ -121,7 +121,7 @@ module PacketFu
 		# correctly. Now with append! XXX: Document this!
 		def to_f(filename=nil,mode='w')
 			filename ||= 'out.pcap'
-			mode = mode.to_s[0,1]
+			mode = mode.to_s[0,1] + "b"
 			raise ArgumentError, "Unknown mode: #{mode.to_s}" unless mode =~ /^[wa]/
 			if(mode == 'w' || !(File.exists?(filename)))
 				data = [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join

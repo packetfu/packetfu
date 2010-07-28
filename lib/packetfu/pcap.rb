@@ -266,7 +266,7 @@ module PacketFu
 		# that readfile clears any existing packets, since that seems to be the
 		# typical use.
 		def readfile(file)
-			f = File.open(file) {|f| f.read}
+			f = File.open(file, "rb") {|f| f.read}
 			self.read! f
 		end
 
@@ -280,7 +280,7 @@ module PacketFu
 		def file_to_array(args={})
 			filename = args[:filename] || args[:file] || args[:f]
 			if filename
-				self.read! File.open(filename) {|f| f.read}
+				self.read! File.open(filename, "rb") {|f| f.read}
 			end
 			if args[:keep_timestamps] || args[:keep_ts] || args[:ts]
 				self[:body].map {|x| {x.timestamp.to_s => x.data.to_s} }
@@ -363,9 +363,9 @@ module PacketFu
 			end
 			append = args[:append]
 			if append
-				File.open(filename,'a') {|file| file.write(self.body.to_s)}
+				File.open(filename,'ab') {|file| file.write(self.body.to_s)}
 			else
-				File.open(filename,'w') {|file| file.write(self.to_s)}
+				File.open(filename,'wb') {|file| file.write(self.to_s)}
 			end
 			[filename, self.body.sz, self.body.size]
 		end
