@@ -18,6 +18,7 @@ module PacketFu
 	@@pcaprub_loaded = false
 	
 	# PacketFu works best with Pcaprub version 0.8-dev (at least)
+	# The current (Aug 01, 2010) pcaprub gem is 0.9, so should be fine.
   def self.pcaprub_platform_require
 		begin
 			require 'pcaprub'
@@ -56,7 +57,7 @@ require "packetfu/config"
 
 module PacketFu
 
-VERSION = "0.3.4" # Version 1.0.0 to be released Jul 29, 2010
+VERSION = "1.0.0" # Version 1.0.0 was released July 31, 2010
 
 	# Returns the current version of PacketFu. Incremented every once 
 	# in a while, when I remember

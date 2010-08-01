@@ -8,6 +8,11 @@ Not using rvm? For shame! Get it now, it will make your life 100x better.
 
 $ links http://rvm.beginrescueend.com/
 
+If you are installing from a source checkout, just run (as root / rvmsudo):
+
+$ rvmsudo ./setup.rb
+$ sudo ruby ./setup.rb # If not on rvm, and seriously what is wrong with you?
+
 == Testing
 
 The easiest way to test the installation is to run PacketFu via
