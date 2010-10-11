@@ -3,6 +3,20 @@ require 'test/unit'
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
 require 'packetfu'
 
+class PacketTest < Test::Unit::TestCase
+	include PacketFu
+	
+	def test_method_missing_and_respond_to
+		p = TCPPacket.new
+		assert p.respond_to? :ip_len
+		assert p.ip_len = 20
+		assert !(p.respond_to? :ip_bogus_header)
+		assert_raise NoMethodError do
+			p.bogus_header = 20
+		end
+	end
+end
+
 class EthPacketTest < Test::Unit::TestCase
 	include PacketFu
 

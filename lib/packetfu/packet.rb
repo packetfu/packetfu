@@ -63,7 +63,7 @@ module PacketFu
 		#This register-of-protocols style switch will work for the 
 		#forseeable future (there aren't /that/ many packet types), and it's a handy
 		#way to know at a glance what packet types are supported.
-		def method_missing(sym, *args)
+		def method_missing(sym, *args, &block)
 			case sym.to_s
 			when /^invalid_/
 				@invalid_header.send(sym,*args)
@@ -83,6 +83,14 @@ module PacketFu
 				@ipv6_header.send(sym,*args)
 			else
 				raise NoMethodError, "Unknown method `#{sym}' for this packet object."
+			end
+		end
+		
+		def respond_to?(sym, include_private = false)
+			if sym.to_s =~ /^(invalid|eth|arp|ip|icmp|udp|tcp|ipv6)_/
+				self.instance_variable_get("@#{$1}_header").respond_to? sym
+			else
+				super
 			end
 		end
 
