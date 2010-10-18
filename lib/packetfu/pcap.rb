@@ -266,8 +266,8 @@ module PacketFu
 		# that readfile clears any existing packets, since that seems to be the
 		# typical use.
 		def readfile(file)
-			f = File.open(file, "rb") {|f| f.read}
-			self.read! f
+			fdata = File.open(file, "rb") {|f| f.read}
+			self.read! fdata
 		end
 
 		# file_to_array() translates a libpcap file into an array of packets.
