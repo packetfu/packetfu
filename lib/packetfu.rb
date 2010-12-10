@@ -57,7 +57,9 @@ require "packetfu/config"
 
 module PacketFu
 
-VERSION = "1.0.0" # Version 1.0.0 was released July 31, 2010
+# Version 1.0.0 was released July 31, 2010
+# Version 1.0.1 is unreleased.
+VERSION = "1.0.1" 
 
 	# Returns the current version of PacketFu. Incremented every once 
 	# in a while, when I remember
