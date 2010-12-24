@@ -50,6 +50,7 @@ require "packetfu/ip"
 require "packetfu/arp"
 require "packetfu/icmp"
 require "packetfu/udp"
+require "packetfu/hsrp" # Depends on UDP
 require "packetfu/tcp"
 require "packetfu/ipv6" # This is pretty minimal.
 require "packetfu/utils"
