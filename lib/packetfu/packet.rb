@@ -368,6 +368,9 @@ module PacketFu
 
 		# Hexify provides a neatly-formatted dump of binary data, familar to hex readers.
 		def hexify(str)
+			if str.respond_to? :force_encoding
+				str.force_encoding("ASCII-8BIT")
+			end
 			hexascii_lines = str.to_s.unpack("H*")[0].scan(/.{1,32}/)
 			chars = str.to_s.gsub(/[\x00-\x1f\x7f-\xff]/,'.')
 			chars_lines = chars.scan(/.{1,16}/)

@@ -28,10 +28,26 @@ require 'test_udp' # Creates udp_test.pcap
 require 'test_tcp'
 require 'test_ip6'
 
+@@root_and_pcaprub = [false,false]
 if Process.euid.zero? 
+	@@root_and_pcaprub[0] = true
+end
+
+begin
+	require 'pcaprub'
 	require 'test_inject'
-else
-	$stderr.puts "** WARNING ** test_inject not tested, needs root access."
+	@@root_and_pcaprub[1] = true
+rescue LoadError
+	@@root_and_pcaprub[1] = false
+end
+
+
+if @@root_and_pcaprub.include? false
+	root = @@root_and_pcaprub[0]
+	pcap = @@root_and_pcaprub[1]
+	warn "** WARNING ** test_inject not tested! "
+	warn "You are not root." unless root
+	warn "You do not have pcaprub installed." unless pcap
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
