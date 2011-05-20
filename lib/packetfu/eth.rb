@@ -252,6 +252,7 @@ module PacketFu
 		def read(str=nil,args={})
 			raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
 			@eth_header.read(str)
+			super(args)
 			return self
 		end
 

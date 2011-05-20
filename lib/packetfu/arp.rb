@@ -185,6 +185,7 @@ module PacketFu
 			@eth_header.read(str)
 			@arp_header.read(str[14,str.size])
 			@eth_header.body = @arp_header
+			super(args)
 			self
 		end
 

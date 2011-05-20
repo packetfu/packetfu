@@ -130,6 +130,7 @@ module PacketFu
 			@eth_header.body = @ip_header
 			@icmp_header.read(str[14+(@ip_header.ip_hlen),str.size])
 			@ip_header.body = @icmp_header
+			super(args)
 			self
 		end
 

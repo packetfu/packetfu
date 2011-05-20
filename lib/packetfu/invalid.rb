@@ -30,6 +30,7 @@ module PacketFu
 	class	InvalidPacket < Packet
 		attr_accessor :invalid_header
 
+		# Any packet is potentially an invalid packet
 		def self.can_parse?(str)
 			true
 		end

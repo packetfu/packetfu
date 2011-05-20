@@ -215,6 +215,7 @@ module PacketFu
 			@eth_header.read(str)
 			@ipv6_header.read(str[14,str.size])
 			@eth_header.body = @ipv6_header
+			super(args)
 			self
 		end
 

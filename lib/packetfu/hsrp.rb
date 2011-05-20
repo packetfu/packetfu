@@ -164,6 +164,7 @@ module PacketFu
 			@ip_header.body = @udp_header
 			@hsrp_header.read(str[14+(@ip_header.ip_hlen)+8,str.size])
 			@udp_header.body = @hsrp_header
+			super(args)
 			self
 		end
 
