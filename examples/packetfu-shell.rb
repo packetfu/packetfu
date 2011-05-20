@@ -43,6 +43,7 @@
 #  72 20 62 69 74 73 2e                              r bits.
 #  => nil
 
+$: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
 require 'examples'
 require 'packetfu'
 
@@ -82,11 +83,12 @@ def packetfu_ascii_art
 EOM
 	end
 
+@pcaprub_loaded = PacketFu.pcaprub_loaded?
 # Displays a helpful banner.
 def banner
 	packetfu_ascii_art
 	puts ">>> PacketFu Shell #{PacketFu.version}."
-	if Process.euid.zero? && @@pcaprub_loaded 
+	if Process.euid.zero? && @pcaprub_loaded
 		puts ">>> Use $packetfu_default.config for salient networking details."
 		print "IP:  %-15s Mac: %s" % [$packetfu_default.ip_saddr, $packetfu_default.eth_saddr]
 		puts "   Gateway: %s" % $packetfu_default.eth_daddr
@@ -103,9 +105,9 @@ end
 
 # Silly wlan0 workaround
 begin
-	$packetfu_default = PacketFu::Config.new(Utils.whoami?) if(@@pcaprub_loaded && Process.euid.zero?)
+	$packetfu_default = PacketFu::Config.new(Utils.whoami?) if(@pcaprub_loaded && Process.euid.zero?)
 rescue RuntimeError
-	$packetfu_default = PacketFu::Config.new(Utils.whoami?(:iface => 'wlan0')) if(@@pcaprub_loaded && Process.euid.zero?)
+	$packetfu_default = PacketFu::Config.new(Utils.whoami?(:iface => 'wlan0')) if(@pcaprub_loaded && Process.euid.zero?)
 end
 
 banner

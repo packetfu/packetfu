@@ -15,27 +15,46 @@ module PacketFu
 	@byte_order = :little
 
 	# Checks if pcaprub is loaded correctly.
-	@@pcaprub_loaded = false
-	
+	@pcaprub_loaded = false
+
 	# PacketFu works best with Pcaprub version 0.8-dev (at least)
 	# The current (Aug 01, 2010) pcaprub gem is 0.9, so should be fine.
-  def self.pcaprub_platform_require
+	def self.pcaprub_platform_require
 		begin
 			require 'pcaprub'
 		rescue LoadError
 			return false
 		end
-      @@pcaprub_loaded = true 
-  end
+		@pcaprub_loaded = true 
+	end
 
 	pcaprub_platform_require
-	if @@pcaprub_loaded
+	if @pcaprub_loaded
 		if Pcap.version !~ /[0-9]\.[7-9][0-9]?(-dev)?/ # Regex for 0.7-dev and beyond.
-			@@pcaprub_loaded = false # Don't bother with broken versions
+			@pcaprub_loaded = false # Don't bother with broken versions
 			raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
 		end
 		require "packetfu/capture" 
 		require "packetfu/inject"
+	end
+
+	def self.add_packet_class(klass)
+		@packet_classes ||= []
+		@packet_classes << klass
+		@packet_classes.sort! {|x,y| x.name <=> y.name}
+	end
+
+	def self.packet_classes
+		@packet_classes || []
+	end
+
+	def self.packet_prefixes
+		return [] unless @packet_classes
+		@packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
+	end
+
+	def self.pcaprub_loaded?
+		@pcaprub_loaded
 	end
 
 end
@@ -58,7 +77,7 @@ module PacketFu
 
 	# Version 1.0.0 was released July 31, 2010
 	# Version 1.0.1 is unreleased.
-	VERSION = "1.0.1" 
+	VERSION = "1.0.2" 
 
 	# Returns the current version of PacketFu. Incremented every once 
 	# in a while, when I remember
@@ -102,6 +121,11 @@ module PacketFu
 	def self.newer_than?(str)
 		return false if str == self.version
 		!self.older_than?(str)
+	end
+
+	# Returns an array of classes defined in PacketFu
+	def self.classes
+		constants.map { |const| const_get(const) if const_get(const).kind_of? Class}.compact
 	end
 
 end
