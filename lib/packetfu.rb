@@ -4,7 +4,10 @@
 # :include: ../INSTALL
 # :include: ../LICENSE
 
-$: << File.expand_path(File.dirname(__FILE__))
+cwd = File.expand_path(File.dirname(__FILE__))
+
+$: << cwd
+
 require "packetfu/structfu"
 require "ipaddr"
 require 'rubygems' if RUBY_VERSION =~ /^1\.[0-8]/
@@ -59,17 +62,21 @@ module PacketFu
 
 end
 
+def require_protos(cwd)
+	protos_dir = File.join(cwd, "packetfu", "protos")
+	Dir.new(protos_dir).each do |fname|
+		next unless fname[/\.rb$/]
+		begin 
+			require File.join(protos_dir,fname)
+		rescue
+			warn "Warning: Could not load `#{fname}'. Skipping."
+		end
+	end
+end
+
 require "packetfu/pcap"
 require "packetfu/packet"
-require "packetfu/invalid"
-require "packetfu/eth"
-require "packetfu/ip" 
-require "packetfu/arp"
-require "packetfu/icmp"
-require "packetfu/udp"
-require "packetfu/hsrp" # Depends on UDP
-require "packetfu/tcp"
-require "packetfu/ipv6" # This is pretty minimal.
+require_protos(cwd)
 require "packetfu/utils"
 require "packetfu/config"
 
