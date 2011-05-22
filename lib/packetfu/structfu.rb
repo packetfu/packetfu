@@ -106,6 +106,7 @@ module StructFu
 
 		# Returns a two byte value as a packed string.
 		def to_s
+			@packstr = (self.e == :big) ? "n" : "v"
 			[(self.v || self.d)].pack(@packstr)
 	 	end
 
@@ -113,10 +114,12 @@ module StructFu
   
 	# Int16be is a two byte value in big-endian format.
 	class Int16be < Int16
+		undef :endian=
 	end
 
 	# Int16le is a two byte value in little-endian format.
 	class Int16le < Int16
+		undef :endian=
 		def initialize(v=nil, e=:little)
 			super(v,e)
 			@packstr = (self.e == :big) ? "n" : "v"
@@ -132,6 +135,7 @@ module StructFu
 
 		# Returns a four byte value as a packed string.
 		def to_s
+			@packstr = (self.e == :big) ? "N" : "V"
 			[(self.v || self.d)].pack(@packstr)
 	 	end
 
@@ -139,10 +143,12 @@ module StructFu
 
 	# Int32be is a four byte value in big-endian format.
 	class Int32be < Int32
+		undef :endian=
 	end
 
 	# Int32le is a four byte value in little-endian format.
 	class Int32le < Int32
+		undef :endian=
 		def initialize(v=nil, e=:little)
 			super(v,e)
 		end

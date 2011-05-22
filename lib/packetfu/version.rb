@@ -33,6 +33,14 @@ module PacketFu
 		this_version >= ask_version
 	end
 
+	# Returns true if the current version is older than the compare version.
+	def self.older_than?(str)
+		return false if str == self.version
+		this_version = binarize_version(self.version)
+		ask_version = binarize_version(str)
+		this_version < ask_version
+	end
+
 	# Returns true if the current version is newer than the compare version.
 	def self.newer_than?(str)
 		return false if str == self.version
