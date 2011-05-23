@@ -1,15 +1,19 @@
 require File.join("..","lib","packetfu")
 
 describe StructFu, "mixin methods" do
-	class StructClass
-		include StructFu
+
+	before :each do
+		class StructClass
+			include StructFu
+		end
+		@sc = StructClass.new
 	end
-	sc = StructClass.new
+
 	it "should provide the basic StructFu methods" do
-		sc.respond_to?(:sz).should be_true
-		sc.respond_to?(:len).should be_true
-		sc.respond_to?(:typecast).should be_true
-		sc.respond_to?(:body=).should be_true
+		@sc.respond_to?(:sz).should be_true
+		@sc.respond_to?(:len).should be_true
+		@sc.respond_to?(:typecast).should be_true
+		@sc.respond_to?(:body=).should be_true
 	end
 end	
 
@@ -246,5 +250,89 @@ describe StructFu::Int32be, "4 byte big-endian value" do
 		expect { @int.endian = :big }.to raise_error
 		expect { @int.endian = :little }.to raise_error
 	end
+
+end
+
+describe StructFu::String, "a sligtly more special String" do
+
+	before :each do
+		@str = StructFu::String.new("Oi, a string")
+	end
+
+	it "should behave pretty much like a string" do
+		@str.should be_kind_of(String)
+	end
+
+	it "should have a read method" do
+		@str.should respond_to(:read)
+	end
+
+	it "should read data like other StructFu things" do
+		@str.read("hello")
+		@str.should == "hello"
+	end
+
+end
+
+describe StructFu::IntString do
+
+	it "should be" do
+		StructFu::IntString.should be
+	end
+
+	it "should have a length and value" do
+		istr = StructFu::IntString.new("Avast!")
+		istr.to_s.should == "\x06Avast!"
+	end
+
+	it "should have a 16-bit length and a value" do
+		istr = StructFu::IntString.new("Avast!",StructFu::Int16)
+		istr.to_s.should == "\x00\x06Avast!"
+	end
+
+	it "should have a 32-bit length and a value" do
+		istr = StructFu::IntString.new("Avast!",StructFu::Int32)
+		istr.to_s.should == "\x00\x00\x00\x06Avast!"
+	end
+
+	before :each do
+		@istr = StructFu::IntString.new("Avast!",StructFu::Int32)
+	end
+
+	it "should report the correct length with a new string" do
+		@istr.to_s.should == "\x00\x00\x00\x06Avast!"
+		@istr.string = "Ahoy!"
+		@istr.to_s.should == "\x00\x00\x00\x05Ahoy!"
+	end
+
+	it "should report the correct length with a new string" do
+		@istr.string = "Ahoy!"
+		@istr.to_s.should == "\x00\x00\x00\x05Ahoy!"
+	end
+
+	it "should keep the old length with a new string" do
+		@istr[:string] = "Ahoy!"
+		@istr.to_s.should == "\x00\x00\x00\x06Ahoy!"
+	end
+
+	it "should allow for adjusting the length manually" do
+		@istr.len = 16
+		@istr.to_s.should == "\x00\x00\x00\x10Avast!"
+	end
+
+	it "should read in an expected string" do
+		data = "\x00\x00\x00\x09Yo ho ho!"
+		@istr.read(data)
+		@istr.to_s.should == data
+	end
+
+	it "should raise when a string is too short" do
+		data = "\x01A"
+		expect { @istr.read(data) }.to raise_error
+	end
+
+	# So far, not implemented anywhere. In fact, none of this IntString
+	# business is. Ah well.
+	it "should parse when something actually needs it"
 
 end

@@ -2,6 +2,7 @@
 # to create meaningful binary data. 
 
 module StructFu
+	
 	# Normally, self.size and self.length will refer to the Struct
 	# size as an array. It's a hassle to redefine, so this introduces some
 	# shorthand to get at the size of the resultant string.
@@ -172,11 +173,11 @@ module StructFu
 	class IntString < Struct.new(:int, :string, :mode)
 
 		def initialize(string='',int=Int8,mode=nil)
-			unless int.respond_to?(:ancestors) && int.ancestors.include?(StructFu::Int)
-				raise StandardError, "Invalid length (#{int.inspect}) associated with this String."
-			else
+			if int < Int
 				super(int.new,string,mode)
 				calc
+			else
+				raise "IntStrings need a StructFu::Int for a length."
 			end
 		end
 
