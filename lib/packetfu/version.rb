@@ -1,7 +1,6 @@
 module PacketFu
 
-	# Version 1.0.0 was released July 31, 2010
-	# Version 1.0.1 is unreleased.
+	# Check the repo's for version release histories
 	VERSION = "1.0.2" 
 
 	def self.version
