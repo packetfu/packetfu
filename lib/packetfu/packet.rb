@@ -162,6 +162,13 @@ module PacketFu
 			end
 		end
 
+		# Packets are bundles of lots of objects, so copying them
+		# is a little complicated. This will do for now, but need
+		# to performance test.
+		def clone
+			Marshal.load(Marshal.dump(self))
+		end
+
 		# Peek provides summary data on packet contents.
 		#
 		# Each packet type should provide a peek_format.
