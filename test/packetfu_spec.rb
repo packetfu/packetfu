@@ -14,6 +14,11 @@ describe PacketFu, "version information" do
 		PacketFu.older_than?("4.0").should be_true
 		PacketFu.newer_than?("1.0").should be_true
 	end
+
+	it "can handle .pre versions" do
+		PacketFu.binarize_version("1.7.6.pre").should == 0x010706
+		PacketFu.at_least?("0.9.0.pre").should be_true
+	end
 end
 
 describe PacketFu, "instance variables" do

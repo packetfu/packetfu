@@ -10,7 +10,7 @@ module PacketFu
 
 	# Returns the version in a binary format for easy comparisons.
 	def self.binarize_version(str)
-		if(str.respond_to?(:split) && str =~ /^[0-9]+(\.([0-9]+)(\.[0-9]+)?)?$/)
+		if(str.respond_to?(:split) && str =~ /^[0-9]+(\.([0-9]+)(\.[0-9]+)?)?\..+$/)
 			bin_major,bin_minor,bin_teeny = str.split(/\x2e/).map {|x| x.to_i}
 			bin_version = (bin_major.to_i << 16) + (bin_minor.to_i << 8) + bin_teeny.to_i
 		else
