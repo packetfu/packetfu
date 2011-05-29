@@ -60,6 +60,13 @@ module PacketFu
 		@packet_classes.sort! {|x,y| x.name <=> y.name}
 	end
 
+	def self.remove_packet_class(klass)
+		raise "Need a class" unless klass.kind_of? Class
+		@packet_classes ||= []
+		@packet_classes.delete klass
+		@packet_classes 
+	end
+
 	def self.packet_classes
 		@packet_classes || []
 	end

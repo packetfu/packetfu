@@ -163,10 +163,31 @@ module PacketFu
 		end
 
 		# Packets are bundles of lots of objects, so copying them
-		# is a little complicated. This will do for now, but need
-		# to performance test.
+		# is a little complicated -- a dup of a packet is actually
+		# full of pass-by-reference stuff in the @headers, so 
+		# if you change one, you're changing all this copies, too.
+		#
+		# Normally, this doesn't seem to be a big deal, and it's
+		# a pretty decent performance tradeoff. But, if you're going
+		# to be creating a template packet to base a bunch of slightly
+		# different ones off of (like a fuzzer might), you'll want
+		# to use clone()
 		def clone
 			Marshal.load(Marshal.dump(self))
+		end
+
+		# If two packets are represented as the same binary string, and
+		# they're both actually PacketFu packets of the same sort, they're equal.
+		#
+		# The intuitive result is that a packet of a higher layer (like DNSPacket)
+		# can be equal to a packet of a lower level (like UDPPacket) as long as
+		# the bytes are equal (this can come up if a transport-layer packet has
+		# a hand-crafted payload that is identical to what would have been created
+		# by using an application layer packet)
+		def ==(other)
+			return false unless other.kind_of? self.class
+			return false unless other.respond_to? :to_s
+			self.to_s == other.to_s
 		end
 
 		# Peek provides summary data on packet contents.
@@ -369,7 +390,13 @@ module PacketFu
 		alias_method :protocol, :proto
 		alias_method :length, :size
 
+		# the Packet class should not be instantiated directly, since it's an 
+		# abstract class that real packet types inherit from. Sadly, this
+		# makes the Packet class more difficult to test directly.
 		def initialize(args={})
+			if self.class.name =~ /(::|^)PacketFu::Packet$/
+				raise NoMethodError, "method `new' called for abstract class #{self.class.name}"
+			end
 			if args[:config]
 				args[:config].each_pair do |k,v|
 					case k

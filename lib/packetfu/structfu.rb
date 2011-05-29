@@ -33,6 +33,11 @@ module StructFu
 		end
 	end
 
+	# Handle deep copies correctly
+	def clone
+		Marshal.load(Marshal.dump(self))
+	end
+
 	# Ints all have a value, an endianness, and a default value.
 	# Note that the signedness of Int values are implicit as
 	# far as the subclasses are concerned; to_i and to_f will 

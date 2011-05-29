@@ -54,17 +54,31 @@ describe PacketFu, "protocol requires" do
 end
 
 describe PacketFu, "packet class list management" do
-	class FooPacket; end
-	class BarPacket; end
-	PacketFu.add_packet_class(FooPacket)
-	PacketFu.add_packet_class(BarPacket)
-	its(:packet_classes) {should include(FooPacket) and include(BarPacket)}
+
+	before(:all) do
+		class PacketFu::FooPacket < PacketFu::Packet; end
+		class PacketFu::BarPacket < PacketFu::Packet; end
+		class PacketFu::PacketBaz; end
+	end
+
+	it "should allow packet class registration" do
+		PacketFu.add_packet_class(PacketFu::FooPacket).should be_kind_of Array
+		PacketFu.add_packet_class(PacketFu::BarPacket).should be_kind_of Array
+	end
+
+	its(:packet_classes) {should include(PacketFu::FooPacket)}
+
 	it "should disallow non-classes as packet classes" do
 		expect { PacketFu.add_packet_class("A String") }.to raise_error
 	end
-	its(:packet_prefixes) {should include("foo") and include("bar")}
-	it "should disallow nonstandard packet class names" do
-		class PacketBaz; end
-		expect { PacketFu.add_packet_class(PacketBaz) }.to raise_error
+
+	its(:packet_prefixes) {should include("bar")}
+
+	# Don't really have much utility for this right now.
+	it "should allow packet class deregistration" do
+		PacketFu.remove_packet_class(PacketFu::BarPacket)
+		PacketFu.packet_prefixes.should_not include("bar")
+		PacketFu.add_packet_class(PacketFu::BarPacket)
 	end
+
 end

@@ -11,9 +11,6 @@ else
 end	
 puts ">> Version: " << PacketFu.version
 
-pcaps = PcapFile.new.file_to_array(:f => 'sample_hsrp_pcapr.cap')
-pcaps.each {|p| puts Packet.parse(p).peek}
-
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
 
 

@@ -331,8 +331,4 @@ describe StructFu::IntString do
 		expect { @istr.read(data) }.to raise_error
 	end
 
-	# So far, not implemented anywhere. In fact, none of this IntString
-	# business is. Ah well.
-	it "should parse when something actually needs it"
-
 end
