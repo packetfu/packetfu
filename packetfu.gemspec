@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name = %q{packetfu}
-  s.version = "1.0.2.pre"
+  s.version = "1.0.3.pre"
   s.date = %q{2011-05-22}
   s.authors = ["Tod Beardsley"]
   s.email = %q{todb@planb-security.net}

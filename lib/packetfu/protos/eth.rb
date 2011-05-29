@@ -229,6 +229,15 @@ module PacketFu
 			EthHeader.str2mac(self[:eth_dst].to_s)
 		end
 
+		# Readability aliases
+
+		alias :eth_dst_readable :eth_daddr
+		alias :eth_src_readable :eth_saddr
+
+		def eth_proto_readable
+			"0x%04x" % eth_proto
+		end
+
 	end
 
 	# EthPacket is used to construct Ethernet packets. They contain an

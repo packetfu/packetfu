@@ -261,6 +261,19 @@ module PacketFu
 			end
 		end
 
+		# Readability aliases
+
+		alias :ip_src_readable :ip_saddr
+		alias :ip_dst_readable :ip_daddr
+
+		def ip_id_readable
+			"0x%04x" % ip_id
+		end
+
+		def ip_sum_readable
+			"0x%04x" % ip_sum
+		end
+
 	end
 
 	# IPPacket is used to construct IP packets. They contain an EthHeader, an IPHeader, and usually

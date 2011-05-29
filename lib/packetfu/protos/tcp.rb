@@ -842,6 +842,15 @@ module PacketFu
 		 self[:tcp_opts].decode
 		end
 
+		# Gets a more readable flags list
+		def tcp_flags_dotmap
+			dotmap = tcp_flags.members.map do |flag|
+				status = self.tcp_flags.send flag
+				status == 0 ? "." : flag.to_s.upcase[0]
+			end
+			dotmap.join
+		end
+
 		# Sets a more readable option list.
 		def tcp_options=(arg)
 			self[:tcp_opts].encode arg
@@ -885,6 +894,26 @@ module PacketFu
 			else
 				raise ArgumentError, "No such field `#{arg}'"
 			end
+		end
+
+		# Readability aliases
+
+		alias :tcp_flags_readable :tcp_flags_dotmap
+
+		def tcp_ack_readable
+			"0x%08x" % tcp_ack
+		end
+
+		def tcp_seq_readable
+			"0x%08x" % tcp_seq
+		end
+
+		def tcp_sum_readable
+			"0x%04x" % tcp_sum
+		end
+
+		def tcp_opts_readable
+			tcp_options
 		end
 
 	end
@@ -1067,12 +1096,7 @@ module PacketFu
 			peek_data << "->"
 			peek_data << "%21s" % "#{self.ip_daddr}:#{self.tcp_dst}"
 			flags = ' ['
-			flags << (self.tcp_flags.urg.zero? ? "." : "U")
-			flags << (self.tcp_flags.ack.zero? ? "." : "A")
-			flags << (self.tcp_flags.psh.zero? ? "." : "P")
-			flags << (self.tcp_flags.rst.zero? ? "." : "R")
-			flags << (self.tcp_flags.syn.zero? ? "." : "S")
-			flags << (self.tcp_flags.fin.zero? ? "." : "F")
+			flags << self.tcp_flags_dotmap
 			flags << '] '
 			peek_data << flags
 			peek_data << "S:"

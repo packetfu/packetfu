@@ -341,6 +341,67 @@ module PacketFu
 			end
 		end
 
+		def dissection_table
+			table = []
+			@headers.each_with_index do |header,table_idx|
+				proto = header.class.name.sub(/^.*::/,"")
+				table << [proto]
+				header.class.members.each do |elem|
+					elem_sym = RUBY_VERSION[/^1\.8/] ? elem.to_sym : elem
+					next if elem_sym == :body 
+					elem_type_value = []
+					elem_type_value[0] = elem
+					readable_element = "#{elem}_readable"
+					if header.respond_to? readable_element
+						elem_type_value[1] = header.send(readable_element)
+					else
+						elem_type_value[1] = header.send(elem)
+					end
+					elem_type_value[2] = header[elem.to_sym].class.name 
+					table[table_idx] ||= []
+					table[table_idx] << elem_type_value
+				end
+			end
+			table
+		end
+
+		# Renders the dissection_table suitable for screen printing. Can take
+		# one or two arguments. If just the one, only that layer will be displayed
+		# take either a range or a number -- if a range, only protos within
+		# that range will be rendered. If an integer, only that proto
+		# will be rendered.
+		def dissect(min=nil,max=nil)
+			table = self.dissection_table
+			widest = (0..2).map {|i| table.map {|x| x.map {|y| y[i].size}}.flatten.sort.last}
+			table_formatted = ""
+			begin
+				if min
+					layer_min = min.to_i
+					layer_max = max ? max.to_i : layer_min
+					table_range = (layer_min..layer_max)
+				else
+					layer_min = min
+				end
+			rescue => e
+				raise ArgumentError, "Method `dissect' accepts one or two to_i-able arguments"
+			end
+			header_line_width = widest.inject {|sum,i| sum ? sum + i : i} + 2
+			table.each_with_index do |proto_table,proto_idx|
+				if layer_min
+					next unless table_range.member? proto_idx
+				end
+				table_formatted << "--#{proto_table.first}"
+				table_formatted << "-" * (header_line_width - proto_table.first.size) << "\n"
+				proto_table[1,proto_table.size].each do |elem,value,type|
+					table_formatted << "  %-#{widest[0]}s " % elem
+					table_formatted << "%-#{widest[1]}s " % value.to_s
+					table_formatted << type << "\n"
+				end
+			end
+			table_formatted << ("-" * header_line_width)
+			table_formatted
+		end
+
 		alias :orig_kind_of? :kind_of?
 
 		def kind_of?(klass)
@@ -451,10 +512,10 @@ module PacketFu
 
 	end # class Packet
 
-	@@inspect_style = :pretty
+	@inspect_style = :pretty
 
-	# If @@inspect_style is :ugly, set the inspect method to the usual inspect. 
-	# By default, @@inspect_style is :pretty. This default may change if people
+	# If @inspect_style is :ugly, set the inspect method to the usual inspect. 
+	# By default, @inspect_style is :pretty. This default may change if people
 	# hate it.
 	# Since PacketFu is designed with irb in mind, the normal inspect is way too
 	# verbose when new packets are created, and it ruins the aesthetics of the
@@ -482,12 +543,12 @@ module PacketFu
 	#  => #<PacketFu::TCPPacket:0xb7aaf96c @ip_header=#<struct PacketFu::IPHeader ip_v=4, ip_hl=5, ip_tos=#<struct StructFu::Int8 value=nil, endian=nil, width=1, default=0>, ip_len=#<struct StructFu::Int16 value=20, endian=:big, width=2, default=0>, ip_id=#<struct StructFu::Int16 value=58458, endian=:big, width=2, default=0>, ip_frag=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, ip_ttl=#<struct StructFu::Int8 value=32, endian=nil, width=1, default=0>, ip_proto=#<struct StructFu::Int8 value=6, endian=nil, width=1, default=0>, ip_sum=#<struct StructFu::Int16 value=65535, endian=:big, width=2, default=0>, ip_src=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, ip_dst=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, body=#<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">>, @tcp_header=#<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">, @eth_header=#<struct PacketFu::EthHeader eth_dst=#<struct PacketFu::EthMac oui=#<struct PacketFu::EthOui b0=nil, b1=nil, b2=nil, b3=nil, b4=nil, b5=nil, local=0, multicast=nil, oui=428>, nic=#<struct PacketFu::EthNic n0=nil, n1=nil, n2=nil>>, eth_src=#<struct PacketFu::EthMac oui=#<struct PacketFu::EthOui b0=nil, b1=nil, b2=nil, b3=nil, b4=nil, b5=nil, local=0, multicast=nil, oui=428>, nic=#<struct PacketFu::EthNic n0=nil, n1=nil, n2=nil>>, eth_proto=#<struct StructFu::Int16 value=2048, endian=:big, width=2, default=0>, body=#<struct PacketFu::IPHeader ip_v=4, ip_hl=5, ip_tos=#<struct StructFu::Int8 value=nil, endian=nil, width=1, default=0>, ip_len=#<struct StructFu::Int16 value=20, endian=:big, width=2, default=0>, ip_id=#<struct StructFu::Int16 value=58458, endian=:big, width=2, default=0>, ip_frag=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, ip_ttl=#<struct StructFu::Int8 value=32, endian=nil, width=1, default=0>, ip_proto=#<struct StructFu::Int8 value=6, endian=nil, width=1, default=0>, ip_sum=#<struct StructFu::Int16 value=65535, endian=:big, width=2, default=0>, ip_src=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, ip_dst=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, body=#<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">>>, @headers=[#<struct PacketFu::EthHeader eth_dst=#<struct PacketFu::EthMac oui=#<struct PacketFu::EthOui b0=nil, b1=nil, b2=nil, b3=nil, b4=nil, b5=nil, local=0, multicast=nil, oui=428>, nic=#<struct PacketFu::EthNic n0=nil, n1=nil, n2=nil>>, eth_src=#<struct PacketFu::EthMac oui=#<struct PacketFu::EthOui b0=nil, b1=nil, b2=nil, b3=nil, b4=nil, b5=nil, local=0, multicast=nil, oui=428>, nic=#<struct PacketFu::EthNic n0=nil, n1=nil, n2=nil>>, eth_proto=#<struct StructFu::Int16 value=2048, endian=:big, width=2, default=0>, body=#<struct PacketFu::IPHeader ip_v=4, ip_hl=5, ip_tos=#<struct StructFu::Int8 value=nil, endian=nil, width=1, default=0>, ip_len=#<struct StructFu::Int16 value=20, endian=:big, width=2, default=0>, ip_id=#<struct StructFu::Int16 value=58458, endian=:big, width=2, default=0>, ip_frag=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, ip_ttl=#<struct StructFu::Int8 value=32, endian=nil, width=1, default=0>, ip_proto=#<struct StructFu::Int8 value=6, endian=nil, width=1, default=0>, ip_sum=#<struct StructFu::Int16 value=65535, endian=:big, width=2, default=0>, ip_src=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, ip_dst=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, body=#<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">>>, #<struct PacketFu::IPHeader ip_v=4, ip_hl=5, ip_tos=#<struct StructFu::Int8 value=nil, endian=nil, width=1, default=0>, ip_len=#<struct StructFu::Int16 value=20, endian=:big, width=2, default=0>, ip_id=#<struct StructFu::Int16 value=58458, endian=:big, width=2, default=0>, ip_frag=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, ip_ttl=#<struct StructFu::Int8 value=32, endian=nil, width=1, default=0>, ip_proto=#<struct StructFu::Int8 value=6, endian=nil, width=1, default=0>, ip_sum=#<struct StructFu::Int16 value=65535, endian=:big, width=2, default=0>, ip_src=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, ip_dst=#<struct PacketFu::Octets o1=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o2=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o3=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>, o4=#<struct StructFu::Int8 value=0, endian=nil, width=1, default=0>>, body=#<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">>, #<struct PacketFu::TCPHeader tcp_src=#<struct StructFu::Int16 value=17222, endian=:big, width=2, default=0>, tcp_dst=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_seq=#<struct StructFu::Int32 value=1528113240, endian=:big, width=4, default=0>, tcp_ack=#<struct StructFu::Int32 value=nil, endian=:big, width=4, default=0>, tcp_hlen=#<struct PacketFu::TcpHlen hlen=5>, tcp_reserved=#<struct PacketFu::TcpReserved r1=0, r2=0, r3=0>, tcp_ecn=#<struct PacketFu::TcpEcn n=nil, c=nil, e=nil>, tcp_flags=#<struct PacketFu::TcpFlags urg=0, ack=0, psh=0, rst=0, syn=0, fin=0>, tcp_win=#<struct StructFu::Int16 value=16384, endian=:big, width=2, default=0>, tcp_sum=#<struct StructFu::Int16 value=43333, endian=:big, width=2, default=0>, tcp_urg=#<struct StructFu::Int16 value=nil, endian=:big, width=2, default=0>, tcp_opts=[], body="">]>
 	#  irb(main):004:0> 
 	def toggle_inspect
-		if @@inspect_style == :pretty
+		if @inspect_style == :pretty
 			eval("class Packet; def inspect; super; end; end")
-			@@inspect_style = :ugly
+			@inspect_style = :ugly
 		else
 			eval("class Packet; def inspect; self.proto.join('|') + \"\n\" + self.inspect_hex; end; end")
-			@@inspect_style = :pretty
+			@inspect_style = :pretty
 		end
 	end
 

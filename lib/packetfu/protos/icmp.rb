@@ -83,6 +83,12 @@ module PacketFu
 			end
 		end
 
+		# Readability aliases
+
+		def icmp_sum_readable
+			"0x%04x" % icmp_sum
+		end
+
 	end
 
 	# ICMPPacket is used to construct ICMP Packets. They contain an EthHeader, an IPHeader, and a ICMPHeader.
