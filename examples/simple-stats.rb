@@ -3,6 +3,11 @@
 # Simple-stats.rb takes a pcap file, and gives some simple 
 # stastics on the protocols found. It's mainly used to
 # demonstrate a method to parse pcap files.
+#
+# XXX: DO NOT USE THIS METHOD TO READ PCAP FILES.
+#
+# See new-simple-stats.rb for an example of the streaming
+# parsing method.
 
 require 'examples' # For path setting slight-of-hand
 require 'packetfu'
@@ -12,6 +17,7 @@ require 'packetfu'
 def count_packet_types(file)
 	file = File.open(file) {|f| f.read}
 	stats = {}
+	count = 0
 	pcapfile = PacketFu::PcapPackets.new
 	pcapfile.read(file)
 	pcapfile.each do |p|
@@ -23,6 +29,8 @@ def count_packet_types(file)
 		else
 			stats[kind] = 0
 		end
+		count += 1
+		break if count >= 1_000
 	end
 	stats.each_pair { |k,v| puts "%-12s: %4d" % [k,v] }
 end
