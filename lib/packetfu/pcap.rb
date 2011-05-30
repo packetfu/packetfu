@@ -44,6 +44,10 @@ module PacketFu
 																:thiszone, :sigfigs, :snaplen, :network)
 		include StructFu
 
+		MAGIC_INT32  = 0xa1b2c3d4
+		MAGIC_LITTLE = [MAGIC_INT32].pack("V")
+		MAGIC_BIG    = [MAGIC_INT32].pack("N")
+
 		def initialize(args={})
 			set_endianness(args[:endian] ||= :little)
 			init_fields(args) 
@@ -54,7 +58,7 @@ module PacketFu
 		
 		# Called by initialize to set the initial fields. 
 		def init_fields(args={})
-			args[:magic] = @int32.new(args[:magic] || 0xa1b2c3d4)
+			args[:magic] = @int32.new(args[:magic] || PcapHeader::MAGIC_INT32)
 			args[:ver_major] = @int16.new(args[:ver_major] || 2)
 			args[:ver_minor] ||= @int16.new(args[:ver_minor] || 4)
 			args[:thiszone] ||= @int32.new(args[:thiszone])
@@ -76,7 +80,7 @@ module PacketFu
 			force_binary(str)
 			return self if str.nil?
 			str.force_encoding("binary") if str.respond_to? :force_encoding
-			if str[0,4] == self[:magic].to_s || true # TODO: raise if it's not magic.
+			if str[0,4] == self[:magic].to_s 
 				self[:magic].read str[0,4]
 				self[:ver_major].read str[4,2]
 				self[:ver_minor].read str[6,2]
@@ -84,6 +88,8 @@ module PacketFu
 				self[:sigfigs].read str[12,4]
 				self[:snaplen].read str[16,4]
 				self[:network].read str[20,4]
+			else
+				raise "Incorrect magic for libpcap"
 			end
 			self
 		end
@@ -195,10 +201,9 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil?
-			magic = "\xa1\xb2\xc3\xd4"
-			if str[0,4] == magic
+			if str[0,4] == PcapHeader::MAGIC_BIG
 				@endian = :big
-			elsif str[0,4] == magic.reverse
+			elsif str[0,4] == PcapHeader::MAGIC_LITTLE
 				@endian = :little
 			else
 				raise ArgumentError, "Unknown file format for #{self.class}"
@@ -496,7 +501,7 @@ module PacketFu
 			# Reads the magic string of a pcap file, and determines
 			# if it's :little or :big endian.
 			def get_byte_order(pcap_file)
-				byte_order = ((pcap_file[0,4] == "\xd4\xc3\xb2\xa1") ? :little : :big)
+				byte_order = ((pcap_file[0,4] == PcapHeader::MAGIC_LITTLE) ? :little : :big)
 				return byte_order
 			end
 
