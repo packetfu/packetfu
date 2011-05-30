@@ -23,6 +23,31 @@ Marshall Beddoe's PcapRub is required only for packet reading and writing from a
 
 PacketFu ships with dozens and dozens of tests, built on Test::Unit. These should give good pointers on how you're expected to use it. See the /tests directory. Furthermore, PacketFu also ships with packetfu-shell.rb, which should be run via IRB (as root, if you intend to use your interfaces).
 
+== Platforms
+
+I tend to test with the following (with bash):
+
+    date > /tmp/tests.txt; for i in default 1.8.6-p420 1.8.7-p334 1.9.1-p431 1.9.2-p180 1.9.3-head
+    do rvm use $i >> /tmp/tests.txt
+    echo Testing with $i
+    echo $i >> /tmp/tests.txt; echo +++++++++++++++++++++++ >> /tmp/tests.txt
+    rvmsudo ./all_tests.rb >> /tmp/tests.txt; rspec . >> /tmp/tests.txt
+    done
+
+=== Passing Platforms
+
+* 1.9.1-p378 -- my favorite and my best
+* 1.8.7-p334
+* 1.9.2-p180
+* 1.9.3-head
+
+=== Failing Platforms
+
+* 1.8.6-p420 -- Has problems with pcaprub and capture/inject
+* 1.9.1-p431 -- Has problems with loading gems in general, see http://redmine.ruby-lang.org/issues/2404
+
+Incidentally, I suspect these Ruby problems are the crux of the Mac OSX problems that people report. Try a different Ruby build and please let me know what works for you.
+
 == Author
 
 PacketFu is maintained primarily by Tod Beardsley <todb@planb-security.net>

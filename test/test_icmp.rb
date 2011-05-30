@@ -24,7 +24,7 @@ class ICMPTest < Test::Unit::TestCase
 		puts "\n"
 		puts "ICMP Peek format: "
 		puts i.peek
-		assert_equal 78,i.peek.size
+		assert (i.peek.size <= 80)
 	end
 
 	def test_icmp_pcap

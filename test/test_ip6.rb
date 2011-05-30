@@ -47,7 +47,7 @@ class IPv6Test < Test::Unit::TestCase
 		puts "\n"
 		puts "IPv6 Peek format: "
 		puts i.peek
-		assert_equal 78, i.peek.size
+		assert (i.peek.size <= 80)
 	end
 
 =begin

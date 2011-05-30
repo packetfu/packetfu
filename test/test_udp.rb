@@ -24,7 +24,7 @@ class UDPTest < Test::Unit::TestCase
 		puts "\n"
 		puts "UDP Peek format: "
 		puts u.peek
-		assert_equal 78,u.peek.size
+		assert (u.peek.size <= 80)
 	end
 
 	def test_udp_pcap

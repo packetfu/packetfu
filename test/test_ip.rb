@@ -48,7 +48,7 @@ class IPTest < Test::Unit::TestCase
 		puts "\n"
 		puts "IP Peek format: "
 		puts i.peek
-		assert_equal 78,i.peek.size
+		assert (i.peek.size <= 80)
 	end
 
 	def test_ip_pcap

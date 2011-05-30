@@ -173,7 +173,7 @@ module PacketFu
 		# different ones off of (like a fuzzer might), you'll want
 		# to use clone()
 		def clone
-			Marshal.load(Marshal.dump(self))
+			Packet.parse(self.to_s)
 		end
 
 		# If two packets are represented as the same binary string, and
@@ -283,11 +283,10 @@ module PacketFu
 
 		# Hexify provides a neatly-formatted dump of binary data, familar to hex readers.
 		def hexify(str)
-			if str.respond_to? :force_encoding
-				str.force_encoding("ASCII-8BIT")
-			end
+			str.force_encoding("ASCII-8BIT") if str.respond_to? :force_encoding
 			hexascii_lines = str.to_s.unpack("H*")[0].scan(/.{1,32}/)
-			chars = str.to_s.gsub(/[\x00-\x1f\x7f-\xff]/,'.')
+			regex = Regexp.new('[\x00-\x1f\x7f-\xff]', nil, 'n')
+			chars = str.to_s.gsub(regex,'.')
 			chars_lines = chars.scan(/.{1,16}/)
 			ret = []
 			hexascii_lines.size.times {|i| ret << "%-48s  %s" % [hexascii_lines[i].gsub(/(.{2})/,"\\1 "),chars_lines[i]]}

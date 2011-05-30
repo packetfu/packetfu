@@ -866,7 +866,7 @@ module PacketFu
 		def tcp_flags_dotmap
 			dotmap = tcp_flags.members.map do |flag|
 				status = self.tcp_flags.send flag
-				status == 0 ? "." : flag.to_s.upcase[0]
+				status == 0 ? "." : flag.to_s.upcase[0].chr
 			end
 			dotmap.join
 		end

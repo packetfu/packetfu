@@ -1,4 +1,3 @@
 lib/packetfu.rb
 lib/packetfu/
-examples/packetfu-shell.rb
-
+README
