@@ -774,10 +774,15 @@ module PacketFu
 
 		# Getter for the TCP Header Length value.
 		def tcp_hlen; self[:tcp_hlen].to_i; end
-		# Setter for the TCP Header Length value.
+		# Setter for the TCP Header Length value. Can take
+		# either a string or an integer. Note that if it's
+		# a string, the top four bits are used.
 		def tcp_hlen=(i)
-			if i.kind_of? PacketFu::TcpHlen
-				self[:tcp_hlen]=i
+			case i
+			when PacketFu::TcpHlen
+				self[:tcp_hlen] = i
+			when Numeric
+				self[:tcp_hlen] = TcpHlen.new(:hlen => i.to_i)
 			else
 				self[:tcp_hlen].read(i)
 			end
@@ -787,8 +792,15 @@ module PacketFu
 		def tcp_reserved; self[:tcp_reserved].to_i; end
 		# Setter for the TCP Reserved field.
 		def tcp_reserved=(i)
-			if i.kind_of? PacketFu::TcpReserved
+			case i
+			when PacketFu::TcpReserved
 				self[:tcp_reserved]=i
+			when Numeric
+				args = {}
+				args[:r1] = (i & 0b100) >> 2
+				args[:r2] = (i & 0b010) >> 1
+				args[:r3] = (i & 0b001)
+				self[:tcp_reserved] = TcpReserved.new(args)
 			else
 				self[:tcp_reserved].read(i)
 			end
@@ -798,8 +810,15 @@ module PacketFu
 		def tcp_ecn; self[:tcp_ecn].to_i; end
 		# Setter for the ECN bits. 
 		def tcp_ecn=(i)
-			if i.kind_of? PacketFu::TcpEcn
+			case i
+			when PacketFu::TcpEcn
 				self[:tcp_ecn]=i
+			when Numeric
+				args = {}
+				args[:n] = (i & 0b100) >> 2
+				args[:c] = (i & 0b010) >> 1
+				args[:e] = (i & 0b001)
+				self[:tcp_ecn] = TcpEcn.new(args)
 			else
 				self[:tcp_ecn].read(i)
 			end
@@ -809,7 +828,8 @@ module PacketFu
 		def tcp_opts; self[:tcp_opts].to_s; end
 		# Setter for TCP Options.
 		def tcp_opts=(i)
-			if i.kind_of? PacketFu::TcpOptions
+			case i
+			when PacketFu::TcpOptions
 				self[:tcp_opts]=i
 			else
 				self[:tcp_opts].read(i)
