@@ -609,7 +609,7 @@ module PacketFu
 		# Note that by using TcpOptions#encode, strings supplied as values which
 		# can be converted to numbers will be converted first.
 		#
-		# == Example
+		# === Example
 		#
 		#   t = TcpOptions.new
 		#   t.encode("MS:1460,WS:6")

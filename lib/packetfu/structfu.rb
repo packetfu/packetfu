@@ -118,12 +118,12 @@ module StructFu
 
 	end
   
-	# Int16be is a two byte value in big-endian format.
+	# Int16be is a two byte value in big-endian format. The endianness cannot be altered.
 	class Int16be < Int16
 		undef :endian=
 	end
 
-	# Int16le is a two byte value in little-endian format.
+	# Int16le is a two byte value in little-endian format. The endianness cannot be altered.
 	class Int16le < Int16
 		undef :endian=
 		def initialize(v=nil, e=:little)
@@ -147,12 +147,12 @@ module StructFu
 
 	end
 
-	# Int32be is a four byte value in big-endian format.
+	# Int32be is a four byte value in big-endian format. The endianness cannot be altered.
 	class Int32be < Int32
 		undef :endian=
 	end
 
-	# Int32le is a four byte value in little-endian format.
+	# Int32le is a four byte value in little-endian format. The endianness cannot be altered.
 	class Int32le < Int32
 		undef :endian=
 		def initialize(v=nil, e=:little)
@@ -208,8 +208,8 @@ module StructFu
 		# is calculated upon assignment. If you'd prefer to have
 		# an incorrect value, use the syntax, obj[:string]="value"
 		# instead. Note, by using the alternate form, you must
-		# #calc before you can trust the int's value. Think of the
-		# = assignment as "set to equal," while the []= assignment
+		# #calc before you can trust the int's value. Think of the = 
+		# assignment as "set to equal," while the []= assignment
 		# as "boxing in" the value. Maybe.
 		def string=(s)
 			self[:string] = s
@@ -246,9 +246,13 @@ module StructFu
 		# is used is dependant on which :mode is set (with self.mode).
 		#
 		# :parse : Read the length, and then read in that many bytes of the string. 
-		#          The string may be truncated or padded out with nulls, as dictated by the value.
-		# :fix   : Skip the length, read the rest of the string, then set the length to what it ought to be.
-		# else   : If neither of these modes are set, just perfom a normal read(). This is the default.
+		# The string may be truncated or padded out with nulls, as dictated by the value.
+		#
+		# :fix   : Skip the length, read the rest of the string, then set the length 
+		# to what it ought to be.
+		#
+		# else   : If neither of these modes are set, just perfom a normal read().
+		# This is the default.
 		def parse(s)
 			unless s[0,int.width].size == int.width
 				raise StandardError, "String is too short for type #{int.class}"

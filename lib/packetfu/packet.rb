@@ -209,7 +209,7 @@ module PacketFu
 		# peek traverses the @header list in reverse to find a suitable
 		# format.
 		#
-		# == Format
+		# === Format
 		# 
 		#   * A one or two character protocol initial. It should be unique
 		#   * The packet size
@@ -218,7 +218,7 @@ module PacketFu
 		# Ideally, related peek_formats will all line up with each other
 		# when printed to the screen.
 		#
-		# == Example
+		# === Example
 		#
 		#    tcp_packet.peek
 		#    #=> "T  1054 10.10.10.105:55000   ->   192.168.145.105:80 [......] S:adc7155b|I:8dd0"
