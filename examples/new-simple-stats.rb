@@ -20,6 +20,7 @@ end
 def count_packet_types(file)
 	stats = {}
 	count = 0
+	elapsed = 0
 	start_time = Time.now
 	PacketFu::PcapFile.read_packets(file) do |pkt|
 		kind = pkt.proto.last.to_sym
