@@ -7,7 +7,7 @@ end
 
 describe PacketFu, "version information" do
 	it "reports a version number" do
-		PacketFu::VERSION.should == "1.0.3"
+		PacketFu::VERSION.should match /^1\.[0-9]\.[0-9]$/
 	end
 	its(:version) {should eq PacketFu::VERSION} 
 
