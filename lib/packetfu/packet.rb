@@ -344,9 +344,9 @@ module PacketFu
 			table = []
 			@headers.each_with_index do |header,table_idx|
 				proto = header.class.name.sub(/^.*::/,"")
-				table << [proto]
+				table << [proto,[]]
 				header.class.members.each do |elem|
-					elem_sym = RUBY_VERSION[/^1\.8/] ? elem.to_sym : elem
+					elem_sym = elem.to_sym # to_sym needed for 1.8
 					next if elem_sym == :body 
 					elem_type_value = []
 					elem_type_value[0] = elem
@@ -357,11 +357,14 @@ module PacketFu
 						elem_type_value[1] = header.send(elem)
 					end
 					elem_type_value[2] = header[elem.to_sym].class.name 
-					table[table_idx] ||= []
-					table[table_idx] << elem_type_value
+					table[table_idx][1] << elem_type_value
 				end
 			end
 			table
+			if @headers.last.members.include? :body
+				body_part = [:body, self.payload, @headers.last.body.class.name]
+			end
+			table << body_part
 		end
 
 		# Renders the dissection_table suitable for screen printing. Can take
@@ -369,36 +372,52 @@ module PacketFu
 		# take either a range or a number -- if a range, only protos within
 		# that range will be rendered. If an integer, only that proto
 		# will be rendered.
-		def dissect(min=nil,max=nil)
-			table = self.dissection_table
-			widest = (0..2).map {|i| table.map {|x| x.map {|y| y[i].size}}.flatten.sort.last}
-			table_formatted = ""
-			begin
-				if min
-					layer_min = min.to_i
-					layer_max = max ? max.to_i : layer_min
-					table_range = (layer_min..layer_max)
+		def dissect
+			dtable = self.dissection_table
+			hex_body = nil
+			if dtable.last.kind_of?(Array) and dtable.last.first == :body
+				body = dtable.pop 
+				hex_body = hexify(body[1])
+			end
+			elem_widths = [0,0,0]
+			dtable.each do |proto_table|
+				proto_table[1].each do |elems|
+					elems.each_with_index do |e,i|
+						width = e.size
+						elem_widths[i] = width if width > elem_widths[i]
+					end
+				end
+			end
+			total_width = elem_widths.inject(0) {|sum,x| sum+x} 
+			table = ""
+			dtable.each do |proto|
+				table << "--"
+				table << proto[0] 
+				if total_width > proto[0].size
+					table << ("-" * (total_width - proto[0].size + 2))
 				else
-					layer_min = min
+					table << ("-" * (total_width + 2))
 				end
-			rescue => e
-				raise ArgumentError, "Method `dissect' accepts one or two to_i-able arguments"
-			end
-			header_line_width = widest.inject {|sum,i| sum ? sum + i : i} + 2
-			table.each_with_index do |proto_table,proto_idx|
-				if layer_min
-					next unless table_range.member? proto_idx
-				end
-				table_formatted << "--#{proto_table.first}"
-				table_formatted << "-" * (header_line_width - proto_table.first.size) << "\n"
-				proto_table[1,proto_table.size].each do |elem,value,type|
-					table_formatted << "  %-#{widest[0]}s " % elem
-					table_formatted << "%-#{widest[1]}s " % value.to_s
-					table_formatted << type << "\n"
+				table << "\n"
+				proto[1].each do |elems|
+					table << "  "
+					elems_table = []
+					(0..2).each do |i|
+						elems_table << ("%-#{elem_widths[i]}s" % elems[i])
+					end
+					table << elems_table.join("\s")
+					table << "\n"
 				end
 			end
-			table_formatted << ("-" * header_line_width)
-			table_formatted
+			if hex_body && !hex_body.empty?
+				table << "-" * 66
+				table << "\n"
+				table << "00-01-02-03-04-05-06-07-08-09-0a-0b-0c-0d-0e-0f---0123456789abcdef\n"
+				table << "-" * 66
+				table << "\n"
+				table << hex_body
+			end
+			table
 		end
 
 		alias :orig_kind_of? :kind_of?
