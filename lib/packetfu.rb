@@ -1,8 +1,6 @@
 
 # :title: PacketFu Documentation
-# :main: ../README
-# :include: ../README
-# :include: ../LICENSE
+# :main: README
 
 cwd = File.expand_path(File.dirname(__FILE__))
 
