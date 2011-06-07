@@ -282,7 +282,7 @@ class Struct
 	# Monkeypatch for Struct to include some string safety -- anything that uses
 	# Struct is going to presume binary strings anyway.
 	def force_binary(str)
-		str.force_encoding "binary" if str.respond_to? :force_encoding
+		PacketFu.force_binary(str)
 	end
 
 end

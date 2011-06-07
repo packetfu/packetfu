@@ -546,14 +546,10 @@ module PacketFu
 			opts
 		end
 
-		def force_binary(str)
-			str.force_encoding "binary" if str.respond_to? :force_encoding
-		end
-
 		# Reads a string to populate the object.
 		def read(str)
-			self.clear if self.size > 0
-			force_binary(str)
+			self.clear 
+			PacketFu.force_binary(str)
 			return self if(!str.respond_to? :to_s || str.nil?)
 			i = 0
 			while i < str.to_s.size
