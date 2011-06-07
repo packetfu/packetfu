@@ -255,7 +255,9 @@ module PacketFu
 		attr_accessor :eth_header
 
 		def self.can_parse?(str)
-			str.size >= 14
+			return false unless str.size >= 14
+			return false unless str[12,2] == "\x08\x00"
+			true
 		end
 
 		def read(str=nil,args={})

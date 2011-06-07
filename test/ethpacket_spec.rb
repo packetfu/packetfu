@@ -1,0 +1,67 @@
+require File.join("..","lib","packetfu")
+
+include PacketFu
+
+describe EthPacket, "when read from a pcap file" do
+
+	context "is a regular ethernet packet" do
+
+		subject {
+			parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","sample.pcap"))
+			parsed_packets.first
+		}
+
+		it "should be an EthPacket kind of packet" do
+			subject.should be_kind_of EthPacket
+		end
+
+		it "should have a dest mac address" do
+			subject.eth_daddr.should == "00:03:2f:1a:74:de"
+		end
+
+		it "should have a source mac address" do
+			subject.eth_saddr.should == "00:1b:11:51:b7:ce"
+		end
+
+		its(:size) { should == 78 }
+
+		it "should have a payload in its first header" do
+			subject.headers.first.body.should_not be_nil
+		end
+
+		context "an EthPacket's first header" do
+
+			subject {
+				parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","sample.pcap"))
+				parsed_packets.first.headers.first
+			}
+
+			it "should be 64 bytes" do
+				subject.body.sz.should == 64
+			end
+
+			context "EthHeader struct members" do
+				its(:members) { should include :eth_dst }
+				its(:members) { should include :eth_src }
+				its(:members) { should include :eth_proto }
+				its(:members) { should include :body }
+			end
+
+		end
+
+	end
+
+	context "isn't a regular Ethernet packet" do
+
+		subject {
+			parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","vlan-pcapr.cap"))
+			parsed_packets.first
+		}
+
+		it "should not be an EthPacket" do
+			subject.should_not be_kind_of EthPacket
+		end
+
+	end
+
+end
