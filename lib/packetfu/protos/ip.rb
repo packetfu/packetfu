@@ -162,11 +162,29 @@ module PacketFu
 		# Getter for the checksum.
 		def ip_sum; self[:ip_sum].to_i; end
 		# Setter for the source IP address.
-		def ip_src=(i); typecast i; end
+		def ip_src=(i)
+			case i
+			when Numeric
+				self[:ip_src] = Octets.new.read([i].pack("N"))
+			when Octets
+				self[:ip_src] = i
+			else
+				typecast i
+			end
+		end
 		# Getter for the source IP address.
 		def ip_src; self[:ip_src].to_i; end
 		# Setter for the destination IP address.
-		def ip_dst=(i); typecast i; end
+		def ip_dst=(i)
+			case i
+			when Numeric
+				self[:ip_dst] = Octets.new.read([i].pack("N"))
+			when Octets
+				self[:ip_dst] = i
+			else
+				typecast i
+			end
+		end
 		# Getter for the destination IP address.
 		def ip_dst; self[:ip_dst].to_i; end
 

@@ -451,7 +451,11 @@ module PacketFu
 			end
 			append = args[:append]
 			if append
-				File.open(filename,'ab') {|file| file.write(self.body.to_s)}
+				if File.exists? filename
+					File.open(filename,'ab') {|file| file.write(self.body.to_s)}
+				else
+					File.open(filename,'wb') {|file| file.write(self.to_s)}
+				end
 			else
 				File.open(filename,'wb') {|file| file.write(self.to_s)}
 			end
