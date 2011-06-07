@@ -246,34 +246,32 @@ module PacketFu
 
 			# Takes a given file name, and reads out the packets. If given a block,
 			# it will yield back a PcapPacket object per packet found.
-			def read(fname,&block)
+			def read(fname,&block) 
+				file_header = PcapHeader.new
+				pcap_packets = PcapPackets.new 
+				unless File.readable? fname
+					raise ArgumentError, "Cannot read file `#{fname}'"
+				end
 				begin
-					file_handle = File.open(fname, "rb")
-					pcap_packets = PcapPackets.new unless block
-					file_header = PcapHeader.new
-					file_header.read file_handle.read(24)
-					packet_count = 0
-					pcap_packet = PcapPacket.new(:endian => file_header.endian)
-					while pcap_packet.read file_handle.read(16) do
-						len = pcap_packet.incl_len
-						pcap_packet.data = StructFu::String.new.read(file_handle.read(len.to_i))
-						packet_count += 1
-						if pcap_packet.data.size < len.to_i
-							warn "Packet ##{packet_count} is corrupted: expected #{len.to_i}, got #{pcap_packet.data.size}. Exiting."
-							break
-						end
-						if block
-							yield pcap_packet
-						else
-							pcap_packets << pcap_packet
-						end
+				file_handle = File.open(fname, "rb")
+				file_header.read file_handle.read(24)
+				packet_count = 0
+				pcap_packet = PcapPacket.new(:endian => file_header.endian)
+				while pcap_packet.read file_handle.read(16) do
+					len = pcap_packet.incl_len
+					pcap_packet.data = StructFu::String.new.read(file_handle.read(len.to_i))
+					packet_count += 1
+					if pcap_packet.data.size < len.to_i
+						warn "Packet ##{packet_count} is corrupted: expected #{len.to_i}, got #{pcap_packet.data.size}. Exiting."
+						break
 					end
-					unless block
-						return pcap_packets 
-					end
+					pcap_packets << pcap_packet.clone
+					yield pcap_packets.last if block
+				end
 				ensure
 					file_handle.close
 				end
+				block ? packet_count : pcap_packets
 			end
 
 			# Takes a filename, and an optional block. If a block is given, 
