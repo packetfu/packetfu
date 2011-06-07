@@ -7,7 +7,7 @@ describe EthPacket, "when read from a pcap file" do
 	context "is a regular ethernet packet" do
 
 		subject {
-			parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","sample.pcap"))
+			parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
 			parsed_packets.first
 		}
 
@@ -32,7 +32,7 @@ describe EthPacket, "when read from a pcap file" do
 		context "an EthPacket's first header" do
 
 			subject {
-				parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","sample.pcap"))
+				parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
 				parsed_packets.first.headers.first
 			}
 
@@ -54,7 +54,7 @@ describe EthPacket, "when read from a pcap file" do
 	context "isn't a regular Ethernet packet" do
 
 		subject {
-			parsed_packets = PacketFu::PcapFile.read_packets(File.join(".","vlan-pcapr.cap"))
+			parsed_packets = PcapFile.read_packets(File.join(".","vlan-pcapr.cap"))
 			parsed_packets.first
 		}
 
