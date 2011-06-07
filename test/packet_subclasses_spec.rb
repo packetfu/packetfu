@@ -1,4 +1,5 @@
-require File.join("..","lib","packetfu")
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
+require 'packetfu'
 
 PacketFu.packet_classes.each do |pclass|
 	describe pclass, "peek format" do

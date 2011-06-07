@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
-$:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib/")
-
 require 'test/unit'
-
-# Needed if you're using the gem version of pcaprub. Obviated in 1.9.
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'
+
 
 class InjectTest < Test::Unit::TestCase
 

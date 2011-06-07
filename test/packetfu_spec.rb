@@ -1,4 +1,5 @@
-require File.join("..","lib","packetfu")
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
+require 'packetfu'
 
 unless %x{#{$0} --version} =~ /^2\.6/
 	puts "PacketFu needs rspec 2.6 or so."
