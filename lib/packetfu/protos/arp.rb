@@ -26,14 +26,17 @@ module PacketFu
 		include StructFu
 
 		def initialize(args={})
+			src_mac = args[:arp_src_mac] || (args[:config][:eth_src] if args[:config])
+			src_ip_bin = args[:arp_src_ip]   || (args[:config][:ip_src_bin] if args[:config])
+
 			super( 
 				Int16.new(args[:arp_hw] || 1), 
 				Int16.new(args[:arp_proto] ||0x0800),
 				Int8.new(args[:arp_hw_len] || 6), 
 				Int8.new(args[:arp_proto_len] || 4), 
 				Int16.new(args[:arp_opcode] || 1),
-				EthMac.new.read(args[:arp_src_mac]),
-				Octets.new.read(args[:arp_src_ip]), 
+				EthMac.new.read(src_mac),
+				Octets.new.read(src_ip_bin),
 				EthMac.new.read(args[:arp_dst_mac]),
 				Octets.new.read(args[:arp_dst_ip]),
 				StructFu::String.new.read(args[:body])

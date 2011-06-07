@@ -41,10 +41,17 @@ describe EthPacket, "when read from a pcap file" do
 			end
 
 			context "EthHeader struct members" do
-				its(:members) { should include :eth_dst }
-				its(:members) { should include :eth_src }
-				its(:members) { should include :eth_proto }
-				its(:members) { should include :body }
+				if RUBY_VERSION =~ /^1\.8/
+					its(:members) { should include :eth_dst.to_s }
+					its(:members) { should include :eth_src.to_s }
+					its(:members) { should include :eth_proto.to_s }
+					its(:members) { should include :body.to_s }
+				else
+					its(:members) { should include :eth_dst }
+					its(:members) { should include :eth_src }
+					its(:members) { should include :eth_proto }
+					its(:members) { should include :body }
+				end
 			end
 
 		end

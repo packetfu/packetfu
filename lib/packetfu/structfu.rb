@@ -33,9 +33,13 @@ module StructFu
 		end
 	end
 
-	# Handle deep copies correctly
+	# Handle deep copies correctly. Marshal in 1.9, re-read myself on 1.8
 	def clone
-		Marshal.load(Marshal.dump(self))
+		begin
+			Marshal.load(Marshal.dump(self))
+		rescue
+			self.class.new.read(self.to_s)
+		end
 	end
 
 	# Ints all have a value, an endianness, and a default value.
