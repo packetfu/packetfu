@@ -4,12 +4,14 @@ include PacketFu
 
 describe EthPacket, "when read from a pcap file" do
 
+	before :all do
+		parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
+		@eth_packet = parsed_packets.first
+	end
+
 	context "is a regular ethernet packet" do
 
-		subject {
-			parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
-			parsed_packets.first
-		}
+		subject { @eth_packet }
 
 		it "should be an EthPacket kind of packet" do
 			subject.should be_kind_of EthPacket
@@ -31,10 +33,7 @@ describe EthPacket, "when read from a pcap file" do
 
 		context "an EthPacket's first header" do
 
-			subject {
-				parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
-				parsed_packets.first.headers.first
-			}
+			subject { @eth_packet.headers.first }
 
 			it "should be 64 bytes" do
 				subject.body.sz.should == 64
