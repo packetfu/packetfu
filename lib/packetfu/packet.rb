@@ -102,7 +102,7 @@ module PacketFu
 		# Put the entire packet on the wire by creating a temporary PacketFu::Inject object.
 		# TODO: Do something with auto-checksumming?
 		def to_w(iface=nil)
-			iface = iface || self.iface || PacketFu::Config.new.config[:iface]
+			iface = (iface || self.iface || PacketFu::Config.new.config[:iface]).to_s
 			inj = PacketFu::Inject.new(:iface => iface)
 			inj.array = [@headers[0].to_s]
 			inj.inject
@@ -467,11 +467,7 @@ module PacketFu
 			if self.class.name =~ /(::|^)PacketFu::Packet$/
 				raise NoMethodError, "method `new' called for abstract class #{self.class.name}"
 			end
-			if args[:inspect_style]
-				@inspect_style = args[:inspect_style]
-			else
-				@inspect_style = :dissect
-			end
+			@inspect_style = args[:inspect_style] || PacketFu.inspect_style || :dissect
 			if args[:config]
 				args[:config].each_pair do |k,v|
 					case k
@@ -482,6 +478,13 @@ module PacketFu
 					end
 				end
 			end
+		end
+
+		# Delegate to PacketFu's inspect_style, since the
+		# class variable name is the same. Yay for namespace
+		# pollution!
+		def inspect_style=()
+			PacketFu.inspect_style(arg)
 		end
 
 		#method_missing() delegates protocol-specific field actions to the apporpraite
@@ -525,21 +528,6 @@ module PacketFu
 		end
 
 	end # class Packet
-
-	# Switches inspect styles between :dissect, :default, and :hex
-	def toggle_inspect
-		case @inspect_style
-		when :hex, :pretty
-			@inspect_style = :dissect
-		when :dissect, :verbose
-			@inspect_style = :default
-		when :default, :ugly
-			@inspect_style = :hex
-		else
-			@inspect_style = :dissect
-		end
-	end
-
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

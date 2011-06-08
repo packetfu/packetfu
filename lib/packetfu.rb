@@ -98,6 +98,43 @@ module PacketFu
 		@packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
 	end
 
+	# The current inspect style. One of :hex, :dissect, or :default
+	# Note that :default means Ruby's default, which is usually
+	# far too long to be useful.
+	def self.inspect_style
+		@inspect_style ||= :dissect
+	end
+
+	# Setter for PacketFu's @inspect_style
+	def self.inspect_style=(arg)
+		@inspect_style = case arg
+			when :hex, :pretty
+				:hex
+			when :dissect, :verbose
+				:dissect
+			when :default, :ugly
+				:default
+			else
+				:dissect
+			end
+	end
+
+	# Switches inspect styles in a round-robin fashion between 
+	# :dissect, :default, and :hex
+	def toggle_inspect
+		case @inspect_style
+		when :hex, :pretty
+			@inspect_style = :dissect
+		when :dissect, :verbose
+			@inspect_style = :default
+		when :default, :ugly
+			@inspect_style = :hex
+		else
+			@inspect_style = :dissect
+		end
+	end
+
+
 end
 
 require File.join(cwd,"packetfu","version")
