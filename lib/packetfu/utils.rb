@@ -173,7 +173,7 @@ module PacketFu
 				end
 				ifconfig_data.each do |s|
 					case s
-					when /inet addr:[\s]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9])(.*Mask:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]))?/i
+					when /inet addr:[\s]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(.*Mask:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+))?/i
 						ret[:ip_saddr] = $1
 						ret[:ip_src] = [IPAddr.new($1).to_i].pack("N")
 						ret[:ip4_obj] = IPAddr.new($1)
