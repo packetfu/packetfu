@@ -19,6 +19,7 @@
 
 $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib/")
 require 'packetfu'
+puts "Testing PacketFu v#{PacketFu::VERSION}"
 dir = Dir.new(File.dirname(__FILE__))
 
 dir.each { |file|
