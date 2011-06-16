@@ -2,8 +2,8 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name = %q{packetfu}
-  s.version = "1.1.0"
-  s.date = %q{2011-06-11}
+  s.version = "1.1.1"
+  s.date = %q{2011-06-15}
   s.authors = ["Tod Beardsley"]
   s.email = %q{todb@planb-security.net}
   s.summary = %q{PacketFu is a mid-level packet manipulation library.}
