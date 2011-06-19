@@ -13,9 +13,8 @@ Gem::Specification.new do |s|
 	s.has_rdoc = true # Use sdoc, though, it's nicer.
 	s.license = 'BSD' 
   s.add_development_dependency('pcaprub',">= 0.9.2")
-	s.requirements << 'sdoc, for generating local documentation'
-	s.requirements << 'rspec, v2.6.2 or later, for testing'
-	s.requirements << 'pcaprub v0.9.2 or later, for packet capture/inject'
+  s.add_development_dependency('rspec',">= 2.6.2")
+  s.add_development_dependency('sdoc',">= 0.2.0")
   s.extra_rdoc_files = %w{README .document}
   s.test_files = (s.files & Dir["test/test_*.rb"])
   s.rubyforge_project = "packetfu"
