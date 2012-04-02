@@ -265,8 +265,11 @@ module PacketFu
 						warn "Packet ##{packet_count} is corrupted: expected #{len.to_i}, got #{pcap_packet.data.size}. Exiting."
 						break
 					end
-					pcap_packets << pcap_packet.clone
-					yield pcap_packets.last if block
+					if block
+						yield pcap_packet
+					else
+						pcap_packets << pcap_packet.clone
+					end
 				end
 				ensure
 					file_handle.close
