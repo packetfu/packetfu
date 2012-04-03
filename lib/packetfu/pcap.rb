@@ -320,6 +320,7 @@ module PacketFu
 
 		def initialize(args={})
 			init_fields(args)
+			@filename = args.delete :filename
 			super(args[:endian], args[:head], args[:body])
 		end
 
@@ -362,6 +363,18 @@ module PacketFu
 		def readfile(file)
 			fdata = File.open(file, "rb") {|f| f.read}
 			self.read! fdata
+		end
+
+		# Calls the class method with this object's @filename
+		def read_packet_bytes(fname=@filename,&block)
+			raise ArgumentError, "Need a file" unless fname
+			return self.class.read_packet_bytes(fname, &block)
+		end
+
+		# Calls the class method with this object's @filename
+		def read_packets(fname=@filename,&block)
+			raise ArgumentError, "Need a file" unless fname
+			return self.class.read_packets(fname, &block)
 		end
 
 		# file_to_array() translates a libpcap file into an array of packets.
