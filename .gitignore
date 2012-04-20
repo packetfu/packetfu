@@ -1,4 +1,4 @@
 *.gem
 doc/
 pkg/
-test/*.pcap
+test/*test.pcap
