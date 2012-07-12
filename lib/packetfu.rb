@@ -77,6 +77,7 @@ module PacketFu
 		end
 		@packet_classes ||= []
 		@packet_classes << klass
+		@packet_classes_dirty = true
 		@packet_classes.sort! {|x,y| x.name <=> y.name}
 	end
 
@@ -85,6 +86,7 @@ module PacketFu
 		raise "Need a class" unless klass.kind_of? Class
 		@packet_classes ||= []
 		@packet_classes.delete klass
+		@packet_classes_dirty = true
 		@packet_classes 
 	end
 
@@ -95,8 +97,11 @@ module PacketFu
 
 	# Returns an array of packet types by packet prefix.
 	def self.packet_prefixes
-		return [] unless @packet_classes
-		@packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
+		return [] if @packet_classes.nil?
+		return @packet_class_prefixes if @packet_classes_dirty == false
+		@packet_classes_dirty = false
+		@packet_class_prefixes = @packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
+		return @packet_class_prefixes
 	end
 
 	# The current inspect style. One of :hex, :dissect, or :default
