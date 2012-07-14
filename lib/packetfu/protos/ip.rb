@@ -5,53 +5,92 @@ module PacketFu
 	#
 	# ==== Header Definition
 	#
-	#  Int8 :o1
-	#  Int8 :o2
-	#  Int8 :o3
-	#  Int8 :o4
-	class Octets < Struct.new(:o1, :o2, :o3, :o4)
+	#  Int32 :ip_addr
+	class Octets < Struct.new(:ip_addr)
 		include StructFu
 
+		IPV4_RE = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/                                                                                                                                                                                        
 		def initialize(args={})
 			super(
-			Int8.new(args[:o1]),
-			Int8.new(args[:o2]),
-			Int8.new(args[:o3]),
-			Int8.new(args[:o4]))
+			Int32.new(args[:ip_addr]))
 		end
 
 		# Returns the object in string form.
 		def to_s
-			self.to_a.map {|x| x.to_s}.join
+      [self[:ip_addr].to_i].pack("N")
 		end
 
 		# Reads a string to populate the object.
 		def read(str)
 			force_binary(str)
 			return self if str.nil?
-			self[:o1].read str[0,1]
-			self[:o2].read str[1,1]
-			self[:o3].read str[2,1]
-			self[:o4].read str[3,1]
+			self[:ip_addr].read str[0,4]
 			self
 		end
 
 		# Returns an address in dotted-quad format.
 		def to_x
-			ip_str = [o1, o2, o3, o4].map {|x| x.to_i.to_s}.join('.')
-			IPAddr.new(ip_str).to_s
+      # This could be slightly faster if we reproduced the code in
+      # 'octets()' and didn't have to map to strings.
+      self.octets.map(&:to_s).join('.')
 		end
 
 		# Returns an address in numerical format.
 		def to_i
-			ip_str = [o1, o2, o3, o4].map {|x| x.to_i.to_s}.join('.')
-			IPAddr.new(ip_str).to_i
+      self[:ip_addr].to_i
 		end
 
 		# Set the IP Address by reading a dotted-quad address.
 		def read_quad(str)
-			read([IPAddr.new(str).to_i].pack("N"))
+			match = IPV4_RE.match(str)
+			if match.nil?
+				raise ArgumentError.new("str is not a valid IPV4 address")
+			end 
+				a = match[1].to_i
+				b = match[2].to_i
+				c = match[3].to_i
+				d = match[4].to_i
+			unless (a >= 0 && a <= 255 &&
+							b >= 0 && b <= 255 &&
+							c >= 0 && c <= 255 &&
+							d >= 0 && d <= 255)
+				raise ArgumentError.new("str is not a valid IPV4 address")
+			end
+      
+      self[:ip_addr].value = (a<<24) + (b<<16) + (c<<8) + d
+			self
 		end
+
+    # Returns the IP address as 4 octets
+    def octets
+      addr = self.to_i
+      [ 
+        ((addr >> 24) & 0xff),
+        ((addr >> 16) & 0xff),
+        ((addr >> 8) & 0xff),
+        (addr & 0xff)
+      ]
+    end
+
+    # Returns the value for the first octet
+    def o1
+      (self.to_i >> 24) & 0xff
+    end
+
+    # Returns the value for the second octet
+    def o2
+      (self.to_i >> 16) & 0xff
+    end
+
+    # Returns the value for the third octet
+    def o3
+      (self.to_i >> 8) & 0xff
+    end
+
+    # Returns the value for the fourth octet
+    def o4
+      self.to_i & 0xff
+    end
 
 	end
 
