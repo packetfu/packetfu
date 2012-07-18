@@ -20,6 +20,15 @@ class OctetsTest < Test::Unit::TestCase
 		assert_equal(0x01020304, o.to_i)
 	end
 
+	def test_octets_single_octet
+		o = Octets.new
+		o.read("ABCD")
+		assert_equal(o.o1, 0x41)
+		assert_equal(o.o2, 0x42)
+		assert_equal(o.o3, 0x43)
+		assert_equal(o.o4, 0x44)
+	end
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
