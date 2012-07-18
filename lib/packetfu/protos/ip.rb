@@ -12,6 +12,7 @@ module PacketFu
 	class Octets < Struct.new(:o1, :o2, :o3, :o4)
 		include StructFu
 
+		IPV4_RE = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/                                                                                                                                                                                        
 		def initialize(args={})
 			super(
 			Int8.new(args[:o1]),
@@ -22,7 +23,7 @@ module PacketFu
 
 		# Returns the object in string form.
 		def to_s
-			self.to_a.map {|x| x.to_s}.join
+			self.to_a.map(&:to_i).pack("CCCC")
 		end
 
 		# Reads a string to populate the object.
@@ -38,19 +39,36 @@ module PacketFu
 
 		# Returns an address in dotted-quad format.
 		def to_x
-			ip_str = [o1, o2, o3, o4].map {|x| x.to_i.to_s}.join('.')
-			IPAddr.new(ip_str).to_s
+			self.to_a.map {|x| x.to_i.to_s}.join('.')
 		end
 
 		# Returns an address in numerical format.
 		def to_i
-			ip_str = [o1, o2, o3, o4].map {|x| x.to_i.to_s}.join('.')
-			IPAddr.new(ip_str).to_i
+			(o1.to_i << 24) + (o2.to_i << 16) + (o3.to_i << 8) + o4.to_i
 		end
 
 		# Set the IP Address by reading a dotted-quad address.
 		def read_quad(str)
-			read([IPAddr.new(str).to_i].pack("N"))
+			match = IPV4_RE.match(str)
+			if match.nil?
+				raise ArgumentError.new("str is not a valid IPV4 address")
+			end 
+				a = match[1].to_i
+				b = match[2].to_i
+				c = match[3].to_i
+				d = match[4].to_i
+			unless (a >= 0 && a <= 255 &&
+							b >= 0 && b <= 255 &&
+							c >= 0 && c <= 255 &&
+							d >= 0 && d <= 255)
+				raise ArgumentError.new("str is not a valid IPV4 address")
+			end
+      
+			self[:o1].value = a
+			self[:o2].value = b
+			self[:o3].value = c
+			self[:o4].value = d
+			self
 		end
 
 	end
