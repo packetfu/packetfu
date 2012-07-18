@@ -3,33 +3,21 @@ require 'test/unit'
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'
 
-class OctetTest < Test::Unit::TestCase
+class OctetsTest < Test::Unit::TestCase
 	include PacketFu
 
-	def setup
-		@o = Octets.new
+	def test_octets_read
+		o = Octets.new
+		o.read("\x04\x03\x02\x01")
+		assert_equal("4.3.2.1", o.to_x)
 	end
 
-	def test_create_octets
-		assert_kind_of Octets, @o
-	end
-
-	def test_read
-		s = "\x0a\x0a\x0a\x0b"
-		@o.read s
-		assert_equal(s, @o.to_s)
-	end
-
-	def test_dotted
-		s = "\x0a\x0a\x0a\x01"
-		@o.read s
-		assert_equal("10.10.10.1", @o.to_x)
-	end
-
-	def test_numerical
-		s = "\x00\x00\x00\x80"
-		@o.read s
-		assert_equal(128, @o.to_i)
+	def test_octets_read_quad
+		o = Octets.new
+		o.read_quad("1.2.3.4")
+		assert_equal("1.2.3.4", o.to_x)
+		assert_equal("\x01\x02\x03\x04", o.to_s)
+		assert_equal(0x01020304, o.to_i)
 	end
 
 end
