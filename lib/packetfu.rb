@@ -27,7 +27,7 @@ module PacketFu
 
 	# Deal with Ruby's encoding by ignoring it.
 	def self.force_binary(str)
-		str.force_encoding "binary" if str.respond_to? :force_encoding
+		str.force_encoding Encoding::BINARY if str.respond_to? :force_encoding
 	end
 
 	# Sets the expected byte order for a pcap file. See PacketFu::Read.set_byte_order
