@@ -61,12 +61,6 @@ module PacketFu
 		def read(str=nil, args={})
 			raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
 			@eth_header.read(str)
-			@ip_header.read(str[14,str.size])
-			@eth_header.body = @ip_header
-			@udp_header.read(str[14+(@ip_header.ip_hlen),str.size])
-			@ip_header.body = @udp_header
-			@hsrp_header.read(str[14+(@ip_header.ip_hlen)+8,str.size])
-			@udp_header.body = @hsrp_header
 			super(args)
 			self
 		end
