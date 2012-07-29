@@ -19,7 +19,7 @@ module PacketFu
 
 		# Force strings into binary.
 		def self.force_binary(str)
-			str.force_encoding "binary" if str.respond_to? :force_encoding
+			str.force_encoding Encoding::BINARY if str.respond_to? :force_encoding
 		end
 
 		# Parse() creates the correct packet type based on the data, and returns the apporpiate
@@ -284,7 +284,7 @@ module PacketFu
 
 		# Hexify provides a neatly-formatted dump of binary data, familar to hex readers.
 		def hexify(str)
-			str.force_encoding("ASCII-8BIT") if str.respond_to? :force_encoding
+			str.force_encoding(Encoding::BINARY) if str.respond_to? :force_encoding
 			hexascii_lines = str.to_s.unpack("H*")[0].scan(/.{1,32}/)
 			regex = Regexp.new('[\x00-\x1f\x7f-\xff]', nil, 'n')
 			chars = str.to_s.gsub(regex,'.')

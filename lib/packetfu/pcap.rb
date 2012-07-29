@@ -79,7 +79,7 @@ module PacketFu
 		def read(str)
 			force_binary(str)
 			return self if str.nil?
-			str.force_encoding("binary") if str.respond_to? :force_encoding
+			str.force_encoding(Encoding::BINARY) if str.respond_to? :force_encoding
 			if str[0,4] == self[:magic].to_s 
 				self[:magic].read str[0,4]
 				self[:ver_major].read str[4,2]
@@ -192,7 +192,7 @@ module PacketFu
 		end
 
 		def force_binary(str)
-			str.force_encoding "binary" if str.respond_to? :force_encoding
+			str.force_encoding Encoding::BINARY if str.respond_to? :force_encoding
 		end
 
 		# Reads a string to populate the object. Note, this read takes in the 
