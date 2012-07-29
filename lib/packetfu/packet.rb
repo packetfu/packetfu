@@ -493,6 +493,7 @@ module PacketFu
 		#forseeable future (there aren't /that/ many packet types), and it's a handy
 		#way to know at a glance what packet types are supported.
 		def method_missing(sym, *args, &block)
+      pp [sym]
 			case sym.to_s
 			when /^is_([a-zA-Z0-9]+)\?/
 				ptype = $1
