@@ -56,8 +56,10 @@ module PacketFu
 			raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
 			@eth_header.read(str)
 
+			# Strip off any extra data, if we are asked to do so.
 			if args[:strip]
-				tcp_len = str[16,2].unpack("n")[0] - 20
+				tcp_body_len = self.ip_len - self.ip_hlen - (self.tcp_hlen * 4)
+				@tcp_header.body.read(@tcp_header.body.to_s[0,tcp_body_len])
 			end
 			super(args)
 			self

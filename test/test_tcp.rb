@@ -302,6 +302,16 @@ class TCPPacketTest < Test::Unit::TestCase
 		pkt.to_f('tcp_test.pcap','a')
 	end
 	
+	def test_tcp_read_strip
+		str = "e0f8472161a600254ba0760608004500004403554000400651d0c0a83207c0a832370224c1d22d94847f0b07c4ba8018ffff30ba00000101080a8731821433564b8c01027165000000000000200000000000".bin
+		str << "0102".bin # Tacking on a couple extra bites tht we'll strip off.
+		not_stripped = TCPPacket.new
+		not_stripped.read(str)
+		assert_equal 18, not_stripped.tcp_header.body.length
+		stripped = TCPPacket.new
+		stripped.read(str, :strip => true)
+		assert_equal 16, stripped.tcp_header.body.length
+	end
 end
 
 class TCPPacketTest < Test::Unit::TestCase

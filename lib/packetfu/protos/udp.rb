@@ -53,8 +53,8 @@ module PacketFu
 			raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
 			@eth_header.read(str)
 			if args[:strip]
-				udp_len = str[16,2].unpack("n")[0] - 20
-				@udp_header.read(str[14+(@ip_header.ip_hlen),udp_len])
+				udp_body_len = self.ip_len - self.ip_hlen - 8
+				@udp_header.body.read(@udp_header.body.to_s[0,udp_body_len])
 			end
 			super(args)
 			self

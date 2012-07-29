@@ -3,6 +3,12 @@ require 'test/unit'
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'
 
+class String
+	def bin
+		self.scan(/../).map {|x| x.to_i(16).chr}.join
+	end
+end
+
 class UDPTest < Test::Unit::TestCase
 	include PacketFu
 
@@ -56,6 +62,17 @@ class UDPTest < Test::Unit::TestCase
 		pkt.recalc
 		assert_equal(0x8bf8, pkt.udp_sum.to_i)
 		pkt.to_f('udp_test.pcap','a')
+	end
+
+	def test_udp_read_strip
+		str = "01005e7ffffa100ba9eb63400800450000a12d7c0000011159b446a5fb7ceffffffacdf3076c008d516e4d2d534541524348202a20485454502f312e310d0a486f73743a3233392e3235352e3235352e3235303a313930300d0a53543a75726e3a736368656d61732d75706e702d6f72673a6465766963653a496e7465726e6574476174657761794465766963653a310d0a4d616e3a22737364703a646973636f766572220d0a4d583a330d0a0d0a".bin
+		str << "0102".bin # Tacking on a couple extra bites tht we'll strip off.
+		not_stripped = UDPPacket.new
+		not_stripped.read(str)
+		assert_equal 135, not_stripped.udp_header.body.length
+		stripped = UDPPacket.new
+		stripped.read(str, :strip => true)
+		assert_equal 133, stripped.udp_header.body.length
 	end
 
 	def test_udp_alter
