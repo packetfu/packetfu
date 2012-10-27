@@ -2,9 +2,9 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = 'packetfu'
-  s.version     = '1.1.5'
+  s.version     = '1.1.6'
   s.authors     = ['Tod Beardsley']
-  s.email       = 'todb@planb-security.net'
+  s.email       = 'todb@packetfu.com'
   s.summary     = 'PacketFu is a mid-level packet manipulation library.'
   s.homepage    = 'https://github.com/todb/packetfu'
   s.description = %q{PacketFu is a mid-level packet manipulation library for Ruby. With it, users can read, parse, and write network packets with the level of ease and fun they expect from Ruby. Note that this gem does not automatically require pcaprub, since users may install pcaprub through non-gem means.}
