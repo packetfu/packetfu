@@ -21,7 +21,7 @@ module PacketFu
 
 		def self.can_parse?(str)
 			# XXX Temporary fix. Need to extend the EthHeader class to handle more.
-			valid_eth_types = [0x0800, 0x0806, 0x86dd]
+			valid_eth_types = [0x0800, 0x0806, 0x86dd, 0x88cc]
 			return false unless str.size >= 14
 			type = str[12,2].unpack("n").first rescue nil
 			return false unless valid_eth_types.include? type

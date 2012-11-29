@@ -251,7 +251,7 @@ module PacketFu
 			case self.name # Lol ran into case's fancy treatment of classes
 			when /InvalidPacket$/; 0
 			when /EthPacket$/; 1
-			when /IPPacket$/, /ARPPacket$/, /IPv6Packet$/; 2
+			when /IPPacket$/, /ARPPacket$/, /LLDPPacket$/, /IPv6Packet$/; 2
 			when /TCPPacket$/, /UDPPacket$/, /ICMPPacket$/; 3
 			when /HSRPPacket$/; 4
 			else; self.new.headers.size
