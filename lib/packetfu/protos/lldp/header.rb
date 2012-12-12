@@ -22,7 +22,7 @@ module PacketFu
       StructFu::String.new.read(:lldp_address) || src_ip_bin,
       Int8.new(args[:lldp_interface_type] || 2),
       Int32.new(args[:lldp_interface]),
-      StructFu::String.new.read(:lldp_oid) || "",
+      StructFu::String.new.read(:lldp_oid) || ""
       )
     end
 
