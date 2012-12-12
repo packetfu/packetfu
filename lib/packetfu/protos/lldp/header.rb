@@ -38,10 +38,10 @@ module PacketFu
       index = 0
       #check for lldp pdu end
       while (str[index,2] != "\x00\x00") && (index+2 < str.size)
-        tlv_known = 0
+        tlv_known = false
         #chassis subtype
         if str[index,1] == "\x02"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_chassis_id_type].read(str[index+2,1])
           self[:lldp_chassis_id].read(str[index+3, tlv_length - 1])
@@ -49,7 +49,7 @@ module PacketFu
         end
         #port subtype
         if str[index,1] == "\x04"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_port_id_type].read(str[index+2,1])
           self[:lldp_port_id].read(str[index+3, tlv_length - 1])
@@ -57,35 +57,35 @@ module PacketFu
         end
         #ttl subtype
         if str[index,1] == "\x06"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_ttl].read(str[index+2, tlv_length])
           index += tlv_length + 2
         end
         #port description
         if str[index,1] == "\x08"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_port_description].read(str[index+2, tlv_length])
           index += tlv_length + 2
         end
         #system name
         if str[index,1] == "\x0a"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_system_name].read(str[index+2, tlv_length])
           index += tlv_length + 2
         end
         #system description
         if str[index,1] == "\x0c"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_system_description].read(str[index+2, tlv_length])
           index += tlv_length + 2
         end
         #system capabilities
         if str[index,1] == "\x0e"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           self[:lldp_capabilty].read(str[index+2, 2])
           self[:lldp_enabled_capability].read(str[index+4, 2])
@@ -93,7 +93,7 @@ module PacketFu
         end
         #management address
         if str[index,1] == "\x10"
-          tlv_known = 1
+          tlv_known = true
           tlv_length = str[index + 1,1].unpack("U*").join.to_i
           addr_length = str[index + 2, 1].unpack("U*").join.to_i
           self[:lldp_address_type].read(str[index + 3, 1])
@@ -108,7 +108,7 @@ module PacketFu
         end
 
         #if tlv type is unknown jump over it
-        if tlv_known == 0
+        unless tlv_known
           tlv_length = str[index+1,1].unpack("U*").join.to_i
           index += tlv_length + 2
         end
