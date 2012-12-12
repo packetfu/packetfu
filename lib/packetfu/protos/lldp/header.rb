@@ -1,5 +1,5 @@
 module PacketFu
-  # LLDPHeader is a complete ARP struct, used in LLDPPacket.
+  # LLDPHeader is a complete LLDP struct, used in LLDPPacket.
 
   class LLDPHeader < Struct.new(:lldp_chassis_id_type, :lldp_chassis_id, :lldp_port_id_type, :lldp_port_id, :lldp_ttl, :lldp_port_description, :lldp_system_name, :lldp_system_description, :lldp_capabilty, :lldp_enabled_capability, :lldp_address_type, :lldp_address, :lldp_interface_type, :lldp_interface, :lldp_oid)
     include StructFu
