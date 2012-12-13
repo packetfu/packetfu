@@ -16,8 +16,7 @@ module PacketFu
       return false unless EthPacket.can_parse? str
       return false unless str.size >= 6
       return false unless str[12,2] == "\x88\xcc"
-      return false unless (str[0,5] == "\x01\x80\xc2\x00\x00")
-      return false unless ((str[6,1] == "\x0e") or (str[6,1] == "\x03") or (str[6,1] == "\x00"))
+      return false unless str =~ /^\x01\x80\xc2\x00\x00[\x0e\x03\x00]/
       true
     end
 
