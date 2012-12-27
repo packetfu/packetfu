@@ -44,9 +44,17 @@ class ICMPTest < Test::Unit::TestCase
 	def test_icmp_read
 		sample_packet = PcapFile.new.file_to_array(:f => 'sample.pcap')[2]
 		pkt = Packet.parse(sample_packet)
+		assert pkt.is_icmp?
 		assert_kind_of ICMPPacket, pkt
 		assert_equal(0x4d58, pkt.icmp_sum.to_i)
 		assert_equal(8, pkt.icmp_type.to_i)
+	end
+
+	def test_icmp_reread
+		sample_packet = PacketFu::ICMPPacket.new
+		pkt = Packet.parse(sample_packet.to_s)
+		assert sample_packet.is_icmp?
+		assert pkt.is_icmp?
 	end
 
 end

@@ -312,6 +312,14 @@ class TCPPacketTest < Test::Unit::TestCase
 		stripped.read(str, :strip => true)
 		assert_equal 16, stripped.tcp_header.body.length
 	end
+
+	def test_tcp_reread
+		sample_packet = PacketFu::TCPPacket.new
+		pkt = Packet.parse(sample_packet.to_s)
+		assert sample_packet.is_tcp?
+		assert pkt.is_tcp?
+	end
+
 end
 
 class TCPPacketTest < Test::Unit::TestCase

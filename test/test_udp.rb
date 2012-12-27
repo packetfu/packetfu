@@ -85,6 +85,14 @@ class UDPTest < Test::Unit::TestCase
 		pkt.to_f('udp_test.pcap','a')
 	end
 
+	def test_udp_reread
+		sample_packet = PacketFu::UDPPacket.new
+		pkt = Packet.parse(sample_packet.to_s)
+		assert sample_packet.is_udp?
+		assert pkt.is_udp?
+	end
+
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
