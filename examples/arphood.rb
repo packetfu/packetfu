@@ -47,7 +47,7 @@ def arp_everyone
 			$arp_results <<  "%s : %s / %s" % [this_host,colon_mac,$oui_prefixes[hyphen_mac]]
 		end
 	end
-	threads.join
+	threads.each {|thr| thr.join}
 end
 
 if $root_ok
