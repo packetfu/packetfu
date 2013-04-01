@@ -11,7 +11,7 @@ def sniff(iface)
 	cap.stream.each do |p|
 		pkt = Packet.parse p
 		if pkt.is_ip?
-			next if pkt.ip_saddr == Utils.ifconfig[:ip_saddr]
+			next if pkt.ip_saddr == Utils.ifconfig(iface)[:ip_saddr]
 			packet_info = [pkt.ip_saddr, pkt.ip_daddr, pkt.size, pkt.proto.last]
 			puts "%-15s -> %-15s %-4d %s" % packet_info
 		end
