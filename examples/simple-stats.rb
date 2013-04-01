@@ -9,7 +9,7 @@
 # See new-simple-stats.rb for an example of the streaming
 # parsing method.
 
-require 'examples' # For path setting slight-of-hand
+require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 # Takes a file name, parses the packets, and records the packet

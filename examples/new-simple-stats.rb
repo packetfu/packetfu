@@ -8,7 +8,7 @@
 # every 11 seconds (my own benchmark) for this script, at least
 # it doesn't hog up all your memory.
 
-require 'examples' # For path setting slight-of-hand
+require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 def print_results(stats)

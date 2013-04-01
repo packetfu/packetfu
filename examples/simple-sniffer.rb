@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'examples'
+require './examples'
 require 'packetfu'
 
 puts "Simple sniffer for PacketFu #{PacketFu.version}"

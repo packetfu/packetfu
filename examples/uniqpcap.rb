@@ -7,7 +7,7 @@
 # Currently, the timestamp information is lost due to PcapRub's 
 # file read. For me, this isn't a big deal. Future versions 
 # will deal with timestamps correctly.
-require 'examples' # For path setting slight-of-hand
+require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 in_array = PacketFu::Read.f2a(:file => ARGV[0])

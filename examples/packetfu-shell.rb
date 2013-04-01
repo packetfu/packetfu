@@ -44,7 +44,7 @@
 #  => nil
 
 $: << File.expand_path(File.dirname(__FILE__) + "/../lib/")
-require 'examples'
+require './examples'
 require 'packetfu'
 
 module PacketFu
