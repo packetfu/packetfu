@@ -1,19 +1,20 @@
 #!/usr/bin/env ruby
 
 # A simple local network fingerprinter. Uses the OUI list.
+# Usage: rvmsudo ./arphood.rb [iface] [network] <oui.txt>
 
-require 'examples'
+require './examples'
 require 'packetfu'
 require 'open-uri'
 
 $oui_prefixes = {}
 $arp_results = []
 def build_oui_list
-	if ARGV[0].nil?
-		puts "Fetching the oui.txt from IEEE, it'll be a second. Avoid this with #{$0} <filename>."
+	if ARGV[2].nil?
+		puts "Fetching the oui.txt from IEEE, it'll be a second. Avoid this with #{$0} [iface] [network] <filename>."
 	oui_file = open("http://standards.ieee.org/regauth/oui/oui.txt")
 	else
-	oui_file =	File.open(ARGV[0], "rb")
+	oui_file =	File.open(ARGV[2], "rb")
 	end
 	oui_file.each do |oui_line|
 		maybe_oui = oui_line.scan(/^[0-9a-f]{2}\-[0-9a-f]{2}\-[0-9a-f]{2}/i)[0]
@@ -30,9 +31,9 @@ build_oui_list
 $root_ok = true if Process.euid.zero?
 
 def arp_everyone
-	my_net = PacketFu::Config.new(PacketFu::Utils.whoami?(:iface => 'wlan0'))
+	my_net = PacketFu::Config.new(PacketFu::Utils.whoami?(:iface =>(ARGV[0] || 'wlan0')))
 	threads = []
-	network = "192.168.2"
+	network = ARGV[1] || "192.168.2"
 	print "Arping around..."
 	253.times do |i|
 		threads[i] = Thread.new do
