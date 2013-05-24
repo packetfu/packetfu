@@ -85,6 +85,18 @@ class TcpFlagsTest < Test::Unit::TestCase
 		assert_equal(0x12, t.to_i)
 	end
 
+	def test_tcp_flags_unset
+		t = TcpFlags.new
+		assert_kind_of TcpFlags, t
+		t.syn = 1
+		assert_equal(0x02, t.to_i)
+		t.syn = 0
+		assert_equal(0x00, t.to_i)
+		t.syn = 1
+		t.syn = false
+		assert_equal(0x00, t.to_i)
+	end
+
 	def test_tcp_flags_read
 		t = TcpFlags.new
 		t.read("\x11")
