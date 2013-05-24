@@ -27,7 +27,7 @@ end
 describe TCPPacket do
 
 	subject do
-		bytes = PcapFile.file_to_array("sample2.pcap")[2]
+		bytes = PcapFile.file_to_array(File.join(File.dirname(__FILE__), "sample2.pcap"))[2]
 		packet = Packet.parse(bytes)
 	end
 

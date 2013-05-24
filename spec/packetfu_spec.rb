@@ -1,16 +1,11 @@
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'
 
-unless %x{#{$0} --version} =~ /^2\.6/
-	puts "PacketFu needs rspec 2.6 or so."
-	exit 1
-end
-
 describe PacketFu, "version information" do
 	it "reports a version number" do
 		PacketFu::VERSION.should match /^1\.[0-9]\.[0-9]$/
 	end
-	its(:version) {should eq PacketFu::VERSION} 
+	its(:version) {should eq PacketFu::VERSION}
 
 	it "can compare version strings" do
 		PacketFu.binarize_version("1.2.3").should == 0x010203
