@@ -6,7 +6,7 @@ include PacketFu
 describe EthPacket, "when read from a pcap file" do
 
 	before :all do
-		parsed_packets = PcapFile.read_packets(File.join(".","sample.pcap"))
+		parsed_packets = PcapFile.read_packets(File.join(File.dirname(__FILE__),"sample.pcap"))
 		@eth_packet = parsed_packets.first
 	end
 
@@ -61,7 +61,7 @@ describe EthPacket, "when read from a pcap file" do
 	context "isn't a regular Ethernet packet" do
 
 		subject {
-			parsed_packets = PcapFile.read_packets(File.join(".","vlan-pcapr.cap"))
+			parsed_packets = PcapFile.read_packets(File.join(File.dirname(__FILE__),"vlan-pcapr.cap"))
 			parsed_packets.first
 		}
 
