@@ -29,10 +29,11 @@ class CaptureTest < Test::Unit::TestCase
 		)
 		cap.start
 		%x{ping -c 1 #{daddr}}
-		sleep 3
+		sleep 1
 		cap.save
-		cap.array.each {|p| puts PacketFu::Packet.parse(p).inspect}
 		assert cap.array.size == 1
+		pkt = PacketFu::Packet.parse(cap.array.first)
+		assert pkt.ip_daddr == daddr
 	end
 
 end
