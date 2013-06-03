@@ -33,6 +33,18 @@ class CaptureTest < Test::Unit::TestCase
 		pkt = PacketFu::Packet.parse(cap.array.first)
 		assert pkt.ip_daddr == daddr
 	end
+	
+	def test_no_filter
+		daddr = PacketFu::Utils.rand_routable_daddr.to_s
+		daddr2 = PacketFu::Utils.rand_routable_daddr.to_s
+		cap = PacketFu::Capture.new
+		cap.start
+		%x{ping -c 1 #{daddr}}
+		%x{ping -c 1 #{daddr2}}
+		sleep 1
+		cap.save
+		assert cap.array.size > 1
+	end
 
 	def test_bpf_alias
 		daddr = PacketFu::Utils.rand_routable_daddr.to_s
