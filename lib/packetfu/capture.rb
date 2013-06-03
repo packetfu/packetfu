@@ -100,7 +100,7 @@ module PacketFu
 		def bpf(args={})
 			filter = args[:filter] || args[:bpf] || @filter
 			capture if @stream.class == Array
-			@stream.setfilter(filter)
+			@stream.setfilter(filter) if filter
 			@filter = filter
 		end
 
