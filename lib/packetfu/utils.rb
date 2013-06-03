@@ -53,6 +53,12 @@ module PacketFu
 			cap_thread.value
 		end
 
+		# Since 177/8 is IANA reserved (for now), this network should 
+		# be handled by your default gateway and default interface.
+		def self.rand_routable_daddr
+			IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET)
+		end
+
 		# Discovers the local IP and Ethernet address, which is useful for writing
 		# packets you expect to get a response to. Note, this is a noisy
 		# operation; a UDP packet is generated and dropped on to the default (or named)
@@ -74,8 +80,6 @@ module PacketFu
 		#    you will need to specify a target which will use this interface.
 		#   :target => "1.2.3.4"
 		#    A target IP address. By default, a packet will be sent to a random address in the 177/8 network.
-		#    Since this network is IANA reserved (for now), this network should be handled by your default gateway
-		#    and default interface.
 		def self.whoami?(args={})
 			unless args.kind_of? Hash
 				raise ArgumentError, "Argument to `whoami?' must be a Hash"
@@ -83,7 +87,7 @@ module PacketFu
 			if args[:iface].to_s =~ /^lo/ # Linux loopback more or less. Need a switch for windows loopback, too.
 				dst_host = "127.0.0.1"
 			else
-				dst_host = (args[:target] || IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET).to_s)
+				dst_host = (args[:target] || rand_routable_daddr.to_s)
 			end
 
 			dst_port = rand(0xffff-1024)+1024

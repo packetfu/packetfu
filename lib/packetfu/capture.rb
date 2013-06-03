@@ -26,7 +26,7 @@ module PacketFu
 	# Read, Write
 	class Capture
 		attr_accessor :array, :stream # Leave these public and open.
-		attr_reader :iface, :snaplen, :promisc, :timeout # Cant change after the init.
+		attr_reader :iface, :snaplen, :promisc, :timeout, :filter # Cant change after the init.
 
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
@@ -35,13 +35,13 @@ module PacketFu
 			@snaplen = args[:snaplen] || 0xffff
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1
-
+			@filter  = args[:filter] || args[:bpf] || nil
 			setup_params(args)
 		end
 
 		# Used by new().
 		def setup_params(args={})
-			filter = args[:filter] # Not global; filter criteria can change.
+			filter = args[:filter] || args[:bpf]
 			start = args[:start] || false
 			capture if start
 			bpf(:filter=>filter) if filter
@@ -98,7 +98,7 @@ module PacketFu
 		#   :filter
 		#     Provide a bpf filter to enable for the capture. For example, 'ip and not tcp'
 		def bpf(args={})
-			filter = args[:filter]
+			@filter = args[:filter]
 			capture if @stream.class == Array
 			@stream.setfilter(filter)
 		end
