@@ -25,8 +25,8 @@ module PacketFu
 	#
 	# Read, Write
 	class Capture
-		attr_accessor :array, :stream, :filter # Leave these public and open.
-		attr_reader :iface, :snaplen, :promisc, :timeout
+		attr_accessor :array, :stream # Leave these public and open.
+		attr_reader :iface, :snaplen, :promisc, :timeout, :filter
 
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
@@ -103,6 +103,8 @@ module PacketFu
 			@stream.setfilter(filter)
 			@filter = filter
 		end
+
+		alias :filter :bpf
 
 		# wire_to_array() saves a packet stream as an array of binary strings. From here,
 		# packets may accessed by other functions. Note that the wire_to_array empties

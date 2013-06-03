@@ -24,9 +24,7 @@ class CaptureTest < Test::Unit::TestCase
 	
 	def test_filter
 		daddr = PacketFu::Utils.rand_routable_daddr.to_s
-		cap = PacketFu::Capture.new(
-			:filter => "icmp and dst host #{daddr}"
-		)
+		cap = PacketFu::Capture.new( :filter => "icmp and dst host #{daddr}")
 		cap.start
 		%x{ping -c 1 #{daddr}}
 		sleep 1
@@ -34,6 +32,12 @@ class CaptureTest < Test::Unit::TestCase
 		assert cap.array.size == 1
 		pkt = PacketFu::Packet.parse(cap.array.first)
 		assert pkt.ip_daddr == daddr
+	end
+
+	def test_bpf_alias
+		daddr = PacketFu::Utils.rand_routable_daddr.to_s
+		cap = PacketFu::Capture.new( :filter => "icmp and dst host #{daddr}")
+		assert cap.filter.object_id == cap.bpf.object_id
 	end
 
 end
