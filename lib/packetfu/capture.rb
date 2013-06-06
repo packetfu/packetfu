@@ -26,7 +26,7 @@ module PacketFu
 	# Read, Write
 	class Capture
 		attr_accessor :array, :stream # Leave these public and open.
-		attr_reader :iface, :snaplen, :promisc, :timeout # Cant change after the init.
+		attr_reader :iface, :snaplen, :promisc, :timeout, :filter
 
 		def initialize(args={})
 			@array = [] # Where the packet array goes.
@@ -35,13 +35,13 @@ module PacketFu
 			@snaplen = args[:snaplen] || 0xffff
 			@promisc = args[:promisc] || false # Sensible for some Intel wifi cards
 			@timeout = args[:timeout] || 1
-
+			@filter  = args[:filter] || args[:bpf]
 			setup_params(args)
 		end
 
 		# Used by new().
 		def setup_params(args={})
-			filter = args[:filter] # Not global; filter criteria can change.
+			filter = args[:filter] || args[:bpf] || @filter
 			start = args[:start] || false
 			capture if start
 			bpf(:filter=>filter) if filter
@@ -55,7 +55,7 @@ module PacketFu
 		#     When true, start capturing packets to the @stream variable. Defaults to true
 		def capture(args={})
 			if Process.euid.zero?
-				filter = args[:filter]
+				filter = args[:filter] || args[:bpf] || @filter
 				start = args[:start] || true
 				if start
 					begin
@@ -98,10 +98,13 @@ module PacketFu
 		#   :filter
 		#     Provide a bpf filter to enable for the capture. For example, 'ip and not tcp'
 		def bpf(args={})
-			filter = args[:filter]
+			filter = args[:filter] || args[:bpf] || @filter
 			capture if @stream.class == Array
-			@stream.setfilter(filter)
+			@stream.setfilter(filter) if filter
+			@filter = filter
 		end
+
+		alias :filter :bpf
 
 		# wire_to_array() saves a packet stream as an array of binary strings. From here,
 		# packets may accessed by other functions. Note that the wire_to_array empties
@@ -111,7 +114,7 @@ module PacketFu
 		#   :filter
 		#     Provide a bpf filter to apply to packets moving from @stream to @array.
 		def wire_to_array(args={})
-			filter = args[:filter] 
+			filter = args[:filter] || args[:bpf] || @filter
 			bpf(:filter=>filter) if filter
 
 			while this_pkt = @stream.next
@@ -146,7 +149,7 @@ module PacketFu
 		#   :quiet
 		#     TODO: Not implemented yet; do less than peek() at the packets.
 		def show_live(args={})
-			filter = args[:filter]
+			filter = args[:filter] || args[:bpf] || @filter
 			save = args[:save]
 			verbose = args[:verbose] || args[:v] || false
 			quiet = args[:quiet] || args[:q] || false # Setting q and v doesn't make a lot of sense but hey.
