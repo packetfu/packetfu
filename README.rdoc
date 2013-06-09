@@ -31,6 +31,16 @@ I tend to test with the following (with bash):
     rvmsudo ./all_tests.rb >> /tmp/tests.txt; rspec . >> /tmp/tests.txt
     done
 
+==== Problem Platforms
+
+* 1.8.6-p420 -- Has problems with pcaprub and capture/inject. Technically, these are pcaprub problems and not PacketFu problems, but PacketFu should at least fail better at them.
+
+* 1.9.1-p431 -- Has problems with loading gems in general, see http://redmine.ruby-lang.org/issues/2404
+
+* 2.0.0-p0   -- Has problems with binary encoding of strings that do not manifest in 1.9.x See #28
+
+
+
 ==== Passing Platforms
 
 * 1.9.1-p378
@@ -38,14 +48,7 @@ I tend to test with the following (with bash):
 * 1.9.2-p180 (suggested version)
 * 1.9.3-head
 
-==== Problem Platforms
 
-* 1.8.6-p420 -- Has problems with pcaprub and capture/inject
-* 1.9.1-p431 -- Has problems with loading gems in general, see http://redmine.ruby-lang.org/issues/2404
-
-Technically, these are pcaprub problems and not PacketFu problems, but PacketFu should at least fail better at them.
-
-Incidentally, I suspect these Ruby problems are the crux of the Mac OSX problems that people report. Try a different Ruby build and please let me know what works for you.
 
 
 == Examples
