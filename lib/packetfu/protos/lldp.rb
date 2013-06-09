@@ -7,6 +7,7 @@ require 'packetfu/protos/lldp/mixin'
 module PacketFu
 
   class LLDPPacket < Packet
+    MAGIC = Regexp.new("^\x01\x80\xc2\x00\x00[\x0e\x03\x00]", nil, "n")
     include ::PacketFu::EthHeaderMixin
     include ::PacketFu::LLDPHeaderMixin
 
@@ -16,7 +17,7 @@ module PacketFu
       return false unless EthPacket.can_parse? str
       return false unless str.size >= 6
       return false unless str[12,2] == "\x88\xcc"
-      return false unless str =~ /^\x01\x80\xc2\x00\x00[\x0e\x03\x00]/
+      return false unless str =~ MAGIC
       true
     end
 
