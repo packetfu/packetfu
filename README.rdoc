@@ -37,7 +37,7 @@ I tend to test with the following (with bash):
 
 * 1.9.1-p431 -- Has problems with loading gems in general, see http://redmine.ruby-lang.org/issues/2404
 
-* 2.0.0-p0   -- Has problems with binary encoding of strings that do not manifest in 1.9.x See [Issue #28](https://github.com/todb/packetfu/issues/28)
+* 2.0.0-p0   -- Has problems with binary encoding of strings that do not manifest in 1.9.x See https://github.com/todb/packetfu/issues/28
 
 
 
