@@ -13,7 +13,7 @@ class CaptureTest < Test::Unit::TestCase
   def test_whoami
     assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
   end
-  
+
   def test_new
     cap = PacketFu::Capture.new
     assert_kind_of PacketFu::Capture, cap
@@ -21,7 +21,7 @@ class CaptureTest < Test::Unit::TestCase
       :filter => 'tcp and dst host 1.2.3.4'
     )
   end
-  
+
   def test_filter
     daddr = PacketFu::Utils.rand_routable_daddr.to_s
     cap = PacketFu::Capture.new( :filter => "icmp and dst host #{daddr}")
@@ -33,7 +33,7 @@ class CaptureTest < Test::Unit::TestCase
     pkt = PacketFu::Packet.parse(cap.array.first)
     assert pkt.ip_daddr == daddr
   end
-  
+
   def test_no_filter
     daddr = PacketFu::Utils.rand_routable_daddr.to_s
     daddr2 = PacketFu::Utils.rand_routable_daddr.to_s

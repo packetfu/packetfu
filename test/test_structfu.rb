@@ -68,29 +68,29 @@ class IntTest < Test::Unit::TestCase
   include StructFu
 
   def test_int_to_s
-    assert_equal("\x02",Int8.new(2).to_s) 
-    assert_equal("\x00\x07",Int16.new(7).to_s) 
-    assert_equal("\x00\x00\x00\x0a",Int32.new(10).to_s) 
+    assert_equal("\x02",Int8.new(2).to_s)
+    assert_equal("\x00\x07",Int16.new(7).to_s)
+    assert_equal("\x00\x00\x00\x0a",Int32.new(10).to_s)
   end
 
   def test_int_big
-    assert_equal("\x00\x07",Int16be.new(7).to_s) 
-    assert_equal("\x00\x00\x00\x0a",Int32be.new(10).to_s) 
+    assert_equal("\x00\x07",Int16be.new(7).to_s)
+    assert_equal("\x00\x00\x00\x0a",Int32be.new(10).to_s)
   end
 
   def test_int_little
-    assert_equal("\x07\x00",Int16le.new(7).to_s) 
-    assert_equal("\x01\x04\x00\x00",Int32le.new(1025).to_s) 
+    assert_equal("\x07\x00",Int16le.new(7).to_s)
+    assert_equal("\x01\x04\x00\x00",Int32le.new(1025).to_s)
   end
 
   def test_read
-    assert_equal(7,Int16.new.read("\x00\x07").to_i) 
-    assert_equal(Int32.new.read("\x00\x00\x00\x0a").to_i,10) 
+    assert_equal(7,Int16.new.read("\x00\x07").to_i)
+    assert_equal(Int32.new.read("\x00\x00\x00\x0a").to_i,10)
     i = Int32.new
     i.read("\x00\x00\x00\xff")
     assert_equal(i.v, 255)
-    assert_equal(7, Int16le.new.read("\x07\x00").to_i) 
-    assert_equal(1025,Int32le.new.read("\x01\x04\x00\x00").to_i) 
+    assert_equal(7, Int16le.new.read("\x07\x00").to_i)
+    assert_equal(1025,Int32le.new.read("\x01\x04\x00\x00").to_i)
     i = Int32le.new
     i.read("\xff\x00\x00\x00")
     assert_equal(i.v, 255)

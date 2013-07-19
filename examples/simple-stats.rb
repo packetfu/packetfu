@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# Simple-stats.rb takes a pcap file, and gives some simple 
+# Simple-stats.rb takes a pcap file, and gives some simple
 # stastics on the protocols found. It's mainly used to
 # demonstrate a method to parse pcap files.
 #
@@ -22,7 +22,7 @@ def count_packet_types(file)
   pcapfile.read(file)
   pcapfile.each do |p|
     # Now it's a PacketFu packet struct.
-    pkt = PacketFu::Packet.parse(p.data) 
+    pkt = PacketFu::Packet.parse(p.data)
     kind = pkt.class.to_s.split("::").last
     if stats[kind]
       stats[kind] += 1

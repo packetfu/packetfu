@@ -24,7 +24,7 @@ class PcapHeaderTest < Test::Unit::TestCase
 
   def test_endian_magic
     p = PcapHeader.new # usual case
-    assert_equal(@file_magic, p.to_s[0,4]) 
+    assert_equal(@file_magic, p.to_s[0,4])
     p = PcapHeader.new(:endian => :big)
     assert_equal("\xa1\xb2\xc3\xd4", p.to_s[0,4])
   end
@@ -160,7 +160,7 @@ class PcapFileTest < Test::Unit::TestCase
     arr = pf.file_to_array(:filename => 'sample.pcap')
     assert_equal(11, arr.size)
     pf = PcapFile.new
-    pf.a2f(:array => arr, :f => 'out.pcap', :ts_inc => 4, 
+    pf.a2f(:array => arr, :f => 'out.pcap', :ts_inc => 4,
            :timestamp => Time.now.to_i - 1_000_000)
     diff_time = pf.body[0].timestamp.sec.to_i - pf.body[1].timestamp.sec.to_i
     assert_equal(-4, diff_time)
@@ -168,7 +168,7 @@ class PcapFileTest < Test::Unit::TestCase
   end
 
 end
-  
+
 # Test the legacy Read objects.
 class ReadTest < Test::Unit::TestCase
 

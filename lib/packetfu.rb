@@ -17,7 +17,7 @@ module PacketFu
     protos_dir = File.join(cwd, "packetfu", "protos")
     Dir.new(protos_dir).each do |fname|
       next unless fname[/\.rb$/]
-      begin 
+      begin
         require File.join(protos_dir,fname)
       rescue
         warn "Warning: Could not load `#{fname}'. Skipping."
@@ -44,18 +44,18 @@ module PacketFu
     rescue LoadError
       return false
     end
-    @pcaprub_loaded = true 
+    @pcaprub_loaded = true
   end
 
   pcaprub_platform_require
 
   if @pcaprub_loaded
     pcaprub_regex = /[0-9]\.([8-9]|[1-7][0-9])(-dev)?/ # Regex for 0.8 and beyond.
-    if Pcap.version !~ pcaprub_regex 
+    if Pcap.version !~ pcaprub_regex
       @pcaprub_loaded = false # Don't bother with broken versions
       raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
     end
-    require "packetfu/capture" 
+    require "packetfu/capture"
     require "packetfu/inject"
   end
 
@@ -87,7 +87,7 @@ module PacketFu
     @packet_classes ||= []
     @packet_classes.delete klass
     @packet_classes_dirty = true
-    @packet_classes 
+    @packet_classes
   end
 
   # Returns an array of packet classes
@@ -125,7 +125,7 @@ module PacketFu
       end
   end
 
-  # Switches inspect styles in a round-robin fashion between 
+  # Switches inspect styles in a round-robin fashion between
   # :dissect, :default, and :hex
   def toggle_inspect
     case @inspect_style

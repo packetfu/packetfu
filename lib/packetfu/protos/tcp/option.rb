@@ -1,15 +1,15 @@
 module PacketFu
-  # TcpOption is the base class for all TCP options. Note that TcpOption#len 
-  # returns the size of the entire option, while TcpOption#optlen is the struct 
+  # TcpOption is the base class for all TCP options. Note that TcpOption#len
+  # returns the size of the entire option, while TcpOption#optlen is the struct
   # for the TCP Option Length field.
   #
-  # Subclassed options should set the correct TcpOption#kind by redefining 
+  # Subclassed options should set the correct TcpOption#kind by redefining
   # initialize. They should also deal with various value types there by setting
-  # them explicitly with an accompanying StructFu#typecast for the setter. 
+  # them explicitly with an accompanying StructFu#typecast for the setter.
   #
   # By default, values are presumed to be strings, unless they are Numeric, in
   # which case a guess is made to the width of the Numeric based on the given
-  # optlen. 
+  # optlen.
   #
   # Note that normally, optlen is /not/ enforced for directly setting values,
   # so the user is perfectly capable of setting incorrect lengths.
@@ -36,7 +36,7 @@ module PacketFu
 
     # Returns the object in string form.
     def to_s
-      self[:kind].to_s + 
+      self[:kind].to_s +
       (self[:optlen].value.nil? ? nil : self[:optlen]).to_s +
       (self[:value].nil? ? nil : self[:value]).to_s
     end
@@ -66,7 +66,7 @@ module PacketFu
     # Setter for the "option length" byte for this option.
     def optlen=(i); typecast i; end
 
-    # Setter for the value of this option. 
+    # Setter for the value of this option.
     def value=(i)
       if i.kind_of? Numeric
         typecast i
@@ -88,7 +88,7 @@ module PacketFu
     def has_optlen?
       (kind.value && kind.value < 2) ? false : true
     end
-    
+
     # Returns true if this option has a value. Some don't.
     def has_value?
       (value.respond_to? :to_s && value.to_s.size > 0) ? false : true
@@ -290,7 +290,7 @@ module PacketFu
                      :optlen => 10
                     )
         )
-        self[:value] = StructFu::String.new.read(args[:value] || "\x00" * 8) 
+        self[:value] = StructFu::String.new.read(args[:value] || "\x00" * 8)
       end
 
       # TS options with lengths other than 10 are malformed.

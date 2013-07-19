@@ -301,7 +301,7 @@ class TCPPacketTest < Test::Unit::TestCase
     pkt = Packet.parse(sample_packet)
     assert_kind_of TCPPacket, pkt
     assert_equal(0x5a73, pkt.tcp_sum)
-    pkt.to_f('tcp_test.pcap','a') 
+    pkt.to_f('tcp_test.pcap','a')
   end
 
   def test_tcp_alter
@@ -313,7 +313,7 @@ class TCPPacketTest < Test::Unit::TestCase
     pkt.recalc
     pkt.to_f('tcp_test.pcap','a')
   end
-  
+
   def test_tcp_read_strip
     str = "e0f8472161a600254ba0760608004500004403554000400651d0c0a83207c0a832370224c1d22d94847f0b07c4ba8018ffff30ba00000101080a8731821433564b8c01027165000000000000200000000000".bin
     str << "0102".bin # Tacking on a couple extra bites tht we'll strip off.

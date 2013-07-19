@@ -1,5 +1,5 @@
 module PacketFu
-  # ARPHeader is a complete ARP struct, used in ARPPacket. 
+  # ARPHeader is a complete ARP struct, used in ARPPacket.
   #
   # ARP is used to discover the machine address of nearby devices.
   #
@@ -28,11 +28,11 @@ module PacketFu
       src_mac = args[:arp_src_mac] || (args[:config][:eth_src] if args[:config])
       src_ip_bin = args[:arp_src_ip]   || (args[:config][:ip_src_bin] if args[:config])
 
-      super( 
-        Int16.new(args[:arp_hw] || 1), 
+      super(
+        Int16.new(args[:arp_hw] || 1),
         Int16.new(args[:arp_proto] ||0x0800),
-        Int8.new(args[:arp_hw_len] || 6), 
-        Int8.new(args[:arp_proto_len] || 4), 
+        Int8.new(args[:arp_hw_len] || 6),
+        Int8.new(args[:arp_proto_len] || 4),
         Int16.new(args[:arp_opcode] || 1),
         EthMac.new.read(src_mac),
         Octets.new.read(src_ip_bin),
@@ -80,9 +80,9 @@ module PacketFu
     def arp_proto_len=(i); typecast i; end
     # Getter for the ARP protocol length.
     def arp_proto_len; self[:arp_proto_len].to_i; end
-    # Setter for the ARP opcode. 
+    # Setter for the ARP opcode.
     def arp_opcode=(i); typecast i; end
-    # Getter for the ARP opcode. 
+    # Getter for the ARP opcode.
     def arp_opcode; self[:arp_opcode].to_i; end
     # Setter for the ARP source MAC address.
     def arp_src_mac=(i); typecast i; end
@@ -125,12 +125,12 @@ module PacketFu
       EthHeader.str2mac(self[:arp_dst_mac].to_s)
     end
 
-    # Set a more readable source IP address. 
+    # Set a more readable source IP address.
     def arp_saddr_ip=(addr)
       self[:arp_src_ip].read_quad(addr)
     end
 
-    # Get a more readable source IP address. 
+    # Get a more readable source IP address.
     def arp_saddr_ip
       self[:arp_src_ip].to_x
     end
@@ -139,7 +139,7 @@ module PacketFu
     def arp_daddr_ip=(addr)
       self[:arp_dst_ip].read_quad(addr)
     end
-    
+
     # Get a more readable destination IP address.
     def arp_daddr_ip
       self[:arp_dst_ip].to_x

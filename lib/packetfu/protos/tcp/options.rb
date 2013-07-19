@@ -7,7 +7,7 @@ module PacketFu
     include StructFu
 
     # If args[:pad] is set, the options line is automatically padded out
-    # with NOPs. 
+    # with NOPs.
     def to_s(args={})
       opts = self.map {|x| x.to_s}.join
       if args[:pad]
@@ -20,7 +20,7 @@ module PacketFu
 
     # Reads a string to populate the object.
     def read(str)
-      self.clear 
+      self.clear
       PacketFu.force_binary(str)
       return self if(!str.respond_to? :to_s || str.nil?)
       i = 0
@@ -51,11 +51,11 @@ module PacketFu
     # Decode parses the TcpOptions object's member options, and produces a
     # human-readable string by iterating over each element's decode() function.
     # If TcpOptions elements were not initially created as TcpOptions, an
-    # attempt will be made to convert them. 
+    # attempt will be made to convert them.
     #
     # The output of decode is suitable as input for TcpOptions#encode.
     def decode
-      decoded = self.map do |x| 
+      decoded = self.map do |x|
         if x.kind_of? TcpOption
           x.decode
         else
@@ -68,12 +68,12 @@ module PacketFu
     # Encode takes a human-readable string and appends the corresponding
     # binary options to the TcpOptions object. To completely replace the contents
     # of the object, use TcpOptions#encode! instead.
-    # 
+    #
     # Options are comma-delimited, and are identical to the output of the
     # TcpOptions#decode function. Note that the syntax can be unforgiving, so
     # it may be easier to create the subclassed TcpOptions themselves directly,
     # but this method can be less typing if you know what you're doing.
-    # 
+    #
     # Note that by using TcpOptions#encode, strings supplied as values which
     # can be converted to numbers will be converted first.
     #

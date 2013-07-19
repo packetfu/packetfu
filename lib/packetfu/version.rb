@@ -21,12 +21,12 @@ module PacketFu
   # Returns true if the version is equal to or greater than the compare version.
   # If the current version of PacketFu is "0.3.1" for example:
   #
-  #   PacketFu.at_least? "0"     # => true 
-  #   PacketFu.at_least? "0.2.9" # => true 
-  #   PacketFu.at_least? "0.3"   # => true 
+  #   PacketFu.at_least? "0"     # => true
+  #   PacketFu.at_least? "0.2.9" # => true
+  #   PacketFu.at_least? "0.3"   # => true
   #   PacketFu.at_least? "1"     # => true after 1.0's release
   #   PacketFu.at_least? "1.12"  # => false
-  #   PacketFu.at_least? "2"     # => false 
+  #   PacketFu.at_least? "2"     # => false
   def self.at_least?(str)
     this_version = binarize_version(self.version)
     ask_version = binarize_version(str)

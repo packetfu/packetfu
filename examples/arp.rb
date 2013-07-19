@@ -29,12 +29,12 @@ def arp(target_ip)
   arp_pkt.arp_daddr_mac = "00:00:00:00:00:00"
 
   arp_pkt.arp_saddr_ip = $packetfu_default[:ip_saddr]
-  arp_pkt.arp_daddr_ip = target_ip 
+  arp_pkt.arp_daddr_ip = target_ip
 
   # Stick the Capture object in its own thread.
 
   cap_thread = Thread.new do
-    cap = PacketFu::Capture.new(:start => true, 
+    cap = PacketFu::Capture.new(:start => true,
                                 :filter => "arp src #{target_ip} and ether dst #{arp_pkt.eth_saddr}")
     arp_pkt.to_w # Shorthand for sending single packets to the default interface.
     target_mac = nil

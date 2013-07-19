@@ -16,7 +16,7 @@ describe StructFu, "mixin methods" do
     @sc.respond_to?(:typecast).should be_true
     @sc.respond_to?(:body=).should be_true
   end
-end	
+end
 
 describe StructFu::Int, "basic Int class" do
 

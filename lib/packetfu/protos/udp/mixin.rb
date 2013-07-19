@@ -1,5 +1,5 @@
 module PacketFu
-  # This Mixin simplifies access to the UDPHeaders. Mix this in with your 
+  # This Mixin simplifies access to the UDPHeaders. Mix this in with your
   # packet interface, and it will add methods that essentially delegate to
   # the 'udp_header' method (assuming that it is a UDPHeader object)
   module UDPHeaderMixin

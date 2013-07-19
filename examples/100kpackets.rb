@@ -14,7 +14,7 @@ count = 0
 
 100.times do
   @pcaps = []
-  1000.times do 
+  1000.times do
     u = UDPPacket.new
     u.ip_src = [rand(2**32-1)].pack("N")
     u.ip_dst = [rand(2**32-1)].pack("N")

@@ -1,7 +1,7 @@
 module PacketFu
 
   # InvalidHeader catches all packets that we don't already have a Struct for,
-  # or for whatever reason, violates some basic packet rules for other packet 
+  # or for whatever reason, violates some basic packet rules for other packet
   # types.
   class InvalidHeader < Struct.new(:body)
     include StructFu

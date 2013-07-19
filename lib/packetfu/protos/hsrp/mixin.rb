@@ -1,5 +1,5 @@
 module PacketFu
-  # This Mixin simplifies access to the HSRPHeaders. Mix this in with your 
+  # This Mixin simplifies access to the HSRPHeaders. Mix this in with your
   # packet interface, and it will add methods that essentially delegate to
   # the 'hsrp_header' method (assuming that it is a HSRPHeader object)
   module HSRPHeaderMixin

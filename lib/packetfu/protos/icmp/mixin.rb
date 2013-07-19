@@ -1,5 +1,5 @@
 module PacketFu
-  # This Mixin simplifies access to the ICMPHeaders. Mix this in with your 
+  # This Mixin simplifies access to the ICMPHeaders. Mix this in with your
   # packet interface, and it will add methods that essentially delegate to
   # the 'icmp_header' method (assuming that it is a ICMPHeader object)
   module ICMPHeaderMixin

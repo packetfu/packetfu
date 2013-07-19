@@ -38,7 +38,7 @@ def arp_everyone
   253.times do |i|
     threads[i] = Thread.new do
       this_host = network + ".#{i+1}"
-      print "." 
+      print "."
       colon_mac = PacketFu::Utils.arp(this_host,my_net.config)
       unless colon_mac.nil?
         hyphen_mac = colon_mac.tr(':','-').upcase[0,8]

@@ -51,9 +51,9 @@ module PacketFu
       return false unless UDPPacket.can_parse? str
       temp_packet = UDPPacket.new
       temp_packet.read(str)
-      if temp_packet.ip_ttl == 1 and [temp_packet.udp_sport,temp_packet.udp_dport] == [1985,1985] 
+      if temp_packet.ip_ttl == 1 and [temp_packet.udp_sport,temp_packet.udp_dport] == [1985,1985]
         return true
-      else 
+      else
         return false
       end
     end

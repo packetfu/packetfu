@@ -5,7 +5,7 @@ module PacketFu
   #
   #   Fixnum (4 bits)  :hlen
   class TcpHlen < Struct.new(:hlen)
-    
+
     include StructFu
 
     def initialize(args={})

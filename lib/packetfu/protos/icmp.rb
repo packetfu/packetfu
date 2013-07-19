@@ -20,7 +20,7 @@ module PacketFu
   #  icmp_pkt.ip_saddr="1.2.3.4"
   #  icmp_pkt.ip_daddr="5.6.7.8"
   #
-  #  icmp_pkt.recalc	
+  #  icmp_pkt.recalc
   #  icmp_pkt.to_f('/tmp/icmp.pcap')
   #
   # == Parameters

@@ -2,11 +2,11 @@
 #
 # Tested on:
 #
-#   ruby-1.9.3-head [ x86_64 ]  
-#   ruby-1.9.1-p378 [ x86_64 ]  
-#   ruby-1.8.6-p399 [ x86_64 ]  
-#   ruby-1.8.7-p334 [ x86_64 ] 
-#   ruby-1.9.2-p180 [ x86_64 ] 
+#   ruby-1.9.3-head [ x86_64 ]
+#   ruby-1.9.1-p378 [ x86_64 ]
+#   ruby-1.8.6-p399 [ x86_64 ]
+#   ruby-1.8.7-p334 [ x86_64 ]
+#   ruby-1.9.2-p180 [ x86_64 ]
 
 # Okay so the regular test/unit stuff screws up some of my
 # meta magic. I need to move these over to spec and see
@@ -28,7 +28,7 @@ dir.each { |file|
   next if file == $0
   puts "Running #{file}..."
   cmd = %x{ruby #{file}}
-  if cmd[/ 0 failures/] && cmd[/ 0 errors/] 
+  if cmd[/ 0 failures/] && cmd[/ 0 errors/]
     puts "#{file}: All passed"
   else
     puts "File: #{file} had failures or errors:"

@@ -129,15 +129,15 @@ module PacketFu
       checksum += (tcp_seq.to_i & 0xffff)
       checksum += (tcp_ack.to_i >> 16)
       checksum += (tcp_ack.to_i & 0xffff)
-      checksum += ((tcp_hlen << 12) + 
-                   (tcp_reserved << 9) + 
-                   (tcp_ecn.to_i << 6) + 
+      checksum += ((tcp_hlen << 12) +
+                   (tcp_reserved << 9) +
+                   (tcp_ecn.to_i << 6) +
                    tcp_flags.to_i
                   )
       checksum += tcp_win
       checksum += tcp_urg
 
-      chk_tcp_opts = (tcp_opts.to_s.size % 2 == 0 ? tcp_opts.to_s : tcp_opts.to_s + "\x00") 
+      chk_tcp_opts = (tcp_opts.to_s.size % 2 == 0 ? tcp_opts.to_s : tcp_opts.to_s + "\x00")
       chk_tcp_opts.unpack("n*").each {|x| checksum = checksum + x }
       if (ip_len - ((ip_hl + tcp_hlen) * 4)) >= 0
         real_tcp_payload = payload[0,( ip_len - ((ip_hl + tcp_hlen) * 4) )] # Can't forget those pesky FCSes!

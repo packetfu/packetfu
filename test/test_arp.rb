@@ -7,14 +7,14 @@ class ArpTest < Test::Unit::TestCase
 
   def test_arp_header
     a = ARPHeader.new
-    assert_kind_of ARPHeader, a 
+    assert_kind_of ARPHeader, a
     assert_kind_of StructFu::Int16, a[:arp_hw]
     assert_kind_of Fixnum, a.arp_hw
     assert_kind_of Octets, a[:arp_src_ip]
     assert_kind_of String, a.arp_src_ip
     assert_kind_of EthMac, a[:arp_dst_mac]
     assert_kind_of String, a.arp_dst_mac
-    assert_kind_of StructFu::String, a.body 
+    assert_kind_of StructFu::String, a.body
   end
 
   def test_read_header
@@ -76,7 +76,7 @@ class ArpTest < Test::Unit::TestCase
     a.arp_hw = 1
     a.arp_proto = 0x0800
     a.arp_hw_len = 6
-    a.arp_proto_len = 4 
+    a.arp_proto_len = 4
     a.arp_opcode = 2
     a.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
     a.arp_src_ip = "\xc0\xa8\x01\x02"
@@ -93,7 +93,7 @@ class ArpTest < Test::Unit::TestCase
                        :arp_opcode => 2, :arp_src_ip => "\xc0\xa8\x01\x02")
     assert_kind_of ARPPacket, arp
     arp.arp_hw_len = 6
-    arp.arp_proto_len = 4 
+    arp.arp_proto_len = 4
     arp.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
     arp.arp_dst_mac = "\x00\x1b\x11\x51\xb7\xce"
     arp.arp_dst_ip = "\xc0\xa8\x01\x69"
@@ -117,7 +117,7 @@ class ArpTest < Test::Unit::TestCase
     a.arp_hw = 1
     a.arp_proto = 0x0800
     a.arp_hw_len = 6
-    a.arp_proto_len = 4 
+    a.arp_proto_len = 4
     a.arp_opcode = 2
     a.arp_src_mac = "\x00\x03\x2f\x1a\x74\xde"
     a.arp_src_ip = "\xc0\xa8\x01\x02"
@@ -128,7 +128,7 @@ class ArpTest < Test::Unit::TestCase
     a.eth_saddr = "00:03:2f:1a:74:de"
     a.to_f('arp_test.pcap','a')
   end
-  
+
 end
 
 

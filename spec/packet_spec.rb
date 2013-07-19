@@ -23,9 +23,9 @@ describe PacketFu::Packet, "abstract packet class behavior" do
   end
 
   it "should disallow badly named subclasses" do
-    expect { 
+    expect {
       class PacketFu::PacketNot < PacketFu::Packet
-      end 
+      end
     }.to raise_error
     PacketFu.packet_classes.include?(PacketFu::PacketNot).should be_false
     PacketFu.packet_classes {should_not include(PacketNot) }

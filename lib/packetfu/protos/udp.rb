@@ -16,7 +16,7 @@ module PacketFu
   #   udp_pkt = PacketFu::UDPPacket.new
   #   udp_pkt.udp_src=rand(0xffff-1024) + 1024
   #   udp_pkt.udp_dst=53
-  # 
+  #
   #   udp_pkt.ip_saddr="1.2.3.4"
   #   udp_pkt.ip_daddr="10.20.30.40"
   #
@@ -72,8 +72,8 @@ module PacketFu
       udp_calc_sum
     end
 
-    # udp_calc_sum() computes the UDP checksum, and is called upon intialization. 
-    # It usually should be called just prior to dropping packets to a file or on the wire. 
+    # udp_calc_sum() computes the UDP checksum, and is called upon intialization.
+    # It usually should be called just prior to dropping packets to a file or on the wire.
     def udp_calc_sum
       # This is /not/ delegated down to @udp_header since we need info
       # from the IP header, too.
@@ -88,10 +88,10 @@ module PacketFu
       checksum += udp_len.to_i
       if udp_len.to_i >= 8
         # For IP trailers. This isn't very reliable. :/
-        real_udp_payload = payload.to_s[0,(udp_len.to_i-8)] 
+        real_udp_payload = payload.to_s[0,(udp_len.to_i-8)]
       else
         # I'm not going to mess with this right now.
-        real_udp_payload = payload 
+        real_udp_payload = payload
       end
       chk_payload = (real_udp_payload.size % 2 == 0 ? real_udp_payload : real_udp_payload + "\x00")
       chk_payload.unpack("n*").each {|x| checksum = checksum+x}

@@ -1,10 +1,10 @@
 module PacketFu
-  # ICMPHeader is a complete ICMP struct, used in ICMPPacket. ICMP is 
+  # ICMPHeader is a complete ICMP struct, used in ICMPPacket. ICMP is
   # typically used for network administration and connectivity testing.
   #
-  # For more on ICMP packets, see 
+  # For more on ICMP packets, see
   # http://www.networksorcery.com/enp/protocol/icmp.htm
-  # 
+  #
   # ==== Header Definition
   #
   #   Int8    :icmp_type                        # Type
@@ -48,7 +48,7 @@ module PacketFu
     def icmp_code=(i); typecast i; end
     # Getter for the code.
     def icmp_code; self[:icmp_code].to_i; end
-    # Setter for the checksum. Note, this is calculated automatically with 
+    # Setter for the checksum. Note, this is calculated automatically with
     # icmp_calc_sum.
     def icmp_sum=(i); typecast i; end
     # Getter for the checksum.
@@ -67,7 +67,7 @@ module PacketFu
       checksum = 0xffff - checksum
       checksum == 0 ? 0xffff : checksum
     end
-    
+
     # Recalculates the calculatable fields for ICMP.
     def icmp_recalc(arg=:all)
       # How silly is this, you can't intern a symbol in ruby 1.8.7pl72?

@@ -19,7 +19,7 @@ module PacketFu
   #   ip_pkt.ip_ttl=64
   #   ip_pkt.ip_payload="\x00\x00\x12\x34\x00\x01\x00\x01"+
   #     "Lovingly hand-crafted echo responses delivered directly to your door."
-  #   ip_pkt.recalc 
+  #   ip_pkt.recalc
   #   ip_pkt.to_f('/tmp/ip.pcap')
   #
   # == Parameters
@@ -48,7 +48,7 @@ module PacketFu
         else
           ipv = str[14,1][0] >> 4
         end
-        return true if ipv == 4 
+        return true if ipv == 4
       else
         return false
       end
@@ -57,11 +57,11 @@ module PacketFu
     def read(str=nil, args={})
       raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
       @eth_header.read(str)
-      super(args) 
+      super(args)
       self
     end
 
-    # Creates a new IPPacket object. 
+    # Creates a new IPPacket object.
     def initialize(args={})
       @eth_header = EthHeader.new(args).read(args[:eth])
       @ip_header = IPHeader.new(args).read(args[:ip])

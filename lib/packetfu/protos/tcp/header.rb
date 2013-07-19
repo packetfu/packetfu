@@ -13,12 +13,12 @@ module PacketFu
   # For more on TCP packets, see http://www.networksorcery.com/enp/protocol/tcp.htm
   #
   # ==== Header Definition
-  # 
-  #   Int16        :tcp_src       Default: random 
+  #
+  #   Int16        :tcp_src       Default: random
   #   Int16        :tcp_dst
   #   Int32        :tcp_seq       Default: random
   #   Int32        :tcp_ack
-  #   TcpHlen      :tcp_hlen      Default: 5           # Must recalc as options are set. 
+  #   TcpHlen      :tcp_hlen      Default: 5           # Must recalc as options are set.
   #   TcpReserved  :tcp_reserved  Default: 0
   #   TcpEcn       :tcp_ecn
   #   TcpFlags     :tcp_flags
@@ -32,8 +32,8 @@ module PacketFu
   class TCPHeader < Struct.new(:tcp_src, :tcp_dst,
                                :tcp_seq,
                                :tcp_ack,
-                               :tcp_hlen, :tcp_reserved, :tcp_ecn, :tcp_flags, :tcp_win, 
-                               :tcp_sum, :tcp_urg, 
+                               :tcp_hlen, :tcp_reserved, :tcp_ecn, :tcp_flags, :tcp_win,
+                               :tcp_sum, :tcp_urg,
                                :tcp_opts, :body)
     include StructFu
 
@@ -172,9 +172,9 @@ module PacketFu
       end
     end
 
-    # Getter for the ECN bits. 
+    # Getter for the ECN bits.
     def tcp_ecn; self[:tcp_ecn].to_i; end
-    # Setter for the ECN bits. 
+    # Setter for the ECN bits.
     def tcp_ecn=(i)
       case i
       when PacketFu::TcpEcn
@@ -213,7 +213,7 @@ module PacketFu
     end
 
     # Sets and returns the true length of the TCP Header.
-    # TODO: Think about making all the option stuff safer. 
+    # TODO: Think about making all the option stuff safer.
     def tcp_calc_hlen
       self[:tcp_hlen] = TcpHlen.new(:hlen => ((20 + tcp_opts_len) / 4))
     end
@@ -256,7 +256,7 @@ module PacketFu
     def tcp_dport
       self.tcp_dst.to_i
     end
-    
+
     # Equivalent to tcp_dst=.
     def tcp_dport=(arg)
       self.tcp_dst=(arg)
@@ -272,11 +272,11 @@ module PacketFu
       when :tcp_sport
         @random_tcp_src = rand_port
       when :tcp_seq
-        @random_tcp_seq = rand(0xffffffff) 
+        @random_tcp_seq = rand(0xffffffff)
       when :all
         tcp_calc_hlen
         @random_tcp_src = rand_port
-        @random_tcp_seq = rand(0xffffffff) 
+        @random_tcp_seq = rand(0xffffffff)
       else
         raise ArgumentError, "No such field `#{arg}'"
       end

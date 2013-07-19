@@ -1,6 +1,6 @@
 
 module PacketFu
-  # This Mixin simplifies access to the IPHeaders. Mix this in with your 
+  # This Mixin simplifies access to the IPHeaders. Mix this in with your
   # packet interface, and it will add methods that essentially delegate to
   # the 'ip_header' method (assuming that it is a IPHeader object)
   module IPHeaderMixin

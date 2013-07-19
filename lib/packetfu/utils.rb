@@ -21,9 +21,9 @@ module PacketFu
     #  === Example
     #    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
     #    PacketFu::Utils::arp("192.168.1.1", :timeout => 5, :flavor => :hp_deskjet)
-    #  
+    #
     #  === Warning
-    #  
+    #
     #  It goes without saying, spewing forged ARP packets on your network is a great way to really
     #  irritate your co-workers.
     def self.arp(target_ip,args={})
@@ -36,7 +36,7 @@ module PacketFu
       # Stick the Capture object in its own thread.
       cap_thread = Thread.new do
         target_mac = nil
-        cap = PacketFu::Capture.new(:iface => iface, :start => true, 
+        cap = PacketFu::Capture.new(:iface => iface, :start => true,
         :filter => "arp src #{target_ip} and ether dst #{arp_pkt.eth_saddr}")
         arp_pkt.to_w(iface) # Shorthand for sending single packets to the default interface.
         timeout = 0
@@ -53,7 +53,7 @@ module PacketFu
       cap_thread.value
     end
 
-    # Since 177/8 is IANA reserved (for now), this network should 
+    # Since 177/8 is IANA reserved (for now), this network should
     # be handled by your default gateway and default interface.
     def self.rand_routable_daddr
       IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET)
@@ -64,14 +64,14 @@ module PacketFu
     # operation; a UDP packet is generated and dropped on to the default (or named)
     # interface, and then captured (which means you need to be root to do this).
     #
-    # whoami? returns a hash of :eth_saddr, :eth_src, :ip_saddr, :ip_src, 
-    # :ip_src_bin, :eth_dst, and :eth_daddr (the last two are usually suitable 
-    # for a gateway mac address). It's most useful as an argument to 
+    # whoami? returns a hash of :eth_saddr, :eth_src, :ip_saddr, :ip_src,
+    # :ip_src_bin, :eth_dst, and :eth_daddr (the last two are usually suitable
+    # for a gateway mac address). It's most useful as an argument to
     # PacketFu::Config.new, or as an argument to the many Packet constructors.
     #
     # Note that if you have multiple interfaces with the same route (such as when
     # wlan0 and eth0 are associated to the same network), the "first" one
-    # according to Pcap.lookupdev will be used, regardless of which :iface you 
+    # according to Pcap.lookupdev will be used, regardless of which :iface you
     # pick.
     #
     # === Parameters
@@ -115,7 +115,7 @@ module PacketFu
             :eth_dst => pkt.eth_dst.to_s,
             :eth_daddr => pkt.eth_daddr
           }
-          else raise SecurityError, 
+          else raise SecurityError,
             "whoami() packet doesn't match sent data. Something fishy's going on."
           end
         else
@@ -139,8 +139,8 @@ module PacketFu
     # Handles ifconfig for various (okay, two) platforms.
     # Will have Windows done shortly.
     #
-    # Takes an argument (either string or symbol) of the interface to look up, and 
-    # returns a hash which contains at least the :iface element, and if configured, 
+    # Takes an argument (either string or symbol) of the interface to look up, and
+    # returns a hash which contains at least the :iface element, and if configured,
     # these additional elements:
     #
     #   :eth_saddr  # A human readable MAC address
@@ -155,7 +155,7 @@ module PacketFu
     #   PacketFu::Utils.ifconfig :wlan0 # Not associated yet
     #   #=> {:eth_saddr=>"00:1d:e0:73:9d:ff", :eth_src=>"\000\035\340s\235\377", :iface=>"wlan0"}
     #   PacketFu::Utils.ifconfig("eth0") # Takes 'eth0' as default
-    #   #=> {:eth_saddr=>"00:1c:23:35:70:3b", :eth_src=>"\000\034#5p;", :ip_saddr=>"10.10.10.9", :ip4_obj=>#<IPAddr: IPv4:10.10.10.0/255.255.254.0>, :ip_src=>"\n\n\n\t", :iface=>"eth0", :ip6_saddr=>"fe80::21c:23ff:fe35:703b/64", :ip6_obj=>#<IPAddr: IPv6:fe80:0000:0000:0000:0000:0000:0000:0000/ffff:ffff:ffff:ffff:0000:0000:0000:0000>}  
+    #   #=> {:eth_saddr=>"00:1c:23:35:70:3b", :eth_src=>"\000\034#5p;", :ip_saddr=>"10.10.10.9", :ip4_obj=>#<IPAddr: IPv4:10.10.10.0/255.255.254.0>, :ip_src=>"\n\n\n\t", :iface=>"eth0", :ip6_saddr=>"fe80::21c:23ff:fe35:703b/64", :ip6_obj=>#<IPAddr: IPv6:fe80:0000:0000:0000:0000:0000:0000:0000/ffff:ffff:ffff:ffff:0000:0000:0000:0000>}
     #   PacketFu::Utils.ifconfig :lo
     #   #=> {:ip_saddr=>"127.0.0.1", :ip4_obj=>#<IPAddr: IPv4:127.0.0.0/255.0.0.0>, :ip_src=>"\177\000\000\001", :iface=>"lo", :ip6_saddr=>"::1/128", :ip6_obj=>#<IPAddr: IPv6:0000:0000:0000:0000:0000:0000:0000:0001/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff>}
     def self.ifconfig(iface='eth0')

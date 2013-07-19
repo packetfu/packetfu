@@ -9,7 +9,7 @@ module PacketFu
   #  Int16   :udp_src
   #  Int16   :udp_dst
   #  Int16   :udp_len  Default: calculated
-  #  Int16   :udp_sum  Default: 0. Often calculated. 
+  #  Int16   :udp_sum  Default: 0. Often calculated.
   #  String  :body
   class UDPHeader < Struct.new(:udp_src, :udp_dst, :udp_len, :udp_sum, :body)
 
@@ -91,7 +91,7 @@ module PacketFu
     def udp_dport
       self.udp_dst
     end
-    
+
     # Equivalent to udp_dst=
     def udp_dport=(arg)
       self.udp_dst=(arg)
