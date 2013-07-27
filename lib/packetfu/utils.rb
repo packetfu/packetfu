@@ -9,6 +9,8 @@ module PacketFu
 		# a dotted-octect notation of the target IP address, as well as a number of parameters:
 		#
 		# === Parameters
+		#	:iface
+		#	 Interface. Defaults to "eth0"
 		#   :eth_saddr
 		#    Source MAC address. Defaults to "00:00:00:00:00:00".
 		#   :ip_saddr
