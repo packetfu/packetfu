@@ -22,7 +22,7 @@ module PacketFu
 		#
 		#  === Example
 		#    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
-		#    PacketFu::Utils::arp("192.168.1.1", :timeout => 5, :flavor => :hp_deskjet)
+		#    PacketFu::Utils::arp("192.168.1.1", :iface => "wlan2", :timeout => 5, :flavor => :hp_deskjet)
 		#  
 		#  === Warning
 		#  
