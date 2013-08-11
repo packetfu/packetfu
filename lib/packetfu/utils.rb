@@ -121,7 +121,7 @@ module PacketFu
 					cap.save
 					pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
 				end
-				raise SocketError, "Didn't receive the whomi() packet, can't automatically configure." if !pkt
+				raise SocketError, "Didn't receive the whoami() packet, can't automatically configure." if !pkt
 				cap = nil
 			end
 			my_data
