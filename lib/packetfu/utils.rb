@@ -9,6 +9,8 @@ module PacketFu
 		# a dotted-octect notation of the target IP address, as well as a number of parameters:
 		#
 		# === Parameters
+		#	:iface
+		#	 Interface. Defaults to "eth0"
 		#   :eth_saddr
 		#    Source MAC address. Defaults to "00:00:00:00:00:00".
 		#   :ip_saddr
@@ -20,7 +22,7 @@ module PacketFu
 		#
 		#  === Example
 		#    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
-		#    PacketFu::Utils::arp("192.168.1.1", :timeout => 5, :flavor => :hp_deskjet)
+		#    PacketFu::Utils::arp("192.168.1.1", :iface => "wlan2", :timeout => 5, :flavor => :hp_deskjet)
 		#  
 		#  === Warning
 		#  
@@ -123,7 +125,7 @@ module PacketFu
 					cap.save
 					pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
 				end
-				raise SocketError, "Didn't receive the whomi() packet, can't automatically configure." if !pkt
+				raise SocketError, "Didn't receive the whoami() packet, can't automatically configure." if !pkt
 				cap = nil
 			end
 			my_data
