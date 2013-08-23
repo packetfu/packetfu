@@ -6,24 +6,24 @@ require 'packetfu'
 
 class InjectTest < Test::Unit::TestCase
 
-	def test_cap
-		assert_nothing_raised { PacketFu::Capture }
-	end
+  def test_cap
+    assert_nothing_raised { PacketFu::Capture }
+  end
 
-	def test_whoami
-		assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
-	end
+  def test_whoami
+    assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
+  end
 
-	def test_to_w
-		assert_equal(Process.euid, 0, "TEST FAIL: This test must be run as root")
-		conf = PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo'))
-		p = PacketFu::UDPPacket.new(:config => conf)
-		p.udp_dport = 12345
-		p.udp_sport = 12345
-		p.payload = "PacketFu test packet"
-		p.recalc
-		assert p.to_w
-	end
+  def test_to_w
+    assert_equal(Process.euid, 0, "TEST FAIL: This test must be run as root")
+    conf = PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo'))
+    p = PacketFu::UDPPacket.new(:config => conf)
+    p.udp_dport = 12345
+    p.udp_sport = 12345
+    p.payload = "PacketFu test packet"
+    p.recalc
+    assert p.to_w
+  end
 
 end
 

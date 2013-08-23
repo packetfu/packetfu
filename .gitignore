@@ -2,3 +2,7 @@
 doc/
 pkg/
 test/*test.pcap
+# Ignore retabbed and reended backups
+*.notab
+*.noend
+
