@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
 
 # new-simple-stats.rb demonstrates the performance difference
 # between the old and busted way to parse pcap files and the

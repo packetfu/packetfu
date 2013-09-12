@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 
 module PacketFu
 	# This Mixin simplifies access to the IPHeaders. Mix this in with your 

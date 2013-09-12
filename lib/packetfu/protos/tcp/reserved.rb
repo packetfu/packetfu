@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 module PacketFu
 	# Implements the Reserved bits for TCPHeader.
 	#

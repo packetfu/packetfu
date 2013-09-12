@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 module PacketFu
   # LLDPHeader is a complete LLDP struct, used in LLDPPacket.
 

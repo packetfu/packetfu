@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 module PacketFu
 	# Implements flags for TCPHeader.
 	#

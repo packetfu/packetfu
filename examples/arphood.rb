@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
 
 # A simple local network fingerprinter. Uses the OUI list.
 # Usage: rvmsudo ./arphood.rb [iface] [network] <oui.txt>

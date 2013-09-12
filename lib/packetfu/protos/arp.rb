@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 require 'packetfu/protos/eth/header'
 require 'packetfu/protos/eth/mixin'
 

@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 module PacketFu
 	# TcpOption is the base class for all TCP options. Note that TcpOption#len 
 	# returns the size of the entire option, while TcpOption#optlen is the struct 

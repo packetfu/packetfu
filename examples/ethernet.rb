@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 
 require './examples' # For path setting slight-of-hand
 require 'packetfu'

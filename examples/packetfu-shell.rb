@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 # == Synopsis
 #
 # packetfu-shell.rb is intended for IRB consumption, and providing an

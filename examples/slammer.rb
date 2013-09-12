@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
 
 # Fires off a slammer packet to an unsuspecting target. This code does not
 # break real devices! (To do that, you'll need to fix up the targetting)

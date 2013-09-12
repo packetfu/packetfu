@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 require 'packetfu/protos/tcp/reserved'
 require 'packetfu/protos/tcp/hlen'
 require 'packetfu/protos/tcp/ecn'

@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 # This is a somewhat contrived and verbose demonstration of how to implement ARP manually.
 #
 # It's contrived because this is really how PacketFu::Utils got born; something similiar

@@ -1,3 +1,4 @@
+# -*- coding: binary -*-
 module PacketFu
 	# This Mixin simplifies access to the IPv6Headers. Mix this in with your 
 	# packet interface, and it will add methods that essentially delegate to

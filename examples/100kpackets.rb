@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
 
 # Used mainly to test for memory leaks and to demo the preferred ways of
 # reading and writing packets to and from pcap files.

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
 
 # Simple-stats.rb takes a pcap file, and gives some simple 
 # stastics on the protocols found. It's mainly used to
