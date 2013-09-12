@@ -1,8 +1,8 @@
 # -*- coding: binary -*-
 module PacketFu
-	# This Mixin simplifies access to the UDPHeaders. Mix this in with your 
-	# packet interface, and it will add methods that essentially delegate to
-	# the 'udp_header' method (assuming that it is a UDPHeader object)
+  # This Mixin simplifies access to the UDPHeaders. Mix this in with your 
+  # packet interface, and it will add methods that essentially delegate to
+  # the 'udp_header' method (assuming that it is a UDPHeader object)
   module UDPHeaderMixin
     def udp_src=(v); self.udp_header.udp_src= v; end
     def udp_src; self.udp_header.udp_src; end
