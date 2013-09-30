@@ -12,6 +12,8 @@ module PacketFu
 		attr_accessor :iface # Default inferface to send packets to
 		attr_accessor :inspect_style # Default is :dissect, can also be :hex or :default
 
+    attr_accessor :timestamp #  access to pcap timestamp
+
 		# Register subclasses in PacketFu.packet_class to do all kinds of neat things
 		# that obviates those long if/else trees for parsing. It's pretty sweet.
 		def self.inherited(subclass)
@@ -35,14 +37,23 @@ module PacketFu
 		# It is no longer neccisary to manually add packet types here.
 		def self.parse(packet=nil,args={})
 			parse_app = true if(args[:parse_app].nil? or args[:parse_app])
-			force_binary(packet)
-			if parse_app
-				classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? packet}
-			else
-				classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? packet}.reject {|pclass| pclass.layer_symbol == :application}
-			end
-			p = classes.sort {|x,y| x.layer <=> y.layer}.last.new
-			parsed_packet = p.read(packet,args)
+      str = packet
+      if packet.is_a? Hash
+        timestamp = packet.keys.first
+        str = packet[timestamp]
+        timestamp = PacketFu::Timestamp.new().read(String.new(timestamp))
+        timestamp = Time.at(timestamp.sec.value, timestamp.usec.value)
+      end
+      force_binary(str)
+      if parse_app
+        classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? str}
+      else
+        classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? str}.reject {|pclass| pclass.layer_symbol == :application}
+      end
+      p = classes.sort {|x,y| x.layer <=> y.layer}.last.new
+      parsed_packet = p.read(str, args)
+      parsed_packet.timestamp = timestamp if packet.is_a? Hash
+      parsed_packet
 		end
 
 		def handle_is_identity(ptype)
