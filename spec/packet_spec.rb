@@ -71,3 +71,53 @@ describe PacketFu::Packet, "abstract packet class behavior" do
 	end
 
 end
+
+describe "standard packet loading should give an array" do
+
+	before(:all) do
+		@packets = PcapFile.new.file_to_array(:filename => File.join(File.dirname(__FILE__),"sample.pcap"))
+		@parsed_packets = @packets.map {|x| Packet.parse(x)}
+	end
+
+	it "of kind" do
+		@packets.should be_a_kind_of(Array)
+	end
+
+	it "where first element is a string" do
+		@packets.first.should be_a_kind_of(String)
+	end
+
+	it "of size 11" do
+		@parsed_packets.size.should == 11
+	end
+
+	it "with timestamps" do
+		@parsed_packets.first.timestamp.should be_nil
+	end
+
+end
+
+describe "packet loading with timestamp should give an array" do
+
+	before(:all) do
+		@packets = PcapFile.new.file_to_array(:filename => File.join(File.dirname(__FILE__),"sample.pcap"), :keep_timestamps => true)
+		@parsed_packets = @packets.map {|x| Packet.parse(x)}
+	end
+
+	it "of kind" do
+		@packets.should be_a_kind_of(Array)
+	end
+
+	it "where first element is a hash" do
+		@packets.first.should be_a_kind_of(Hash)
+	end
+
+	it "of size 11" do
+		@parsed_packets.size.should == 11
+	end
+
+	it "with timestamp is" do
+		@parsed_packets.first.timestamp.should == Time.at(1255289346, 244202)
+	end
+
+end
