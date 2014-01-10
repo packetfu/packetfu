@@ -1,5 +1,6 @@
 # -*- coding: binary -*-
 require 'singleton'
+require 'timeout'
 module PacketFu
 
 	# Utils is a collection of various and sundry network utilities that are useful for packet
@@ -100,35 +101,43 @@ module PacketFu
 			udp_sock = UDPSocket.new
 			udp_sock.send(msg,0,dst_host,dst_port)
 			udp_sock = nil
-			cap.save
-			pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
-			timeout = 0
-			while timeout < 1 # Sometimes packet generation can be a little pokey.
-				if pkt
-					timeout = 1.1 # Cancel the timeout
-					if pkt.payload == msg
-					my_data =	{
-						:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo").to_s,
-						:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
-						:eth_saddr => pkt.eth_saddr,
-						:eth_src => pkt.eth_src.to_s,
-						:ip_saddr => pkt.ip_saddr,
-						:ip_src => pkt.ip_src,
-						:ip_src_bin => [pkt.ip_src].pack("N"),
-						:eth_dst => pkt.eth_dst.to_s,
-						:eth_daddr => pkt.eth_daddr
-					}
-					else raise SecurityError, 
-						"whoami() packet doesn't match sent data. Something fishy's going on."
+
+			my_data = nil
+
+			begin
+				Timeout::timeout(1) {
+					pkt = nil
+					
+					while pkt.nil?
+						raw_pkt = cap.next
+						next if raw_pkt.nil?
+
+						pkt = Packet.parse(raw_pkt)
+						
+						if pkt.payload == msg
+
+							my_data =	{
+								:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo").to_s,
+								:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
+								:eth_saddr => pkt.eth_saddr,
+								:eth_src => pkt.eth_src.to_s,
+								:ip_saddr => pkt.ip_saddr,
+								:ip_src => pkt.ip_src,
+								:ip_src_bin => [pkt.ip_src].pack("N"),
+								:eth_dst => pkt.eth_dst.to_s,
+								:eth_daddr => pkt.eth_daddr
+							}
+
+						else raise SecurityError, 
+							"whoami() packet doesn't match sent data. Something fishy's going on."
+						end
+
 					end
-				else
-					sleep 0.1; timeout += 0.1
-					cap.save
-					pkt = Packet.parse(cap.array[0]) unless cap.save.zero?
-				end
-				raise SocketError, "Didn't receive the whoami() packet, can't automatically configure." if !pkt
-				cap = nil
+				}
+			rescue Timeout::Error
+				raise SocketError, "Didn't receive the whoami() packet, can't automatically configure."
 			end
+
 			my_data
 		end
 
