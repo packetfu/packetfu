@@ -18,34 +18,24 @@ Marshall Beddoe's PcapRub is required only for packet reading and writing from a
 
 === Platforms
 
-I tend to test with the following (with bash):
+Given the security issues with older Rubies and the long-past [EOL for
+1.8.x](http://www.ruby-lang.org/en/news/2011/10/06/plans-for-1-8-7/),
+PacketFu is rather stuck on very recent versions of 1.9.3 (as of this
+moment, the version to trust is 1.9.3-p484).
 
-    date > /tmp/tests.txt; for i in default 1.8.6-p420 1.8.7-p334 1.9.1-p431 1.9.2-p180 1.9.3-head
-    do rvm use $i >> /tmp/tests.txt
-    echo Testing with $i
-    echo $i >> /tmp/tests.txt; echo +++++++++++++++++++++++ >> /tmp/tests.txt
-    rvmsudo ./all_tests.rb >> /tmp/tests.txt; rspec . >> /tmp/tests.txt
-    done
+==== 1.8.x
 
-==== Problem Platforms
+EOL, no longer supported in any sense. PacketFu may or may not work.
 
-* 1.8.6-p420 -- Has problems with pcaprub and capture/inject. Technically, these are pcaprub problems and not PacketFu problems, but PacketFu should at least fail better at them.
+==== 1.9.x
 
-* 1.9.1-p431 -- Has problems with loading gems in general, see http://redmine.ruby-lang.org/issues/2404
+1.9.3-p484.
 
-* 2.0.0-p0   -- Has problems with binary encoding of strings that do not manifest in 1.9.x See https://github.com/todb/packetfu/issues/28
+==== 2.x
 
-
-
-==== Passing Platforms
-
-* 1.9.1-p378
-* 1.8.7-p334
-* 1.9.2-p180 (suggested version)
-* 1.9.3-head
-
-
-
+Not yet vetted. I don't believe there's anything exciting in these
+platforms, but there has been no attempt yet to perform formal testing.
+I know, I'm behind the times.
 
 == Examples
 
@@ -53,7 +43,7 @@ PacketFu ships with dozens and dozens of tests, built on Test::Unit. These shoul
 
 == Author
 
-PacketFu is maintained primarily by Tod Beardsley todb@planb-security.net, with help from Open Source Land.
+PacketFu is maintained primarily by Tod Beardsley todb@packetfu.com, with help from Open Source Land.
 
 See LICENSE for licensing details.
 
