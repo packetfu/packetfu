@@ -37,11 +37,11 @@ module PacketFu
 			parse_app = true if(args[:parse_app].nil? or args[:parse_app])
 			force_binary(packet)
 			if parse_app
-				classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? packet}
+				classes = PacketFu.packet_classes_by_layer
 			else
-				classes = PacketFu.packet_classes.select {|pclass| pclass.can_parse? packet}.reject {|pclass| pclass.layer_symbol == :application}
+				classes = PacketFu.packet_classes_by_layer_without_application
 			end
-			p = classes.sort {|x,y| x.layer <=> y.layer}.last.new
+			p = classes.detect { |pclass| pclass.can_parse?(packet) }.new
 			parsed_packet = p.read(packet,args)
 		end
 

@@ -78,8 +78,8 @@ module PacketFu
 		end
 		@packet_classes ||= []
 		@packet_classes << klass
-		@packet_classes_dirty = true
-		@packet_classes.sort! {|x,y| x.name <=> y.name}
+		self.clear_packet_groups
+		@packet_classes.sort_by! { |x| x.name }
 	end
 
 	# Presumably, there may be a time where you'd like to remove a packet class.
@@ -87,7 +87,7 @@ module PacketFu
 		raise "Need a class" unless klass.kind_of? Class
 		@packet_classes ||= []
 		@packet_classes.delete klass
-		@packet_classes_dirty = true
+		self.clear_packet_groups
 		@packet_classes 
 	end
 
@@ -99,10 +99,32 @@ module PacketFu
 	# Returns an array of packet types by packet prefix.
 	def self.packet_prefixes
 		return [] if @packet_classes.nil?
-		return @packet_class_prefixes if @packet_classes_dirty == false
-		@packet_classes_dirty = false
-		@packet_class_prefixes = @packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
-		return @packet_class_prefixes
+		self.reset_packet_groups unless @packet_class_prefixes
+		@packet_class_prefixes
+	end
+	
+	def self.packet_classes_by_layer
+		return [] if @packet_classes.nil?
+		self.reset_packet_groups unless @packet_classes_by_layer
+		@packet_classes_by_layer
+	end
+	
+	def self.packet_classes_by_layer_without_application
+		return [] if @packet_classes.nil?
+		self.reset_packet_groups unless @packet_classes_by_layer_without_application
+		@packet_classes_by_layer_without_application
+	end
+	
+	def self.clear_packet_groups
+		@packet_class_prefixes = nil
+		@packet_classes_by_layer = nil
+		@packet_classes_by_layer_without_application = nil
+	end		
+
+	def self.reset_packet_groups
+ 		@packet_class_prefixes = @packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
+		@packet_classes_by_layer = @packet_classes.sort_by { |pclass| pclass.layer }.reverse
+		@packet_classes_by_layer_without_application = @packet_classes_by_layer.reject { |pclass| pclass.layer_symbol == :application }
 	end
 
 	# The current inspect style. One of :hex, :dissect, or :default

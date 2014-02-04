@@ -1,5 +1,4 @@
-$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
-require 'packetfu'
+require 'spec_helper'
 
 include PacketFu
 
