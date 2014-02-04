@@ -1,6 +1,8 @@
 # -*- coding: binary -*-
 require 'singleton'
 require 'timeout'
+require 'network_interface'
+
 module PacketFu
 
 	# Utils is a collection of various and sundry network utilities that are useful for packet
@@ -63,6 +65,11 @@ module PacketFu
 			IPAddr.new((rand(16777216) + 2969567232), Socket::AF_INET)
 		end
 
+		# A helper for getting a random port number
+		def self.rand_port
+			rand(0xffff-1024)+1024
+		end
+
 		# Discovers the local IP and Ethernet address, which is useful for writing
 		# packets you expect to get a response to. Note, this is a noisy
 		# operation; a UDP packet is generated and dropped on to the default (or named)
@@ -94,9 +101,9 @@ module PacketFu
 				dst_host = (args[:target] || rand_routable_daddr.to_s)
 			end
 
-			dst_port = rand(0xffff-1024)+1024
+			dst_port = rand_port
 			msg = "PacketFu whoami? packet #{(Time.now.to_i + rand(0xffffff)+1)}"
-			iface = (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || :lo ).to_s
+			iface = (args[:iface] || ENV['IFACE'] || default_int || :lo ).to_s
 			cap = PacketFu::Capture.new(:iface => iface, :promisc => false, :start => true, :filter => "udp and dst host #{dst_host} and dst port #{dst_port}")
 			udp_sock = UDPSocket.new
 			udp_sock.send(msg,0,dst_host,dst_port)
@@ -117,7 +124,7 @@ module PacketFu
 						if pkt.payload == msg
 
 							my_data =	{
-								:iface => (args[:iface] || ENV['IFACE'] || Pcap.lookupdev || "lo").to_s,
+								:iface => (args[:iface] || ENV['IFACE'] || default_int || "lo").to_s,
 								:pcapfile => args[:pcapfile] || "/tmp/out.pcap",
 								:eth_saddr => pkt.eth_saddr,
 								:eth_src => pkt.eth_src.to_s,
@@ -141,11 +148,35 @@ module PacketFu
 			my_data
 		end
 
-		# This is a brute-force approach at trying to find a suitable interface with an IP address.
-		def self.lookupdev
-			# XXX cycle through eth0-9 and wlan0-9, and if a cap start throws a RuntimeErorr (and we're
-			# root), it's not a good interface. Boy, really ought to fix lookupdev directly with another
-			# method that returns an array rather than just the first candidate.
+		# Determine the default ip address
+		def self.default_ip
+			begin
+				orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true  # turn off reverse DNS resolution temporarily
+ 
+  			UDPSocket.open do |s|
+    			s.connect rand_routable_daddr.to_s, rand_port
+    			s.addr.last
+  			end
+			ensure
+  			Socket.do_not_reverse_lookup = orig
+			end
+		end
+
+		# Determine the default routeable interface
+		def self.default_int
+			ip = default_ip
+
+			NetworkInterface.interfaces.each do |interface|
+				NetworkInterface.addresses(interface).values.each do |addresses|
+					addresses.each do |address|
+						next if address["addr"].nil?
+						return interface if address["addr"] == ip
+					end
+				end
+			end
+
+			# Fall back to libpcap as last resort
+			return Pcap.lookupdev
 		end
 
 		# Handles ifconfig for various (okay, two) platforms.
