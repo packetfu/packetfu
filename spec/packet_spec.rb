@@ -1,11 +1,13 @@
-$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
-require 'packetfu'
+require 'spec_helper'
 
 describe PacketFu::Packet, "abstract packet class behavior" do
 
 	before(:all) do
-		class PacketFu::FooPacket < PacketFu::Packet; end
-		class PacketFu::BarPacket < PacketFu::Packet; end
+		add_fake_packets
+	end
+
+	after(:all) do
+		remove_fake_packets
 	end
 
 	it "should not be instantiated" do

@@ -1,5 +1,4 @@
-$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
-require 'packetfu'
+require 'spec_helper'
 
 describe PacketFu, "version information" do
 	it "reports a version number" do
@@ -55,12 +54,6 @@ describe PacketFu, "protocol requires" do
 end
 
 describe PacketFu, "packet class list management" do
-
-	before(:all) do
-		class PacketFu::FooPacket < PacketFu::Packet; end
-		class PacketFu::BarPacket < PacketFu::Packet; end
-		class PacketFu::PacketBaz; end
-	end
 
 	it "should allow packet class registration" do
 		PacketFu.add_packet_class(PacketFu::FooPacket).should be_kind_of Array
