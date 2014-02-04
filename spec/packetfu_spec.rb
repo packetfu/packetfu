@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe PacketFu, "version information" do
 	it "reports a version number" do
-		PacketFu::VERSION.should match /^1\.[0-9]\.[0-9]$/
+		PacketFu::VERSION.should match /^1\.[0-9]+\.[0-9]+$/
 	end
 	its(:version) {should eq PacketFu::VERSION}
 
