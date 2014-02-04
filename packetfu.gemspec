@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.files       = `git ls-files`.split($/)
   s.license     = 'BSD'
 
-  s.add_development_dependency('pcaprub', '>= 0.9.2')
+  s.add_dependency('pcaprub', '>= 0.9.2')
   s.add_development_dependency('rspec',   '>= 2.6.2')
   s.add_development_dependency('sdoc',    '>= 0.2.0')
 
