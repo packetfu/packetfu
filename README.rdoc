@@ -3,7 +3,7 @@
 A library for reading and writing packets to an interface or to a
 libpcap-formatted file.
 
-It is maintained at https://github.com/todb/packetfu .
+It is maintained at https://github.com/packetfu/packetfu .
 
 == Documentation
 
