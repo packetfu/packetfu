@@ -254,6 +254,30 @@ module PacketFu
 						ret[:ip6_obj] = IPAddr.new($1)
 					end
 				end # darwin
+			when /freebsd/i
+					ifconfig_data = %x[ifconfig #{iface}]
+					if ifconfig_data =~ /#{iface}/
+						ifconfig_data = ifconfig_data.split(/[\s]*\n[\s]*/)
+					else
+						raise ArgumentError, "Cannot ifconfig #{iface}"
+					end
+					real_iface = ifconfig_data.first
+					ret[:iface] = real_iface.split.first.downcase.chomp(":")
+					ifconfig_data.each do |s|
+						case s
+						when /ether[\s]*([0-9a-fA-F:]{17})/
+							ret[:eth_saddr] = $1.downcase
+							ret[:eth_src] = EthHeader.mac2str(ret[:eth_saddr])
+						when /inet[\s]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(.*netmask[\s]*(0x[0-9a-fA-F]{8}))?/
+							ret[:ip_saddr] = $1
+							ret[:ip_src] = [IPAddr.new($1).to_i].pack("N")
+							ret[:ip4_obj] = IPAddr.new($1)
+							ret[:ip4_obj] = ret[:ip4_obj].mask(($3.hex.to_s(2) =~ /0*$/)) if $3
+						when /inet6[\s]*([0-9a-fA-F:\x2f]+)/
+							ret[:ip6_saddr] = $1
+							ret[:ip6_obj] = IPAddr.new($1)
+					end
+				end # freebsd
 			end # RUBY_PLATFORM
 			ret
 		end
