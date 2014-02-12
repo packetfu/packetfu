@@ -1,5 +1,7 @@
 = PacketFu
 
+{<img src="https://codeclimate.com/github/packetfu/packetfu.png" />}[https://codeclimate.com/github/packetfu/packetfu]
+
 A library for reading and writing packets to an interface or to a
 libpcap-formatted file.
 
