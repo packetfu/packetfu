@@ -23,19 +23,19 @@ puts "Testing PacketFu v#{PacketFu::VERSION}"
 dir = Dir.new(File.dirname(__FILE__))
 
 dir.each { |file|
-	next unless File.file? file
-	next unless file[/^test_.*rb$/]
-	next if file == $0
-	puts "Running #{file}..."
-	cmd = %x{ruby #{file}}
-	if cmd[/ 0 failures/] && cmd[/ 0 errors/] 
-		puts "#{file}: All passed"
-	else
-		puts "File: #{file} had failures or errors:"
-		puts "-" * 80
-		puts cmd
-		puts "-" * 80
-	end
+  next unless File.file? file
+  next unless file[/^test_.*rb$/]
+  next if file == $0
+  puts "Running #{file}..."
+  cmd = %x{ruby #{file}}
+  if cmd[/ 0 failures/] && cmd[/ 0 errors/] 
+    puts "#{file}: All passed"
+  else
+    puts "File: #{file} had failures or errors:"
+    puts "-" * 80
+    puts cmd
+    puts "-" * 80
+  end
 }
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
