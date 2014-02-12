@@ -14,10 +14,10 @@ include PacketFu
 
 packets = PcapFile.file_to_array fname
 packets.each do |packet|
-	puts "_" * 75
-	puts packet.inspect
-	puts "_" * 75
-	pkt = Packet.parse(packet)
-	puts pkt.dissect
-	sleep sleep_interval
+  puts "_" * 75
+  puts packet.inspect
+  puts "_" * 75
+  pkt = Packet.parse(packet)
+  puts pkt.dissect
+  sleep sleep_interval
 end

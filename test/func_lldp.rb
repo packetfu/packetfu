@@ -6,12 +6,12 @@ $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'
 
 def lldp_pcap
-	fname = "./sample_lldp.pcap"
-	fname if File.readable? fname
+  fname = "./sample_lldp.pcap"
+  fname if File.readable? fname
 end
 
 def lldp_test()
-	raise RuntimeError, "Need a sample_lldp.pcap to check!" unless lldp_pcap
+  raise RuntimeError, "Need a sample_lldp.pcap to check!" unless lldp_pcap
   cap = PacketFu::PcapFile.new.file_to_array(:filename => lldp_pcap)
   cap.each do |p|
         pkt = PacketFu::Packet.parse p
