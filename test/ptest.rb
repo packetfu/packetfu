@@ -5,9 +5,9 @@ require 'packetfu'
 include PacketFu
 
 if Process.euid.zero? 
-	puts ">> Interface: " << Pcap.lookupdev
+  puts ">> Interface: " << Pcap.lookupdev
 else
-	puts ">> No interface access"
+  puts ">> No interface access"
 end	
 puts ">> Version: " << PacketFu.version
 

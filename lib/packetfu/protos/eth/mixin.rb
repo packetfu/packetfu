@@ -1,8 +1,8 @@
 # -*- coding: binary -*-
 module PacketFu
-	# This Mixin simplifies access to the EthHeaders. Mix this in with your 
-	# packet interface, and it will add methods that essentially delegate to
-	# the 'eth_header' method (assuming that it is a EthHeader object)
+  # This Mixin simplifies access to the EthHeaders. Mix this in with your 
+  # packet interface, and it will add methods that essentially delegate to
+  # the 'eth_header' method (assuming that it is a EthHeader object)
   module EthHeaderMixin
     def eth_daddr; self.eth_header.eth_daddr ; end
     def eth_daddr=(v); self.eth_header.eth_daddr= v; end
