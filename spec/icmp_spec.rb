@@ -28,7 +28,7 @@ describe ICMPPacket, "when read from a pcap file" do
       @icmp_packet.icmp_sum.to_s(16).should eq @icmp_packet.icmp_calc_sum.to_s(16)
     end
 
-    it "should have the right checksum even with backslash in payload" do
+    it "should have the right checksum even with 0xOA byte in payload" do
       @icmp_packet_with_backslash.icmp_sum.to_s(16).should eq @icmp_packet_with_backslash.icmp_calc_sum.to_s(16)
     end
 
