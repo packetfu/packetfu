@@ -9,7 +9,7 @@ describe ICMPPacket, "when read from a pcap file" do
         @icmp_packet = parsed_packets[3]
 
         parsed_packets3 = PcapFile.read_packets(File.join(File.dirname(__FILE__),"sample3.pcap"))
-        @icmp_packet_with_backslash = parsed_packets3[8]
+        @icmp_packet2 = parsed_packets3[8] # contains 0x0A byte in payload
     end
 
     it "should be recognized as an icmp packet" do
@@ -29,7 +29,7 @@ describe ICMPPacket, "when read from a pcap file" do
     end
 
     it "should have the right checksum even with 0xOA byte in payload" do
-      @icmp_packet_with_backslash.icmp_sum.to_s(16).should eq @icmp_packet_with_backslash.icmp_calc_sum.to_s(16)
+      @icmp_packet2.icmp_sum.to_s(16).should eq @icmp_packet2.icmp_calc_sum.to_s(16)
     end
 
 end
