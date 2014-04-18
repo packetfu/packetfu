@@ -78,7 +78,7 @@ describe StructFu::Int8, "one byte value" do
     @int.to_s.should == "\x02"
     @int.read(254)
     @int.to_i.should == 254
-    @int.to_s.should == "\xfe"
+    @int.to_s.should == "\xfe".force_encoding("binary")
   end
 
 end
@@ -98,7 +98,7 @@ describe StructFu::Int16, "two byte value" do
   end
 
   it "should print a two character packed string" do
-    @int.to_s.should == "\x00\x0b"
+    @int.to_s.should == "\x00\x0b".force_encoding("binary")
   end
 
   it "should have a value of 11" do
@@ -113,7 +113,7 @@ describe StructFu::Int16, "two byte value" do
     @int.to_s.should == "\x00\x02"
     @int.read(254)
     @int.to_i.should == 254
-    @int.to_s.should == "\x00\xfe"
+    @int.to_s.should == "\x00\xfe".force_encoding("binary")
   end
 
   it "should be able to set endianness" do
@@ -198,7 +198,7 @@ describe StructFu::Int32, "four byte value" do
     @int.to_s.should == "\x00\x00\x00\x02"
     @int.read(254)
     @int.to_i.should == 254
-    @int.to_s.should == "\x00\x00\x00\xfe"
+    @int.to_s.should == "\x00\x00\x00\xfe".force_encoding("binary")
   end
 
   it "should be able to set endianness" do
