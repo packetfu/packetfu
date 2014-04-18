@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency('network_interface', '>= 0.0.1')
   s.add_dependency('pcaprub', '>= 0.9.2')
+  s.add_development_dependency('bundler')
+  s.add_development_dependency('rake')
   s.add_development_dependency('rspec',   '>= 2.6.2')
   s.add_development_dependency('sdoc',    '>= 0.2.0')
 
