@@ -1,5 +1,6 @@
 = PacketFu
 
+{<img src="https://travis-ci.org/packetfu/packetfu.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/packetfu/packetfu]
 {<img src="https://codeclimate.com/github/packetfu/packetfu.png" />}[https://codeclimate.com/github/packetfu/packetfu]
 
 A library for reading and writing packets to an interface or to a
@@ -61,4 +62,3 @@ PacketFu is maintained primarily by Tod Beardsley todb@packetfu.com,
 with help from Open Source Land.
 
 See LICENSE for licensing details.
-
