@@ -10,12 +10,12 @@ describe StructFu, "mixin methods" do
   end
 
   it "should provide the basic StructFu methods" do
-    @sc.respond_to?(:sz).should be_true
-    @sc.respond_to?(:len).should be_true
-    @sc.respond_to?(:typecast).should be_true
-    @sc.respond_to?(:body=).should be_true
+    @sc.respond_to?(:sz).should be true
+    @sc.respond_to?(:len).should be true
+    @sc.respond_to?(:typecast).should be true
+    @sc.respond_to?(:body=).should be true
   end
-end	
+end
 
 describe StructFu::Int, "basic Int class" do
 
