@@ -149,7 +149,7 @@ module PacketFu
 
     # Calculates the payload length.
     def ipv6_calc_len
-      self[:ipv6_len] = body.to_s.length
+      self.ipv6_len = body.to_s.length
     end
 
     # Recalculates the calculatable fields for this object.
@@ -158,7 +158,7 @@ module PacketFu
       when :ipv6_len
         ipv6_calc_len
       when :all
-        ipv6_recalc(:len)
+        ipv6_recalc(:ipv6_len)
       end
     end
 
