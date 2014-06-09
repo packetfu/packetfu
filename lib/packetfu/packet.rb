@@ -116,6 +116,8 @@ module PacketFu
       case arg
       when :ip
         ip_recalc(:all)
+      when :ipv6
+        ipv6_recalc(:all)
       when :icmp
         icmp_recalc(:all)
       when :udp
@@ -124,6 +126,7 @@ module PacketFu
         tcp_recalc(:all)
       when :all
         ip_recalc(:all) if @ip_header
+        ipv6_recalc(:all) if @ipv6_header
         icmp_recalc(:all) if @icmp_header
         udp_recalc(:all) if @udp_header
         tcp_recalc(:all) if @tcp_header
