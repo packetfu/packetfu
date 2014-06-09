@@ -13,7 +13,7 @@ describe ICMPPacket, "when read from a pcap file" do
     end
 
     it "should be recognized as an icmp packet" do
-        @icmp_packet.is_icmp?.should be_true
+        @icmp_packet.is_icmp?.should be true
     end
 
     it "should report the right seq number" do

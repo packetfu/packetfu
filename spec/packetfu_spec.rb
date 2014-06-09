@@ -9,15 +9,15 @@ describe PacketFu, "version information" do
   it "can compare version strings" do
     PacketFu.binarize_version("1.2.3").should == 0x010203
     PacketFu.binarize_version("3.0").should == 0x030000
-    PacketFu.at_least?("1.0").should be_true
-    PacketFu.at_least?("4.0").should be_false
-    PacketFu.older_than?("4.0").should be_true
-    PacketFu.newer_than?("1.0").should be_true
+    PacketFu.at_least?("1.0").should be true
+    PacketFu.at_least?("4.0").should be false
+    PacketFu.older_than?("4.0").should be true
+    PacketFu.newer_than?("1.0").should be true
   end
 
   it "can handle .pre versions" do
     PacketFu.binarize_version("1.7.6.pre").should == 0x010706
-    PacketFu.at_least?("0.9.0.pre").should be_true
+    PacketFu.at_least?("0.9.0.pre").should be true
   end
 end
 
@@ -37,9 +37,9 @@ describe PacketFu, "pcaprub deps" do
     rescue LoadError
     end
     if has_pcap
-      PacketFu.instance_variable_get(:@pcaprub_loaded).should be_true
+      PacketFu.instance_variable_get(:@pcaprub_loaded).should be true
     else
-      PacketFu.instance_variable_get(:@pcaprub_loaded).should be_false
+      PacketFu.instance_variable_get(:@pcaprub_loaded).should be false
     end
   end
 end
