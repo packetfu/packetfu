@@ -15,8 +15,8 @@ describe PacketFu::Packet, "abstract packet class behavior" do
   end
 
   it "should allow subclasses to instantiate" do
-    expect { PacketFu::FooPacket.new }. to be
-    PacketFu.packet_classes.include?(PacketFu::FooPacket).should be_true
+    expect(PacketFu::FooPacket.new).to be
+    PacketFu.packet_classes.include?(PacketFu::FooPacket).should be true
   end
 
   it "should register packet classes with PacketFu" do
@@ -25,11 +25,11 @@ describe PacketFu::Packet, "abstract packet class behavior" do
   end
 
   it "should disallow badly named subclasses" do
-    expect { 
+    expect {
       class PacketFu::PacketNot < PacketFu::Packet
-      end 
+      end
     }.to raise_error
-    PacketFu.packet_classes.include?(PacketFu::PacketNot).should be_false
+    PacketFu.packet_classes.include?(PacketFu::PacketNot).should be false
     PacketFu.packet_classes {should_not include(PacketNot) }
   end
 
