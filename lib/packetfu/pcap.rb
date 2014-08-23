@@ -422,7 +422,7 @@ module PacketFu
       end
       arr.each_with_index do |p,i|
         if p.kind_of? Hash # Binary timestamps are included
-          this_ts = p.keys.first
+          this_ts = p.keys.first.dup
           this_incl_len = p.values.first.size
           this_orig_len = this_incl_len
           this_data = p.values.first
