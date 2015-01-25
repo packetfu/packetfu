@@ -59,6 +59,18 @@ module PacketFu
       cap_thread.value
     end
 
+    def self.arp_cache
+      arp_cache = {}
+      arp_table = `arp -na`
+      arp_table.split(/\n/).each do |line|
+        match = line.match(/\? \((?<ip>\d+\.\d+\.\d+\.\d+)\) at (?<mac>([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})(?: \[ether\])? on (?<int>[a-zA-Z0-9]+)/)
+        if match
+          arp_cache[match[:ip]] = [match[:mac], match[:int]]
+        end
+      end
+      arp_cache
+    end
+
     # Since 177/8 is IANA reserved (for now), this network should 
     # be handled by your default gateway and default interface.
     def self.rand_routable_daddr
