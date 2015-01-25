@@ -23,6 +23,9 @@ module PacketFu
     #    The flavor of the ARP request. Defaults to :none.
     #   :timeout
     #    Timeout in seconds. Defaults to 3.
+    #   :no_cache
+    #    Do not query ARP cache and always send an ARP request. Defaults to
+    #    false.
     #
     #  === Example
     #    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
@@ -33,6 +36,11 @@ module PacketFu
     #  It goes without saying, spewing forged ARP packets on your network is a great way to really
     #  irritate your co-workers.
     def self.arp(target_ip,args={})
+      unless args[:no_cache]
+        cache = self.arp_cache
+        return cache[target_ip].first if cache[target_ip]
+      end
+
       iface = args[:iface] || :eth0
       args[:config] ||= whoami?(:iface => iface)
       arp_pkt = PacketFu::ARPPacket.new(:flavor => (args[:flavor] || :none), :config => args[:config])
