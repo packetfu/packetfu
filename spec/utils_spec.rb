@@ -24,6 +24,9 @@ describe Utils do
       allow(PacketFu::Utils).to receive(:ifconfig_data_string) { mac_osx_reply }
       util_reply = PacketFu::Utils.ifconfig
 
+      # Ensure we got a hash back
+      expect(util_reply).to be_a(::Hash)
+
       # Ensure all our values parse correctly
       expect(util_reply[:iface]).to eq("ifconfig en0")
       expect(util_reply[:eth_saddr]).to eq("78:31:c1:ce:39:bc")
