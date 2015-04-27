@@ -21,8 +21,8 @@ describe Utils do
                       "nd6 options=1<PERFORMNUD>\n" +
                       "media: autoselect\n" +
                       "status: active\n"
-      allow(PacketFu::Utils).to receive(:ifconfig_data_string) { mac_osx_reply }
-      util_reply = PacketFu::Utils.ifconfig
+      allow(PacketFu::Utils).to receive(:ifconfig_data_string).and_return(mac_osx_reply)
+      util_reply = PacketFu::Utils.ifconfig("en0")
 
       # Ensure we got a hash back
       expect(util_reply).to be_a(::Hash)
