@@ -201,7 +201,7 @@ module PacketFu
     #   #=> {:eth_saddr=>"00:1c:23:35:70:3b", :eth_src=>"\000\034#5p;", :ip_saddr=>"10.10.10.9", :ip4_obj=>#<IPAddr: IPv4:10.10.10.0/255.255.254.0>, :ip_src=>"\n\n\n\t", :iface=>"eth0", :ip6_saddr=>"fe80::21c:23ff:fe35:703b/64", :ip6_obj=>#<IPAddr: IPv6:fe80:0000:0000:0000:0000:0000:0000:0000/ffff:ffff:ffff:ffff:0000:0000:0000:0000>}
     #   PacketFu::Utils.ifconfig :lo
     #   #=> {:ip_saddr=>"127.0.0.1", :ip4_obj=>#<IPAddr: IPv4:127.0.0.0/255.0.0.0>, :ip_src=>"\177\000\000\001", :iface=>"lo", :ip6_saddr=>"::1/128", :ip6_obj=>#<IPAddr: IPv6:0000:0000:0000:0000:0000:0000:0000:0001/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff>}
-    def self.ifconfig(iface='eth0')
+    def self.ifconfig(iface=default_int)
       ret = {}
       iface = iface.to_s.scan(/[0-9A-Za-z]/).join # Sanitizing input, no spaces, semicolons, etc.
       case RUBY_PLATFORM
