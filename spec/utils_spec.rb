@@ -29,7 +29,7 @@ describe Utils do
       expect(util_reply).to be_a(::Hash)
 
       # Ensure all our values parse correctly
-      expect(util_reply[:iface]).to eq("ifconfig en0")
+      expect(util_reply[:iface]).to eq("en0")
       expect(util_reply[:eth_saddr]).to eq("78:31:c1:ce:39:bc")
       expect(util_reply[:eth_src]).to eq("x1\xC1\xCE9\xBC")
       expect(util_reply[:ip6_saddr]).to eq("fe80::7a31:c1ff:fece:39bc")
