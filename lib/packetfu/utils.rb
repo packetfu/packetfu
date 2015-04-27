@@ -179,6 +179,15 @@ module PacketFu
       return Pcap.lookupdev
     end
 
+    # Determine the ifconfig data string for a given interface
+    def self.ifconfig_data_string(iface=default_int)
+      # Make sure to only get interface data for a real interface
+      unless NetworkInterface.interfaces.include?(iface)
+        raise ArgumentError, "#{iface} interface does not exist"
+      end
+      return %x[ifconfig #{iface}]
+    end
+
     # Handles ifconfig for various (okay, two) platforms.
     # Will have Windows done shortly.
     #
@@ -206,7 +215,7 @@ module PacketFu
       iface = iface.to_s.scan(/[0-9A-Za-z]/).join # Sanitizing input, no spaces, semicolons, etc.
       case RUBY_PLATFORM
       when /linux/i
-        ifconfig_data = %x[ifconfig #{iface}]
+        ifconfig_data = ifconfig_data_string(iface)
         if ifconfig_data =~ /#{iface}/i
           ifconfig_data = ifconfig_data.split(/[\s]*\n[\s]*/)
         else
@@ -231,14 +240,13 @@ module PacketFu
           end
         end # linux
       when /darwin/i
-        ifconfig_data = %x[ifconfig #{iface}]
+        ifconfig_data = ifconfig_data_string(iface)
         if ifconfig_data =~ /#{iface}/i
           ifconfig_data = ifconfig_data.split(/[\s]*\n[\s]*/)
         else
           raise ArgumentError, "Cannot ifconfig #{iface}"
         end
-        real_iface = ifconfig_data.first
-        ret[:iface] = real_iface.split(':')[0]
+        ret[:iface] = iface
         ifconfig_data.each do |s|
           case s
           when /ether[\s]([0-9a-fA-F:]{17})/i
