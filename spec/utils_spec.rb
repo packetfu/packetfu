@@ -10,7 +10,7 @@ describe Utils do
 
     it "should prevent non-interface values" do
       expect {
-        PacketFu::Utils.ifconfig("not_a_interface")
+        PacketFu::Utils.ifconfig("not_an_interface")
       }.to raise_error(ArgumentError)
     end
   end
