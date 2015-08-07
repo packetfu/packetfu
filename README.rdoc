@@ -58,7 +58,7 @@ to use your interfaces).
 
 == Author
 
-PacketFu is maintained primarily by Tod Beardsley todb@packetfu.com,
-with help from Open Source Land.
+PacketFu is maintained primarily by Tod Beardsley todb@packetfu.com and
+Jonathan Claudius claudijd@yahoo.com, with help from Open Source Land.
 
 See LICENSE for licensing details.
