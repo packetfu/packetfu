@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# -*- coding: binary -*-
+
 require 'test/unit'
 $:.unshift File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 require 'packetfu'

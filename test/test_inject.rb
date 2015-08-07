@@ -11,12 +11,12 @@ class InjectTest < Test::Unit::TestCase
   end
 
   def test_whoami
-    assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
+    assert_nothing_raised { PacketFu::Utils.whoami?(:iface => PacketFu::Utils.default_int) }
   end
 
   def test_to_w
     assert_equal(Process.euid, 0, "TEST FAIL: This test must be run as root")
-    conf = PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo'))
+    conf = PacketFu::Utils.whoami?(:iface => PacketFu::Utils.default_int)
     p = PacketFu::UDPPacket.new(:config => conf)
     p.udp_dport = 12345
     p.udp_sport = 12345
