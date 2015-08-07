@@ -5,6 +5,9 @@ require 'packetfu/protos/eth/mixin'
 require 'packetfu/protos/ip/header'
 require 'packetfu/protos/ip/mixin'
 
+require 'packetfu/protos/ipv6/header'
+require 'packetfu/protos/ipv6/mixin'
+
 require 'packetfu/protos/udp/header'
 require 'packetfu/protos/udp/mixin'
 
@@ -17,12 +20,18 @@ module PacketFu
   #   udp_pkt = PacketFu::UDPPacket.new
   #   udp_pkt.udp_src=rand(0xffff-1024) + 1024
   #   udp_pkt.udp_dst=53
-  # 
   #   udp_pkt.ip_saddr="1.2.3.4"
   #   udp_pkt.ip_daddr="10.20.30.40"
-  #
   #   udp_pkt.recalc
   #   udp_pkt.to_f('/tmp/udp.pcap')
+  #
+  #   udp6_pkt = PacketFu::UDPPacket.new(:on_ipv6 => true)
+  #   udp6_pkt.udp_src=rand(0xffff-1024) + 1024
+  #   udp6_pkt.udp_dst=53
+  #   udp6_pkt.ip6_saddr="4::1"
+  #   udp6_pkt.ip6_daddr="12:3::4567"
+  #   udp6_pkt.recalc
+  #   udp6_pkt.to_f('/tmp/udp.pcap')
   #
   # == Parameters
   #
@@ -38,9 +47,10 @@ module PacketFu
   class UDPPacket < Packet
     include ::PacketFu::EthHeaderMixin
     include ::PacketFu::IPHeaderMixin
+    include ::PacketFu::IPv6HeaderMixin
     include ::PacketFu::UDPHeaderMixin
 
-    attr_accessor :eth_header, :ip_header, :udp_header
+    attr_accessor :eth_header, :ip_header, :ipv6_header, :udp_header
 
     def self.can_parse?(str)
       return false unless str.size >= 28
@@ -62,13 +72,25 @@ module PacketFu
     end
 
     def initialize(args={})
-      @eth_header = EthHeader.new(args).read(args[:eth])
-      @ip_header = IPHeader.new(args).read(args[:ip])
-      @ip_header.ip_proto=0x11
-      @udp_header = UDPHeader.new(args).read(args[:icmp])
-      @ip_header.body = @udp_header
-      @eth_header.body = @ip_header
-      @headers = [@eth_header, @ip_header, @udp_header]
+      if args[:on_ipv6] or args[:ipv6]
+        @eth_header = EthHeader.new(args.merge(:eth_proto => 0x86dd)).read(args[:eth])
+        @ipv6_header = IPv6Header.new(args).read(args[:ipv6])
+        @ipv6_header.ipv6_next=0x11
+      else
+        @eth_header = EthHeader.new(args).read(args[:eth])
+        @ip_header = IPHeader.new(args).read(args[:ip])
+        @ip_header.ip_proto=0x11
+      end
+      @udp_header = UDPHeader.new(args).read(args[:udp])
+      if args[:on_ipv6] or args[:ipv6]
+        @ipv6_header.body = @udp_header
+        @eth_header.body = @ipv6_header
+        @headers = [@eth_header, @ipv6_header, @udp_header]
+      else
+        @ip_header.body = @udp_header
+        @eth_header.body = @ip_header
+        @headers = [@eth_header, @ip_header, @udp_header]
+      end
       super
       udp_calc_sum
     end
@@ -78,10 +100,19 @@ module PacketFu
     def udp_calc_sum
       # This is /not/ delegated down to @udp_header since we need info
       # from the IP header, too.
-      checksum = (ip_src.to_i >> 16)
-      checksum += (ip_src.to_i & 0xffff)
-      checksum += (ip_dst.to_i >> 16)
-      checksum += (ip_dst.to_i & 0xffff)
+      checksum = 0
+      if @ipv6_header
+        [ipv6_src, ipv6_dst].each do |iaddr|
+          8.times do |i|
+            checksum += (iaddr >> (i * 16)) & 0xffff
+          end
+        end
+      else
+        checksum += (ip_src.to_i >> 16)
+        checksum += (ip_src.to_i & 0xffff)
+        checksum += (ip_dst.to_i >> 16)
+        checksum += (ip_dst.to_i & 0xffff)
+      end
       checksum += 0x11
       checksum += udp_len.to_i
       checksum += udp_src.to_i
@@ -134,6 +165,11 @@ module PacketFu
       peek_data << "%23s" % "I:"
       peek_data << "%04x" % self.ip_id
       peek_data.join
+    end
+
+    # Is that packet an UDP on IPv6 packet ?
+    def ipv6?
+      @ipv6_header
     end
 
   end
