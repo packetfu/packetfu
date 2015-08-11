@@ -66,5 +66,30 @@ describe Utils do
       expect(util_reply[:ip4_obj]).to eq(IPAddr.new("192.168.10.0/24"))
     end
 
+    it "should work on FreeBSD" do
+      stub_const("RUBY_PLATFORM", "freebsd")
+      freebsd_reply = "dc0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500\n" + 
+                      "options=80008<VLAN_MTU,LINKSTATE>\n" + 
+                      "ether 00:a0:cc:da:da:da\n" + 
+                      "inet 192.168.1.3 netmask 0xffffff00 broadcast 192.168.1.255\n" + 
+                      "media: Ethernet autoselect (100baseTX <full-duplex>)\n" + 
+                      "status: active"
+      allow(PacketFu::Utils).to receive(:ifconfig_data_string).and_return(freebsd_reply)
+      util_reply = PacketFu::Utils.ifconfig("dc0")
+
+      # Ensure we got a hash back
+      expect(util_reply).to be_a(::Hash)
+
+      # Ensure all our values parse correctly
+      expect(util_reply[:iface]).to eq("dc0")
+      expect(util_reply[:eth_saddr]).to eq("00:a0:cc:da:da:da")
+      expect(util_reply[:eth_src]).to eq("\x00\xA0\xCC\xDA\xDA\xDA")
+      expect(util_reply[:ip6_saddr]).to eq(nil)
+      expect(util_reply[:ip6_obj]).to eq(nil)
+      expect(util_reply[:ip_saddr]).to eq("192.168.1.3")
+      expect(util_reply[:ip_src]).to eq("\xC0\xA8\x01\x03")
+      expect(util_reply[:ip4_obj]).to eq(IPAddr.new("192.168.1.0/24"))
+    end
+
   end
 end
