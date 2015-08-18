@@ -32,7 +32,7 @@ describe StructFu::Int, "basic Int class" do
   end
 
   it "should raise when to_s'ed directly" do
-    expect { @int.to_s}.to raise_error
+    expect { @int.to_s}.to raise_error(StandardError, "StructFu::Int#to_s accessed, must be redefined.")
   end
 
   it "should have a value of 8" do
@@ -145,8 +145,8 @@ describe StructFu::Int16le, "2 byte little-endian value" do
   end
 
   it "should raise when you try to change endianness" do
-    expect { @int.endian = :big }.to raise_error
-    expect { @int.endian = :little }.to raise_error
+    expect { @int.endian = :big }.to raise_error(NoMethodError, /undefined method `endian='/)
+    expect { @int.endian = :little }.to raise_error(NoMethodError, /undefined method `endian='/)
   end
 
 end
@@ -162,8 +162,8 @@ describe StructFu::Int16be, "2 byte big-endian value" do
   end
 
   it "should raise when you try to change endianness" do
-    expect { @int.endian = :big }.to raise_error
-    expect { @int.endian = :little }.to raise_error
+    expect { @int.endian = :big }.to raise_error(NoMethodError, /undefined method `endian='/)
+    expect { @int.endian = :little }.to raise_error(NoMethodError, /undefined method `endian='/)
   end
 
 end
@@ -230,8 +230,8 @@ describe StructFu::Int32le, "4 byte little-endian value" do
   end
 
   it "should raise when you try to change endianness" do
-    expect { @int.endian = :big }.to raise_error
-    expect { @int.endian = :little }.to raise_error
+    expect { @int.endian = :big }.to raise_error(NoMethodError, /undefined method `endian='/)
+    expect { @int.endian = :little }.to raise_error(NoMethodError, /undefined method `endian='/)
   end
 
 end
@@ -247,8 +247,8 @@ describe StructFu::Int32be, "4 byte big-endian value" do
   end
 
   it "should raise when you try to change endianness" do
-    expect { @int.endian = :big }.to raise_error
-    expect { @int.endian = :little }.to raise_error
+    expect { @int.endian = :big }.to raise_error(NoMethodError, /undefined method `endian='/)
+    expect { @int.endian = :little }.to raise_error(NoMethodError, /undefined method `endian='/)
   end
 
 end
@@ -328,7 +328,7 @@ describe StructFu::IntString do
 
   it "should raise when a string is too short" do
     data = "\x01A"
-    expect { @istr.read(data) }.to raise_error
+    expect { @istr.read(data) }.to raise_error(StandardError, "String is too short for type StructFu::Int32")
   end
 
 end
