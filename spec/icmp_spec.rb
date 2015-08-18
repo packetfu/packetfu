@@ -1,5 +1,6 @@
 # -*- coding: binary -*-
 require 'spec_helper'
+require 'tempfile'
 
 include PacketFu
 
