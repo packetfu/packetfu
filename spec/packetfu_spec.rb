@@ -49,7 +49,7 @@ describe PacketFu, "protocol requires" do
     PacketFu::EthPacket.should_not be_nil
     PacketFu::IPPacket.should_not be_nil
     PacketFu::TCPPacket.should_not be_nil
-    expect { PacketFu::FakePacket }.to raise_error
+    expect { PacketFu::FakePacket }.to raise_error(NameError, "uninitialized constant PacketFu::FakePacket")
   end
 end
 
@@ -63,7 +63,7 @@ describe PacketFu, "packet class list management" do
   its(:packet_classes) {should include(PacketFu::FooPacket)}
 
   it "should disallow non-classes as packet classes" do
-    expect { PacketFu.add_packet_class("A String") }.to raise_error
+    expect { PacketFu.add_packet_class("A String") }.to raise_error(RuntimeError, "Need a class")
   end
 
   its(:packet_prefixes) {should include("bar")}
