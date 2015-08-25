@@ -22,4 +22,12 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files  = %w[.document README.rdoc]
   s.test_files        = (s.files & (Dir['spec/**/*_spec.rb'] + Dir['test/test_*.rb']) )
   s.rubyforge_project = 'packetfu'
+
+  cert = File.expand_path("~/.ssh/gem-private_key_todb.pem")
+
+  if File.exist?(cert) and File.readable?(cert)
+    s.signing_key = cert
+    s.cert_chain = ['gem-public_cert.pem']
+  end
+
 end
