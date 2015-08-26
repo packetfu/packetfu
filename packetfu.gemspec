@@ -4,8 +4,8 @@ require './lib/packetfu/version'
 Gem::Specification.new do |s|
   s.name        = 'packetfu'
   s.version     = PacketFu::VERSION
-  s.authors     = ['Tod Beardsley']
-  s.email       = 'todb@packetfu.com'
+  s.authors     = ['Tod Beardsley', 'Jonathan Claudius']
+  s.email       = ['todb@packetfu.com', 'claudijd@yahoo.com']
   s.summary     = 'PacketFu is a mid-level packet manipulation library.'
   s.homepage    = 'https://github.com/packetfu/packetfu'
   s.description = %q{
