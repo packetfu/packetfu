@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Tod Beardsley']
   s.email       = 'todb@packetfu.com'
   s.summary     = 'PacketFu is a mid-level packet manipulation library.'
-  s.homepage    = 'https://github.com/todb/packetfu'
+  s.homepage    = 'https://github.com/packetfu/packetfu'
   s.description = %q{
     PacketFu is a mid-level packet manipulation library for Ruby. With
     it, users can read, parse, and write network packets with the level of
