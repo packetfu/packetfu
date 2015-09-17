@@ -1,5 +1,4 @@
 # Picks up all the protocols defined in the protos subdirectory
-Dir.glob("packetfu/protos").each do |file|
-  next unless file[/\.rb$/]
+Dir.glob("protos/*.rb").each do |file|
   require File.expand_path(file)
 end
