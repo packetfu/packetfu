@@ -1,30 +1,6 @@
 # -*- coding: binary -*-
 
-# :title: PacketFu Documentation
-# :main: README
-
-cwd = File.expand_path(File.dirname(__FILE__))
-
-$: << cwd
-
-require File.join(cwd,"packetfu","structfu")
-require "ipaddr"
-require 'rubygems' if RUBY_VERSION =~ /^1\.[0-8]/
-
 module PacketFu
-
-  # Picks up all the protocols defined in the protos subdirectory
-  def self.require_protos(cwd)
-    protos_dir = File.join(cwd, "packetfu", "protos")
-    Dir.new(protos_dir).each do |fname|
-      next unless fname[/\.rb$/]
-      begin 
-        require File.join(protos_dir,fname)
-      rescue
-        warn "Warning: Could not load `#{fname}'. Skipping."
-      end
-    end
-  end
 
   # Deal with Ruby's encoding by ignoring it.
   def self.force_binary(str)
@@ -45,18 +21,18 @@ module PacketFu
     rescue LoadError
       return false
     end
-    @pcaprub_loaded = true 
+    @pcaprub_loaded = true
   end
 
   pcaprub_platform_require
 
   if @pcaprub_loaded
     pcaprub_regex = /[0-9]\.([8-9]|[1-7][0-9])(-dev)?/ # Regex for 0.8 and beyond.
-    if Pcap.version !~ pcaprub_regex 
+    if Pcap.version !~ pcaprub_regex
       @pcaprub_loaded = false # Don't bother with broken versions
       raise LoadError, "PcapRub not at a minimum version of 0.8-dev"
     end
-    require "packetfu/capture" 
+    require "packetfu/capture"
     require "packetfu/inject"
   end
 
@@ -88,7 +64,7 @@ module PacketFu
     @packet_classes ||= []
     @packet_classes.delete klass
     self.clear_packet_groups
-    @packet_classes 
+    @packet_classes
   end
 
   # Returns an array of packet classes
@@ -102,24 +78,24 @@ module PacketFu
     self.reset_packet_groups unless @packet_class_prefixes
     @packet_class_prefixes
   end
-  
+
   def self.packet_classes_by_layer
     return [] if @packet_classes.nil?
     self.reset_packet_groups unless @packet_classes_by_layer
     @packet_classes_by_layer
   end
-  
+
   def self.packet_classes_by_layer_without_application
     return [] if @packet_classes.nil?
     self.reset_packet_groups unless @packet_classes_by_layer_without_application
     @packet_classes_by_layer_without_application
   end
-  
+
   def self.clear_packet_groups
     @packet_class_prefixes = nil
     @packet_classes_by_layer = nil
     @packet_classes_by_layer_without_application = nil
-  end		
+  end
 
   def self.reset_packet_groups
  		@packet_class_prefixes = @packet_classes.map {|p| p.to_s.split("::").last.to_s.downcase.gsub(/packet$/,"")}
@@ -148,7 +124,7 @@ module PacketFu
       end
   end
 
-  # Switches inspect styles in a round-robin fashion between 
+  # Switches inspect styles in a round-robin fashion between
   # :dissect, :default, and :hex
   def toggle_inspect
     case @inspect_style
@@ -162,15 +138,13 @@ module PacketFu
       @inspect_style = :dissect
     end
   end
-
-
 end
 
-require File.join(cwd,"packetfu","version")
-require File.join(cwd,"packetfu","pcap")
-require File.join(cwd,"packetfu","packet")
-PacketFu.require_protos(cwd)
-require File.join(cwd,"packetfu","utils")
-require File.join(cwd,"packetfu","config")
-
-# vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
+require 'ipaddr'
+require 'packetfu/structfu'
+require 'packetfu/version'
+require 'packetfu/pcap'
+require 'packetfu/packet'
+require 'packetfu/protos'
+require 'packetfu/utils'
+require 'packetfu/config'
