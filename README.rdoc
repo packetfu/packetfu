@@ -36,7 +36,7 @@ This project is integrated with travis-ci and is regularly tested to work with t
 * 2.1.6
 * 2.2.3
 
-To checkout the current build status for these rubies, click [here](https://travis-ci.org/packetfu/packetfu).
+To checkout the current build status for these rubies, click here: https://travis-ci.org/packetfu/packetfu.
 
 == Examples
 
