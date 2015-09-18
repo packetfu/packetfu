@@ -1,4 +1,8 @@
 require 'spec_helper'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/tcp'
+require 'packetfu/pcap'
 
 include PacketFu
 
@@ -97,4 +101,3 @@ describe TCPPacket do
   end
 
 end
-

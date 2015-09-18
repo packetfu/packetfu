@@ -8,8 +8,6 @@
 # forever. This still takes kinda forever, but at 5000 packets
 # every 11 seconds (my own benchmark) for this script, at least
 # it doesn't hog up all your memory.
-
-require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 def print_results(stats)
@@ -46,8 +44,3 @@ if File.readable?(infile = (ARGV[0] || 'in.pcap'))
 else
   raise RuntimeError, "Need an infile, like so: #{$0} in.pcap"
 end
-
-
-
-
-

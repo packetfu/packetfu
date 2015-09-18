@@ -8,11 +8,8 @@ sleep_interval = ARGV[1] || 1
 
 require File.join("..","lib","packetfu")
 puts "Loaded: PacketFu v#{PacketFu.version}"
-# $: << File.join(File.expand_path(File.dirname(__FILE__)),"..","lib")
 
-include PacketFu
-
-packets = PcapFile.file_to_array fname
+packets = PacketFu::PcapFile.file_to_array fname
 packets.each do |packet|
   puts "_" * 75
   puts packet.inspect

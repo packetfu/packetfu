@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'tempfile'
+require 'packetfu/protos/ip'
 
 include PacketFu
 

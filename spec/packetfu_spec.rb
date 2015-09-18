@@ -1,4 +1,9 @@
 require 'spec_helper'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/tcp'
+require 'packetfu/version'
+require 'fake_packets'
 
 describe PacketFu, "version information" do
   it "reports a version number" do

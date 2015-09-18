@@ -3,8 +3,6 @@
 
 # A simple local network fingerprinter. Uses the OUI list.
 # Usage: rvmsudo ./arphood.rb [iface] [network] <oui.txt>
-
-require './examples'
 require 'packetfu'
 require 'open-uri'
 
@@ -39,7 +37,7 @@ def arp_everyone
   253.times do |i|
     threads[i] = Thread.new do
       this_host = network + ".#{i+1}"
-      print "." 
+      print "."
       colon_mac = PacketFu::Utils.arp(this_host,my_net.config)
       unless colon_mac.nil?
         hyphen_mac = colon_mac.tr(':','-').upcase[0,8]
@@ -58,4 +56,3 @@ if $root_ok
   sleep 3
   $arp_results.sort.each {|a| puts a unless a =~ /NOTHERE/}
 end
-

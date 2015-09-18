@@ -1,5 +1,9 @@
 # -*- coding: binary -*-
 require 'spec_helper'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/arp'
+require 'packetfu/protos/ip'
+require 'packetfu/pcap'
 require 'tempfile'
 
 include PacketFu

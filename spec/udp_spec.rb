@@ -1,12 +1,12 @@
 require 'spec_helper'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/udp'
 
 include PacketFu
 
-
 describe UDPPacket do
-
   context "new" do
-
     it "should create UDP on IPv4 packets by default" do
       udp = UDPPacket.new
       expect(udp.ip_header).to be_a(IPHeader)
@@ -27,6 +27,5 @@ describe UDPPacket do
       expect(udp.udp_sum).to eq(0xbb82)
       expect(udp.udp_len).to eq(24)
     end
-
   end
 end
