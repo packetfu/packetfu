@@ -27,26 +27,16 @@ writing from a network interfaces (which is a pretty big only). PcapRub
 itself relies on libpcap 0.9.8 or later for packet injection. PcapRub
 also requires root privileges to access the interface directly.
 
-=== Platforms
+=== Supported Rubies
 
-Given the security issues with older Rubies and the long-past [EOL for
-1.8.x](http://www.ruby-lang.org/en/news/2011/10/06/plans-for-1-8-7/),
-PacketFu is rather stuck on very recent versions of 1.9.3 (as of this
-moment, the version to trust is 1.9.3-p484).
+This project is integrated with travis-ci and is regularly tested to work with the following rubies:
 
-==== 1.8.x
+* 1.9.3
+* 2.0.0
+* 2.1.6
+* 2.2.3
 
-EOL, no longer supported in any sense. PacketFu may or may not work.
-
-==== 1.9.x
-
-1.9.3-p484.
-
-==== 2.x
-
-Not yet vetted. I don't believe there's anything exciting in these
-platforms, but there has been no attempt yet to perform formal testing.
-I know, I'm behind the times.
+To checkout the current build status for these rubies, click here: https://travis-ci.org/packetfu/packetfu.
 
 == Examples
 
