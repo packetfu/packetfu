@@ -75,7 +75,7 @@ describe IPPacket do
 
       @ip_packet.to_f(ip_pcap_file, 'a')
       expect(File.exists?('ip_pcap'))
-      expect(ip_pcap_file.read.size).to be >= 50
+      expect(ip_pcap_file.read.size).to be >= 49
     end
   end
 end
