@@ -1,4 +1,9 @@
 require 'spec_helper'
+require 'packetfu/packet'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/tcp'
+require 'fake_packets'
 
 describe PacketFu::Packet, "abstract packet class behavior" do
 

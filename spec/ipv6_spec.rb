@@ -1,4 +1,8 @@
 require 'spec_helper'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/ipv6'
+require 'packetfu/pcap'
 
 include PacketFu
 
