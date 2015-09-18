@@ -6,9 +6,7 @@
 #
 # == Usage
 #
-#   irb -r packetfu-shell.rb
-# or
-#   sudo irb -r packetfu-shell.rb
+#   sudo ruby -I lib packetfu-shell.rb
 #
 # If run as root, packet capturing/injecting is available, which includes
 # access to Utils.whoami?
@@ -44,6 +42,7 @@
 #  72 20 62 69 74 73 2e                              r bits.
 #  => nil
 require 'packetfu'
+require 'irb'
 
 module PacketFu
   def whoami?(args={})
@@ -109,3 +108,5 @@ rescue RuntimeError
 end
 
 banner
+
+IRB.start
