@@ -1,4 +1,3 @@
 # Picks up all the protocols defined in the protos subdirectory
-Dir.glob("protos/*.rb").each do |file|
-  require File.expand_path(file)
-end
+path = File.expand_path("lib/packetfu/protos/*.rb")
+Dir.glob(path).each {|file| require file}
