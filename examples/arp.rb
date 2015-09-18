@@ -4,8 +4,6 @@
 # It's contrived because this is really how PacketFu::Utils got born; something similiar
 # (and a wee bit cleaner) is already available as Packet::Utils::arp, since knowing the
 # MAC address of a target IP turns out to be pretty useful day-to-day.
-
-require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 def usage
@@ -30,12 +28,12 @@ def arp(target_ip)
   arp_pkt.arp_daddr_mac = "00:00:00:00:00:00"
 
   arp_pkt.arp_saddr_ip = $packetfu_default[:ip_saddr]
-  arp_pkt.arp_daddr_ip = target_ip 
+  arp_pkt.arp_daddr_ip = target_ip
 
   # Stick the Capture object in its own thread.
 
   cap_thread = Thread.new do
-    cap = PacketFu::Capture.new(:start => true, 
+    cap = PacketFu::Capture.new(:start => true,
                                 :filter => "arp src #{target_ip} and ether dst #{arp_pkt.eth_saddr}")
     arp_pkt.to_w # Shorthand for sending single packets to the default interface.
     target_mac = nil
@@ -57,5 +55,3 @@ def arp(target_ip)
 end
 
 arp(target_ip)
-
-

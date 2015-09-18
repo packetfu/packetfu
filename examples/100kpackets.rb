@@ -3,7 +3,6 @@
 
 # Used mainly to test for memory leaks and to demo the preferred ways of
 # reading and writing packets to and from pcap files.
-require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 include PacketFu
@@ -15,7 +14,7 @@ count = 0
 
 100.times do
   @pcaps = []
-  1000.times do 
+  1000.times do
     u = UDPPacket.new
     u.ip_src = [rand(2**32-1)].pack("N")
     u.ip_dst = [rand(2**32-1)].pack("N")
@@ -37,6 +36,3 @@ read_packets_start = Time.now.utc
 puts "Reading packets..."
 packet_bytes = PcapFile.read_packets "/tmp/out.pcap"
 puts "Read #{packet_bytes.size} parsed packets in #{Time.now.utc - read_packets_start} seconds."
-
-
-
