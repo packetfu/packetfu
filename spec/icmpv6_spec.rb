@@ -10,11 +10,9 @@ include PacketFu
 
 describe ICMPv6Packet, "when read from a pcap file" do
   before(:all) do
-    parsed_packets = PcapFile.read_packets(File.join(File.dirname(__FILE__),"ipv6_icmp.pcap"))
+    parsed_packets = PcapFile.read_packets(File.join(File.dirname(__FILE__),
+                                                     "ipv6_icmp.pcap"))
     @icmpv6_packet = parsed_packets.first
-
-    #parsed_packets3 = PcapFile.read_packets(File.join(File.dirname(__FILE__),"sample3.pcap"))
-    #@icmp_packet2 = parsed_packets3[8] # contains 0x0A byte in payload
   end
 
   it 'should be recognized as an icmp packet' do
