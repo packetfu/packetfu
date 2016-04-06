@@ -54,7 +54,7 @@ describe PacketFu, "protocol requires" do
     PacketFu::EthPacket.should_not be_nil
     PacketFu::IPPacket.should_not be_nil
     PacketFu::TCPPacket.should_not be_nil
-    expect { PacketFu::FakePacket }.to raise_error(NameError, "uninitialized constant PacketFu::FakePacket")
+    expect { PacketFu::FakePacket }.to raise_error(NameError, /uninitialized constant PacketFu::FakePacket/)
   end
 end
 
