@@ -16,18 +16,24 @@ can generate local documentation easily with either `yard doc .` or
 done, navigate at the top, and read up on how to create a Packet or
 Capture from an interface with show_live or whatever.
 
-== Requirements
+== Setup
 
-PcapRub:
+To install the gem, type
 
-$ rvm gem install pcaprub
+```bash
+gem install packetfu
+```
 
-Marshall Beddoe's PcapRub is required only for packet reading and
-writing from a network interfaces (which is a pretty big only). PcapRub
-itself relies on libpcap 0.9.8 or later for packet injection. PcapRub
-also requires root privileges to access the interface directly.
+To install from source, type
 
-=== Supported Rubies
+```bash
+gem install bundler
+git clone https://github.com/packetfu/packetfu.git
+cd packetfu
+bundle install
+```
+
+== Supported Rubies
 
 This project is integrated with travis-ci and is regularly tested to work with the following rubies:
 
