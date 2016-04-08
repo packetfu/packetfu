@@ -56,7 +56,49 @@ Net: 192.168.0.0                              Iface:   en0
 2.3.0 :001 >
 ```
 
-Once you're a this point, you're in an IRB (aka: REPL) interface when you can start creating and injection packets with PacketFu
+Once you're a this point, you're in an IRB (aka: [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)) interface when you can start creating and injection packets with PacketFu.
+
+Here's an example of creating a TCPPacket and sending it out on the wire:
+
+```
+2.3.0 :002 > packet = TCPPacket.new(:config => Utils.whoami?)
+ => --EthHeader-------------------------------------------
+  eth_dst      ec:08:6b:62:bc:d2 PacketFu::EthMac     
+  eth_src      ac:bc:32:85:47:3f PacketFu::EthMac     
+  eth_proto    0x0800            StructFu::Int16      
+--IPHeader--------------------------------------------
+  ip_v         4                 Fixnum               
+  ip_hl        5                 Fixnum               
+  ip_tos       0                 StructFu::Int8       
+  ip_len       20                StructFu::Int16      
+  ip_id        0x77e4            StructFu::Int16      
+  ip_frag      0                 StructFu::Int16      
+  ip_ttl       32                StructFu::Int8       
+  ip_proto     6                 StructFu::Int8       
+  ip_sum       0xffff            StructFu::Int16      
+  ip_src       192.168.0.100     PacketFu::Octets     
+  ip_dst       0.0.0.0           PacketFu::Octets     
+--TCPHeader-------------------------------------------
+  tcp_src      42653             StructFu::Int16      
+  tcp_dst      0                 StructFu::Int16      
+  tcp_seq      0x8d65fbbf        StructFu::Int32      
+  tcp_ack      0x00000000        StructFu::Int32      
+  tcp_hlen     5                 PacketFu::TcpHlen    
+  tcp_reserved 0                 PacketFu::TcpReserved
+  tcp_ecn      0                 PacketFu::TcpEcn     
+  tcp_flags    ......            PacketFu::TcpFlags   
+  tcp_win      16384             StructFu::Int16      
+  tcp_sum      0x7f29            StructFu::Int16      
+  tcp_urg      0                 StructFu::Int16      
+  tcp_opts                       PacketFu::TcpOptions
+
+2.3.0 :003 > packet.ip_dst = "8.8.8.8"
+ => "8.8.8.8"
+2.3.0 :004 > packet.tcp_dst = 53
+ => 53
+2.3.0 :005 > packet.to_w
+ => [1, 1, 54]
+```
 
 ## Documentation
 
