@@ -1,7 +1,6 @@
 # -*- coding: binary -*-
 require 'singleton'
 require 'timeout'
-require 'network_interface'
 
 module PacketFu
 
@@ -165,12 +164,12 @@ module PacketFu
     # Determine the default routeable interface
     def self.default_int
       ip = default_ip
-      
+
       Socket.getifaddrs.each do |ifaddr|
         next unless ifaddr.addr.ip?
-        
+
         return ifaddr.name if ifaddr.addr.ip_address == ip
-      end      
+      end
 
       # Fall back to libpcap as last resort
       return Pcap.lookupdev
