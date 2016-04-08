@@ -31,10 +31,9 @@ also requires root privileges to access the interface directly.
 
 This project is integrated with travis-ci and is regularly tested to work with the following rubies:
 
-* 1.9.3
-* 2.0.0
 * 2.1.6
 * 2.2.3
+* 2.3.0
 
 To checkout the current build status for these rubies, click here: https://travis-ci.org/packetfu/packetfu.
 
