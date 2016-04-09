@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: binary -*-
 
-# Simple-stats.rb takes a pcap file, and gives some simple 
+# Simple-stats.rb takes a pcap file, and gives some simple
 # stastics on the protocols found. It's mainly used to
 # demonstrate a method to parse pcap files.
 #
@@ -9,8 +9,6 @@
 #
 # See new-simple-stats.rb for an example of the streaming
 # parsing method.
-
-require './examples' # For path setting slight-of-hand
 require 'packetfu'
 
 # Takes a file name, parses the packets, and records the packet
@@ -23,7 +21,7 @@ def count_packet_types(file)
   pcapfile.read(file)
   pcapfile.each do |p|
     # Now it's a PacketFu packet struct.
-    pkt = PacketFu::Packet.parse(p.data) 
+    pkt = PacketFu::Packet.parse(p.data)
     kind = pkt.class.to_s.split("::").last
     if stats[kind]
       stats[kind] += 1
@@ -44,8 +42,3 @@ if File.readable?(infile = (ARGV[0] || 'in.pcap'))
 else
   raise RuntimeError, "Need an infile, like so: #{$0} in.pcap"
 end
-
-
-
-
-

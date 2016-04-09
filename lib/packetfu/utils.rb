@@ -1,7 +1,6 @@
 # -*- coding: binary -*-
 require 'singleton'
 require 'timeout'
-require 'network_interface'
 
 module PacketFu
 
@@ -186,13 +185,10 @@ module PacketFu
     def self.default_int
       ip = default_ip
 
-      NetworkInterface.interfaces.each do |interface|
-        NetworkInterface.addresses(interface).values.each do |addresses|
-          addresses.each do |address|
-            next if address["addr"].nil?
-            return interface if address["addr"] == ip
-          end
-        end
+      Socket.getifaddrs.each do |ifaddr|
+        next unless ifaddr.addr.ip?
+
+        return ifaddr.name if ifaddr.addr.ip_address == ip
       end
 
       # Fall back to libpcap as last resort
@@ -202,7 +198,7 @@ module PacketFu
     # Determine the ifconfig data string for a given interface
     def self.ifconfig_data_string(iface=default_int)
       # Make sure to only get interface data for a real interface
-      unless NetworkInterface.interfaces.include?(iface)
+      unless Socket.getifaddrs.any? {|ifaddr| ifaddr.name == iface}
         raise ArgumentError, "#{iface} interface does not exist"
       end
       return %x[ifconfig #{iface}]
@@ -287,6 +283,29 @@ module PacketFu
             ret[:ip6_obj] = IPAddr.new($1)
           end
         end # darwin
+      when /freebsd/i
+          ifconfig_data = ifconfig_data_string(iface)
+          if ifconfig_data =~ /#{iface}/
+            ifconfig_data = ifconfig_data.split(/[\s]*\n[\s]*/)
+          else
+            raise ArgumentError, "Cannot ifconfig #{iface}"
+          end
+          ret[:iface] = iface
+          ifconfig_data.each do |s|
+            case s
+            when /ether[\s]*([0-9a-fA-F:]{17})/
+              ret[:eth_saddr] = $1.downcase
+              ret[:eth_src] = EthHeader.mac2str(ret[:eth_saddr])
+            when /inet[\s]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(.*netmask[\s]*(0x[0-9a-fA-F]{8}))?/
+              ret[:ip_saddr] = $1
+              ret[:ip_src] = [IPAddr.new($1).to_i].pack("N")
+              ret[:ip4_obj] = IPAddr.new($1)
+              ret[:ip4_obj] = ret[:ip4_obj].mask(($3.hex.to_s(2) =~ /0*$/)) if $3
+            when /inet6[\s]*([0-9a-fA-F:\x2f]+)/
+              ret[:ip6_saddr] = $1
+              ret[:ip6_obj] = IPAddr.new($1)
+          end
+        end # freebsd
       end # RUBY_PLATFORM
       ret
     end

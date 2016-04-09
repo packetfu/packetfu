@@ -4,7 +4,7 @@ module PacketFu
   # The Inject class handles injecting arrays of binary data on the wire.
   #
   # To inject single packets, use PacketFu::Packet.to_w() instead.
-  class Inject 
+  class Inject
     attr_accessor :array, :stream, :show_live # Leave these public and open.
     attr_reader :iface, :snaplen, :promisc, :timeout # Cant change after the init.
 
@@ -19,7 +19,7 @@ module PacketFu
     end
 
     # Takes an array, and injects them onto an interface. Note that
-    # complete packets (Ethernet headers on down) are expected. 
+    # complete packets (Ethernet headers on down) are expected.
     #
     # === Parameters
     #
@@ -48,7 +48,7 @@ module PacketFu
         pkt_count +=1
         puts "Sent Packet \##{pkt_count} (#{pkt.size})" if show_live
       end
-      # Return # of packets sent, array size, and array total size 
+      # Return # of packets sent, array size, and array total size
       [pkt_count, pkt_array.size, pkt_array.join.size]
     end
 

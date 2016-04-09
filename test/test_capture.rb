@@ -11,7 +11,7 @@ class CaptureTest < Test::Unit::TestCase
   end
 
   def test_whoami
-    assert_nothing_raised { PacketFu::Utils.whoami?(:iface => (ENV['IFACE'] || 'lo')) }
+    assert_nothing_raised { PacketFu::Utils.whoami?(:iface => PacketFu::Utils.default_int) }
   end
   
   def test_new

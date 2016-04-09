@@ -1,7 +1,7 @@
 # -*- coding: binary -*-
+require 'packetfu/common'
 require 'packetfu/protos/eth/header'
 require 'packetfu/protos/eth/mixin'
-
 require 'packetfu/protos/arp/header'
 require 'packetfu/protos/arp/mixin'
 
@@ -16,7 +16,7 @@ module PacketFu
   #  arp_pkt.arp_saddr_ip="10.10.10.17"  # Your IP address
   #  arp_pkt.arp_daddr_ip="10.10.10.1"  # Target IP address
   #  arp_pkt.arp_opcode=1  # Request
-  # 
+  #
   #  arp_pkt.to_w('eth0')	# Inject on the wire. (requires root)
   #  arp_pkt.to_f('/tmp/arp.pcap') # Write to a file.
   #
@@ -24,7 +24,7 @@ module PacketFu
   #
   #  :flavor
   #   Sets the "flavor" of the ARP packet. Choices are currently:
-  #     :windows, :linux, :hp_deskjet 
+  #     :windows, :linux, :hp_deskjet
   #  :eth
   #   A pre-generated EthHeader object. If not specified, a new one will be created.
   #  :arp
@@ -53,23 +53,23 @@ module PacketFu
 
     def initialize(args={})
       @eth_header = EthHeader.new(args).read(args[:eth])
-      @arp_header = ARPHeader.new(args).read(args[:arp]) 
+      @arp_header = ARPHeader.new(args).read(args[:arp])
       @eth_header.eth_proto = "\x08\x06"
       @eth_header.body=@arp_header
 
       # Please send more flavors to todb+packetfu@planb-security.net.
       # Most of these initial fingerprints come from one (1) sample.
       case (args[:flavor].nil?) ? :nil : args[:flavor].to_s.downcase.intern
-      when :windows; @arp_header.body = "\x00" * 64				# 64 bytes of padding 
-      when :linux; @arp_header.body = "\x00" * 4 +				# 32 bytes of padding 
+      when :windows; @arp_header.body = "\x00" * 64				# 64 bytes of padding
+      when :linux; @arp_header.body = "\x00" * 4 +				# 32 bytes of padding
         "\x00\x07\x5c\x14" + "\x00" * 4 +
         "\x00\x0f\x83\x34" + "\x00\x0f\x83\x74" +
-        "\x01\x11\x83\x78" + "\x00\x00\x00\x0c" + 
+        "\x01\x11\x83\x78" + "\x00\x00\x00\x0c" +
         "\x00\x00\x00\x00"
       when :hp_deskjet; 																	# Pads up to 60 bytes.
-        @arp_header.body = "\xe0\x90\x0d\x6c" + 
-        "\xff\xff\xee\xee" + "\x00" * 4 + 
-        "\xe0\x8f\xfa\x18\x00\x20"	
+        @arp_header.body = "\xe0\x90\x0d\x6c" +
+        "\xff\xff\xee\xee" + "\x00" * 4 +
+        "\xe0\x8f\xfa\x18\x00\x20"
       else; @arp_header.body = "\x00" * 18								# Pads up to 60 bytes.
       end
 

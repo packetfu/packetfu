@@ -1,4 +1,9 @@
 require 'spec_helper'
+require 'packetfu/packet'
+require 'packetfu/protos/eth'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/tcp'
+require 'fake_packets'
 
 describe PacketFu::Packet, "abstract packet class behavior" do
 
@@ -28,7 +33,7 @@ describe PacketFu::Packet, "abstract packet class behavior" do
     expect {
       class PacketFu::PacketNot < PacketFu::Packet
       end
-    }.to raise_error
+    }.to raise_error(RuntimeError, "Packet classes should be named 'ProtoPacket'")
     PacketFu.packet_classes.include?(PacketFu::PacketNot).should be false
     PacketFu.packet_classes {should_not include(PacketNot) }
   end

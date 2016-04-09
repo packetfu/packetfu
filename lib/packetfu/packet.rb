@@ -1,9 +1,10 @@
 # -*- coding: binary -*-
+
 module PacketFu
 
   # Packet is the parent class of EthPacket, IPPacket, UDPPacket, TCPPacket, and all
   # other packets. It acts as both a singleton class, so things like
-  # Packet.parse can happen, and as an abstract class to provide 
+  # Packet.parse can happen, and as an abstract class to provide
   # subclasses some structure.
   class Packet
 
@@ -24,7 +25,7 @@ module PacketFu
     end
 
     # Parse() creates the correct packet type based on the data, and returns the apporpiate
-    # Packet subclass object. 
+    # Packet subclass object.
     #
     # There is an assumption here that all incoming packets are either EthPacket
     # or InvalidPacket types. This will be addressed pretty soon.
@@ -108,7 +109,7 @@ module PacketFu
       inj.array = [@headers[0].to_s]
       inj.inject
     end
-    
+
     # Recalculates all the calcuated fields for all headers in the packet.
     # This is important since read() wipes out all the calculated fields
     # such as length and checksum and what all.
@@ -142,7 +143,7 @@ module PacketFu
     # A note on the :strip => true argument: If :strip is set, defined lengths of data will
     # be believed, and any trailers (such as frame check sequences) will be chopped off. This
     # helps to ensure well-formed packets, at the cost of losing perhaps important FCS data.
-    # 
+    #
     # If :strip is false, header lengths are /not/ believed, and all data will be piped in.
     # When capturing from the wire, this is usually fine, but recalculating the length before
     # saving or re-transmitting will absolutely change the data payload; FCS data will become
@@ -169,7 +170,7 @@ module PacketFu
 
     # Packets are bundles of lots of objects, so copying them
     # is a little complicated -- a dup of a packet is actually
-    # full of pass-by-reference stuff in the @headers, so 
+    # full of pass-by-reference stuff in the @headers, so
     # if you change one, you're changing all this copies, too.
     #
     # Normally, this doesn't seem to be a big deal, and it's
@@ -215,7 +216,7 @@ module PacketFu
     # format.
     #
     # === Format
-    # 
+    #
     #   * A one or two character protocol initial. It should be unique
     #   * The packet size
     #   * Useful data in a human-usable form.
@@ -229,7 +230,7 @@ module PacketFu
     #    #=> "T  1054 10.10.10.105:55000   ->   192.168.145.105:80 [......] S:adc7155b|I:8dd0"
     #    tcp_packet.peek.size
     #    #=> 79
-    #   
+    #
     def peek_format
       peek_data = ["?  "]
       peek_data << "%-5d" % self.to_s.size
@@ -237,9 +238,9 @@ module PacketFu
       peek_data.join
     end
 
-    # Defines the layer this packet type lives at, based on the number of headers it 
+    # Defines the layer this packet type lives at, based on the number of headers it
     # requires. Note that this has little to do with the OSI model, since TCP/IP
-    # doesn't really have Session and Presentation layers. 
+    # doesn't really have Session and Presentation layers.
     #
     # Ethernet and the like are layer 1, IP, IPv6, and ARP are layer 2,
     # TCP, UDP, and other transport protocols are layer 3, and application
@@ -299,7 +300,7 @@ module PacketFu
     end
 
     # If @inspect_style is :default (or :ugly), the inspect output is the usual
-    # inspect. 
+    # inspect.
     #
     # If @inspect_style is :hex (or :pretty), the inspect output is
     # a much more compact hexdump-style, with a shortened set of packet header
@@ -335,7 +336,7 @@ module PacketFu
         table << [proto,[]]
         header.class.members.each do |elem|
           elem_sym = elem.to_sym # to_sym needed for 1.8
-          next if elem_sym == :body 
+          next if elem_sym == :body
           elem_type_value = []
           elem_type_value[0] = elem
           readable_element = "#{elem}_readable"
@@ -344,7 +345,7 @@ module PacketFu
           else
             elem_type_value[1] = header.send(elem)
           end
-          elem_type_value[2] = header[elem.to_sym].class.name 
+          elem_type_value[2] = header[elem.to_sym].class.name
           table[table_idx][1] << elem_type_value
         end
       end
@@ -364,7 +365,7 @@ module PacketFu
       dtable = self.dissection_table
       hex_body = nil
       if dtable.last.kind_of?(Array) and dtable.last.first == :body
-        body = dtable.pop 
+        body = dtable.pop
         hex_body = hexify(body[1])
       end
       elem_widths = [0,0,0]
@@ -376,11 +377,11 @@ module PacketFu
           end
         end
       end
-      total_width = elem_widths.inject(0) {|sum,x| sum+x} 
+      total_width = elem_widths.inject(0) {|sum,x| sum+x}
       table = ""
       dtable.each do |proto|
         table << "--"
-        table << proto[0] 
+        table << proto[0]
         if total_width > proto[0].size
           table << ("-" * (total_width - proto[0].size + 2))
         else
@@ -464,7 +465,7 @@ module PacketFu
     alias_method :protocol, :proto
     alias_method :length, :size
 
-    # the Packet class should not be instantiated directly, since it's an 
+    # the Packet class should not be instantiated directly, since it's an
     # abstract class that real packet types inherit from. Sadly, this
     # makes the Packet class more difficult to test directly.
     def initialize(args={})
@@ -493,7 +494,7 @@ module PacketFu
 
     #method_missing() delegates protocol-specific field actions to the apporpraite
     #class variable (which contains the associated packet type)
-    #This register-of-protocols style switch will work for the 
+    #This register-of-protocols style switch will work for the
     #forseeable future (there aren't /that/ many packet types), and it's a handy
     #way to know at a glance what packet types are supported.
     def method_missing(sym, *args, &block)
