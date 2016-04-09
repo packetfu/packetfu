@@ -55,9 +55,12 @@ module PacketFu
     def self.can_parse?(str)
       return false unless str.size >= 28
       return false unless EthPacket.can_parse? str
-      return false unless IPPacket.can_parse? str
-      return false unless str[23,1] == "\x11"
-      return true
+      if IPPacket.can_parse? str
+        return true if str[23,1] == "\x11"
+      elsif IPv6Packet.can_parse? str
+        return true if str[20,1] == "\x11"
+      end
+      false
     end
 
     def read(str=nil, args={})
