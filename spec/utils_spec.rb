@@ -111,6 +111,8 @@ describe Utils do
     end
 
     context 'when cached' do
+      it 'should work on Mac OSX Yosemite'
+
       it 'should work on Ubuntu 14.04 LTS' do
         stub_const('RUBY_PLATFORM', 'x86_64-linux')
         ubuntu_reply = "? (192.168.254.56) at 00:01:02:03:cc:b2 [ether] on eth0\n"
@@ -122,6 +124,8 @@ describe Utils do
         expect(util_reply).to be_a(String)
         expect(util_reply).to eq('00:01:02:03:cc:b2')
       end
+
+      it 'should work on FreeBSD'
     end
 
   end
