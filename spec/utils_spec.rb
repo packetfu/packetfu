@@ -125,7 +125,17 @@ describe Utils do
         expect(util_reply).to eq('00:01:02:03:cc:b2')
       end
 
-      it 'should work on FreeBSD'
+      it 'should work on FreeBSD' do
+        stub_const('RUBY_PLATFORM', 'freebsd')
+        freebsd_reply = "? (192.168.254.57) at 00:13:20:c3:7d:22 on em0 [ethernet]\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(freebsd_reply)
+        whoami_reply = @whoami.call('em0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.57')
+
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('00:13:20:c3:7d:22')
+      end
     end
 
   end
