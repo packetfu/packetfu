@@ -59,7 +59,6 @@ module PacketFu
         return true if str[23,1] == "\x11"
       elsif IPv6Packet.can_parse? str
         return true if str[20,1] == "\x11"
-        p str[21,1]
       end
       false
     end
