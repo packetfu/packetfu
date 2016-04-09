@@ -1,4 +1,6 @@
 # -*- coding: binary -*-
+require 'ipaddr'
+
 module PacketFu
   # AddrIpv6 handles addressing for IPv6Header
   #
