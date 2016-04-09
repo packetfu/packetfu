@@ -93,6 +93,32 @@ describe Utils do
       expect(util_reply[:ip4_obj]).to eq(IPAddr.new("192.168.1.0/24"))
     end
 
+    it "should work on OpenBSD" do
+      stub_const("RUBY_PLATFORM", "openbsd")
+      openbsd_reply = "em0: flags=8b43\\<UP,BROADCAST,RUNNING,PROMISC,ALLMULTI,SIMPLEX,MULTICAST\\> mtu 1500\n" +
+                      "        lladdr 00:01:02:03:04:05\n" +
+                      "        priority: 0\n" +
+                      "        groups: egress\n" +
+                      "        media: Ethernet autoselect (1000baseT full-duplex,rxpause,txpause)\n" +
+                      "        status: active\n" +
+                      "        inet 10.0.0.1 netmask 0xffffff00 broadcast 10.0.0.255"
+      allow(PacketFu::Utils).to receive(:ifconfig_data_string).and_return(openbsd_reply)
+      util_reply = PacketFu::Utils.ifconfig("em0")
+
+      # Ensure we got a hash back
+      expect(util_reply).to be_a(::Hash)
+
+      # Ensure all our values parse correctly
+      expect(util_reply[:iface]).to eq("em0")
+      expect(util_reply[:eth_saddr]).to eq("00:01:02:03:04:05")
+      expect(util_reply[:eth_src]).to eq("\x00\x01\x02\x03\x04\x05")
+      expect(util_reply[:ip6_saddr]).to eq(nil)
+      expect(util_reply[:ip6_obj]).to eq(nil)
+      expect(util_reply[:ip_saddr]).to eq("10.0.0.1")
+      expect(util_reply[:ip_src]).to eq("\n\x00\x00\x01")
+      expect(util_reply[:ip4_obj]).to eq(IPAddr.new("10.0.0.0/24"))
+    end
+
   end
 
   context 'when using arp' do
