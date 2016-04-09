@@ -94,4 +94,59 @@ describe Utils do
     end
 
   end
+
+  context 'when using arp' do
+
+    before(:all) do
+      @whoami = lambda { |iface| {
+                           :iface => iface,
+                           :eth_saddr => '00:01:02:03:dd:b3',
+                           :eth_src => "\x00\x01\x02\x03\xdd\xb3",
+                           :ip_saddr => '192.168.254.1',
+                           :ip_src => 0xc0a8fe01,
+                           :ip_src_bin => "\xc0\xa8\xfe\x01",
+                           :eth_dst => "\x00\x01\x02\x03\xcc\xb2",
+                           :eth_daddr => '00:01:02:03:cc:b2',
+                         } }
+    end
+
+    context 'when cached' do
+      it 'should work on Mac OSX Yosemite' do
+        stub_const('RUBY_PLATFORM', 'macosx')
+        mac_osx_reply = "? (192.168.254.57) at 64:00:00:00:cc:b2 on en0 ifscope [ethernet]\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(mac_osx_reply)
+        whoami_reply = @whoami.call('em0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.57')
+
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('64:00:00:00:cc:b2')
+      end
+
+      it 'should work on Ubuntu 14.04 LTS' do
+        stub_const('RUBY_PLATFORM', 'x86_64-linux')
+        ubuntu_reply = "? (192.168.254.56) at 00:01:02:03:cc:b2 [ether] on eth0\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(ubuntu_reply)
+        whoami_reply = @whoami.call('eth0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.56')
+
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('00:01:02:03:cc:b2')
+      end
+
+      it 'should work on FreeBSD' do
+        stub_const('RUBY_PLATFORM', 'freebsd')
+        freebsd_reply = "? (192.168.254.57) at 00:13:20:c3:7d:22 on em0 [ethernet]\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(freebsd_reply)
+        whoami_reply = @whoami.call('em0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.57')
+
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('00:13:20:c3:7d:22')
+      end
+    end
+
+  end
 end

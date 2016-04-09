@@ -22,6 +22,9 @@ module PacketFu
     #    The flavor of the ARP request. Defaults to :none.
     #   :timeout
     #    Timeout in seconds. Defaults to 3.
+    #   :no_cache
+    #    Do not query ARP cache and always send an ARP request. Defaults to
+    #    false.
     #
     #  === Example
     #    PacketFu::Utils::arp("192.168.1.1") #=> "00:18:39:01:33:70"
@@ -32,6 +35,11 @@ module PacketFu
     #  It goes without saying, spewing forged ARP packets on your network is a great way to really
     #  irritate your co-workers.
     def self.arp(target_ip,args={})
+      unless args[:no_cache]
+        cache = self.arp_cache
+        return cache[target_ip].first if cache[target_ip]
+      end
+
       iface = args[:iface] || :eth0
       args[:config] ||= whoami?(:iface => iface)
       arp_pkt = PacketFu::ARPPacket.new(:flavor => (args[:flavor] || :none), :config => args[:config])
@@ -56,6 +64,25 @@ module PacketFu
         target_mac
       end # cap_thread
       cap_thread.value
+    end
+
+    # Determine ARP cache data string
+    def self.arp_cache_raw
+      %x(/usr/sbin/arp -na)
+    end
+
+    # Get ARP cache.
+    # More rubyish than PAcketFu::Utils.arp_cache_data_string
+    def self.arp_cache
+      arp_cache = {}
+      arp_table = arp_cache_raw
+      arp_table.split(/\n/).each do |line|
+        match = line.match(/\? \((?<ip>\d+\.\d+\.\d+\.\d+)\) at (?<mac>([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})(?: \[ether\])? on (?<int>[a-zA-Z0-9]+)/)
+        if match
+          arp_cache[match[:ip]] = [match[:mac], match[:int]]
+        end
+      end
+      arp_cache
     end
 
     # Since 177/8 is IANA reserved (for now), this network should
