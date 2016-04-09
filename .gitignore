@@ -1,5 +1,6 @@
 *.gem
 doc/
+.yardoc/
 pkg/
 test/*test.pcap
 Gemfile.lock
