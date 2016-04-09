@@ -31,12 +31,9 @@ module PacketFu
   #  :eth
   #     A pre-generated EthHeader object.
   #  :ipv6
-  #     A pre-generated IPHeader object.
-  #  :flavor
-  #     TODO: Sets the "flavor" of the ICMP packet. Pings, in particular, often betray
-  #     their true OS.
-  #  :config
-  #     A hash of return address details, often the output of Utils.whoami?
+  #     A pre-generated IPv6Header object.
+  #  :icmpv6
+  #     A pre-generated ICMPv6Header object.
   class ICMPv6Packet < Packet
     include ::PacketFu::EthHeaderMixin
     include ::PacketFu::IPv6HeaderMixin
