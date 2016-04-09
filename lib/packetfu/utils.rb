@@ -1,7 +1,6 @@
 # -*- coding: binary -*-
 require 'singleton'
 require 'timeout'
-require 'network_interface'
 
 module PacketFu
 
@@ -166,13 +165,10 @@ module PacketFu
     def self.default_int
       ip = default_ip
 
-      NetworkInterface.interfaces.each do |interface|
-        NetworkInterface.addresses(interface).values.each do |addresses|
-          addresses.each do |address|
-            next if address["addr"].nil?
-            return interface if address["addr"] == ip
-          end
-        end
+      Socket.getifaddrs.each do |ifaddr|
+        next unless ifaddr.addr.ip?
+
+        return ifaddr.name if ifaddr.addr.ip_address == ip
       end
 
       # Fall back to libpcap as last resort
@@ -182,7 +178,7 @@ module PacketFu
     # Determine the ifconfig data string for a given interface
     def self.ifconfig_data_string(iface=default_int)
       # Make sure to only get interface data for a real interface
-      unless NetworkInterface.interfaces.include?(iface)
+      unless Socket.getifaddrs.any? {|ifaddr| ifaddr.name == iface}
         raise ArgumentError, "#{iface} interface does not exist"
       end
       return %x[ifconfig #{iface}]
