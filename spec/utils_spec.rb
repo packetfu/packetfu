@@ -111,7 +111,17 @@ describe Utils do
     end
 
     context 'when cached' do
-      it 'should work on Mac OSX Yosemite'
+      it 'should work on Mac OSX Yosemite' do
+        stub_const('RUBY_PLATFORM', 'macosx')
+        mac_osx_reply = "? (192.168.254.57) at 64:00:00:00:cc:b2 on en0 ifscope [ethernet]\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(mac_osx_reply)
+        whoami_reply = @whoami.call('em0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.57')
+
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('64:00:00:00:cc:b2')
+      end
 
       it 'should work on Ubuntu 14.04 LTS' do
         stub_const('RUBY_PLATFORM', 'x86_64-linux')
