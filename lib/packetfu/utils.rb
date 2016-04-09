@@ -66,9 +66,16 @@ module PacketFu
       cap_thread.value
     end
 
+    # Determine ARP cache data string
+    def self.arp_cache_raw
+      %x(/usr/sbin/arp -na)
+    end
+
+    # Get ARP cache.
+    # More rubyish than PAcketFu::Utils.arp_cache_data_string
     def self.arp_cache
       arp_cache = {}
-      arp_table = `arp -na`
+      arp_table = arp_cache_raw
       arp_table.split(/\n/).each do |line|
         match = line.match(/\? \((?<ip>\d+\.\d+\.\d+\.\d+)\) at (?<mac>([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})(?: \[ether\])? on (?<int>[a-zA-Z0-9]+)/)
         if match

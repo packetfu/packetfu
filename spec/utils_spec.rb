@@ -98,63 +98,31 @@ describe Utils do
   context 'when using arp' do
 
     before(:all) do
-      # Get default gateway
-      routes = `/sbin/route -n`.split("\n")[2..-1]
-      routes.each do |route|
-        route =~ /^([0-9\.]+)\s+([0-9\.]+)/
-        if $1 == '0.0.0.0'
-          @gateway = $2
-          break
-        end
-      end
-
-      # Get local MAC address
-      info = Utils.whoami?
-      @mac = info[:eth_saddr]
-      @gateway_mac = info[:eth_daddr]
+      @whoami = lambda { |iface| {
+                           :iface => iface,
+                           :eth_saddr => '00:01:02:03:dd:b3',
+                           :eth_src => "\x00\x01\x02\x03\xdd\xb3",
+                           :ip_saddr => '192.168.254.1',
+                           :ip_src => 0xc0a8fe01,
+                           :ip_src_bin => "\xc0\xa8\xfe\x01",
+                           :eth_dst => "\x00\x01\x02\x03\xcc\xb2",
+                           :eth_daddr => '00:01:02:03:cc:b2',
+                         } }
     end
 
-    it 'should get MAC address from IP' do
-      gateway_mac = Utils.arp(@gateway)
-      expect(gateway_mac).to eql(@gateway_mac)
-    end
+    context 'when cached' do
+      it 'should work on Ubuntu 14.04 LTS' do
+        stub_const('RUBY_PLATFORM', 'x86_64-linux')
+        ubuntu_reply = "? (192.168.254.56) at 00:01:02:03:cc:b2 [ether] on eth0\n"
+        allow(PacketFu::Utils).to receive(:arp_cache_raw).and_return(ubuntu_reply)
+        whoami_reply = @whoami.call('eth0')
+        allow(PacketFu::Utils).to receive(:whoami?).and_return(whoami_reply)
+        util_reply = PacketFu::Utils.arp('192.168.254.56')
 
-    it 'should get MAC address from ARP cache (when cached)' do
-      # Ensure MAC address is in cache
-      gateway_mac = Utils.arp(@gateway, :cache => false)
-
-      gateway_mac2 = nil
-      packets = send_arp_request do
-        gateway_mac2 = Utils.arp(@gateway, :cache => true)
+        expect(util_reply).to be_a(String)
+        expect(util_reply).to eq('00:01:02:03:cc:b2')
       end
-
-      expect(packets).to be_nil
-      expect(gateway_mac2).to eql(gateway_mac)
-    end
-
-    it 'should send an ARP request if IP is not in cache' do
-      packets = send_arp_request do
-        Utils.arp(Utils.rand_routable_daddr.to_s, :cache => true)
-      end
-
-      expect(packets.size).to eql(1)
     end
 
   end
-end
-
-
-def send_arp_request(&block)
-  th = Thread.start do
-    string = `tcpdump -i eth0 -c 1 -n arp and ether src #@mac 2>/dev/null`
-    packets = string.split("\n")
-    packets.reject! { |l| l =~ /Reply/ }
-    Thread.current.thread_variable_set(:packets, packets)
-  end
-
-  sleep 0.5
-  yield
-
-  th.join(2)
-  th.thread_variable_get(:packets)
 end
