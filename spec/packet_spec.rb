@@ -1,8 +1,11 @@
 require 'spec_helper'
 require 'packetfu/packet'
+require 'packetfu/pcap'
 require 'packetfu/protos/eth'
 require 'packetfu/protos/ip'
+require 'packetfu/protos/ipv6'
 require 'packetfu/protos/tcp'
+require 'packetfu/protos/icmp'
 require 'fake_packets'
 
 describe PacketFu::Packet, "abstract packet class behavior" do
@@ -75,6 +78,22 @@ describe PacketFu::Packet, "abstract packet class behavior" do
     p7.tcp_src = p6.tcp_src
     p7.tcp_sum = p6.tcp_sum
     p7.should == p6
+  end
+
+  it "should parse IPv4 packets" do
+    packets = PacketFu::PcapFile.read(File.join(File.dirname(__FILE__), 'ipv4_icmp.pcap'))
+    packets.size.should == 1
+    packet = PacketFu::Packet.parse(packets.first.data.to_s)
+    packet.should be_a(PacketFu::ICMPPacket)
+    packet.headers[1].should be_a(PacketFu::IPHeader)
+  end
+
+  it "should parse IPv6 packets" do
+    packets = PacketFu::PcapFile.read(File.join(File.dirname(__FILE__), 'ipv6_udp.pcap'))
+    packets.size.should == 1
+    packet = PacketFu::Packet.parse(packets.first.data.to_s)
+    packet.should be_a(PacketFu::UDPPacket)
+    packet.headers[1].should be_a(PacketFu::IPv6Header)
   end
 
 end
