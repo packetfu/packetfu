@@ -59,6 +59,23 @@ describe UDPPacket do
     end
   end
 
+  context "when initializing UDPHeader from scratch" do
+    before(:each) { @udp_header = UDPHeader.new }
+    it 'should have the right instance variables' do
+      expect(@udp_header.udp_src).to eq(0)
+      expect(@udp_header.udp_dst).to eq(0)
+      expect(@udp_header.udp_len).to eq(8)
+      expect(@udp_header.udp_sum).to eq(0)
+    end
+
+    it 'should allow setting of port numbers' do
+      @udp_header.udp_src = 1024
+      @udp_header.udp_dst = 1025
+      expect(@udp_header.udp_src).to eq(1024)
+      expect(@udp_header.udp_dst).to eq(1025)
+    end
+  end
+
   context "when initializing UDPPacket from scratch" do
     it "should create UDP on IPv4 packets by default" do
       udp = UDPPacket.new
@@ -80,5 +97,8 @@ describe UDPPacket do
       expect(udp.udp_sum).to eq(0xbb82)
       expect(udp.udp_len).to eq(24)
     end
+
+    it 'should support peak functionnality (IPv4 case)'
+    it 'should support peak functionnality (IPv6 case)'
   end
 end
