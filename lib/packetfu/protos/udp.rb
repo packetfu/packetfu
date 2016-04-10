@@ -181,7 +181,7 @@ module PacketFu
 
     # Is that packet an UDP on IPv6 packet ?
     def ipv6?
-      @ipv6_header
+      not @ipv6_header.nil?
     end
 
   end

@@ -18,6 +18,7 @@ describe UDPPacket do
 
       it 'should be recognized as a UDP packet' do
         expect(@udp4_packet.is_udp?).to be(true)
+        expect(@udp4_packet.ipv6?).to be(false)
       end
 
       it 'should have the right port numbers' do
@@ -42,6 +43,7 @@ describe UDPPacket do
 
       it 'should be recognized as a UDP packet' do
         expect(@udp6_packet.is_udp?).to be(true)
+        expect(@udp6_packet.ipv6?).to be(true)
       end
 
       it 'should have the right port numbers' do
