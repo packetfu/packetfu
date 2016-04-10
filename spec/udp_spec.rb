@@ -98,7 +98,27 @@ describe UDPPacket do
       expect(udp.udp_len).to eq(24)
     end
 
-    it 'should support peak functionnality (IPv4 case)'
-    it 'should support peak functionnality (IPv6 case)'
+    it 'should support peek functionnality (IPv4 case)' do
+      udp = UDPPacket.new
+      udp.ip_saddr = '192.168.1.1'
+      udp.ip_daddr = '192.168.1.254'
+      udp.udp_src = 32756
+      udp.udp_dst = 80
+      udp.payload = 'abcdefghijklmnopqrstuvwxyz'
+      udp.recalc
+      expect(udp.peek).to match(/U  68\s+192.168.1.1:32756\s+->\s+192.168.1.254:80/)
+    end
+
+    it 'should support peek functionnality (IPv6 case)' do
+      udp = UDPPacket.new(:on_ipv6 => true)
+      udp.ipv6_saddr = '2000::1'
+      udp.ipv6_daddr = '2001::1'
+      udp.udp_src = 32756
+      udp.udp_dst = 80
+      udp.payload = 'abcdefghijklmnopqrstuvwxyz'
+      udp.recalc
+      expect(udp.peek).to match(/6U 88\s+2000::1:32756\s+->\s+2001::1:80/)
+    end
+
   end
 end
