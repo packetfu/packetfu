@@ -160,19 +160,28 @@ module PacketFu
 
     # Peek provides summary data on packet contents.
     def peek_format
-      peek_data = ["U  "]
-      peek_data << "%-5d" % self.to_s.size
-      peek_data << "%-21s" % "#{self.ip_saddr}:#{self.udp_sport}"
-      peek_data << "->"
-      peek_data << "%21s" % "#{self.ip_daddr}:#{self.udp_dport}"
-      peek_data << "%23s" % "I:"
-      peek_data << "%04x" % self.ip_id
-      peek_data.join
+      if self.ipv6?
+        peek_data = ["6U "]
+        peek_data << "%-5d" % self.to_s.size
+        peek_data << "%-31s" % "#{self.ipv6_saddr}:#{self.udp_sport}"
+        peek_data << "->"
+        peek_data << "%31s" % "#{self.ipv6_daddr}:#{self.udp_dport}"
+        peek_data.join
+      else
+        peek_data = ["U  "]
+        peek_data << "%-5d" % self.to_s.size
+        peek_data << "%-21s" % "#{self.ip_saddr}:#{self.udp_sport}"
+        peek_data << "->"
+        peek_data << "%21s" % "#{self.ip_daddr}:#{self.udp_dport}"
+        peek_data << "%23s" % "I:"
+        peek_data << "%04x" % self.ip_id
+        peek_data.join
+      end
     end
 
     # Is that packet an UDP on IPv6 packet ?
     def ipv6?
-      @ipv6_header
+      not @ipv6_header.nil?
     end
 
   end
