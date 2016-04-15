@@ -11,7 +11,10 @@ module PacketFu
         @sections = []
       end
 
-      def read(fname, &block)
+      # Read a given file and analyze it.
+      # If given a block, it will yield PcapNG::EPB or PcapNG::SPB objects.
+      # This is the only way to get packet timestamps.
+      def read(fname, &blk)
         unless ::File.readable?(fname)
           raise ArgumentError, "cannot read file #{fname}"
         end
@@ -21,14 +24,26 @@ module PacketFu
             parse_section(f)
           end
         end
+
+        if blk
+          count = 0
+          @sections.each do |section|
+            section.interfaces.each do |intf|
+              intf.packets.each { |pkt| count += 1; yield pkt }
+            end
+          end
+          count
+        end
       end
 
-      def read_packet_bytes(fname, &block)
+      # Give an array of parsed packets (raw data from packets).
+      # If a block is given, yield raw packet data from the given file.
+      def read_packet_bytes(fname, &blk)
         count = 0
-        packets = [] unless block
+        packets = [] unless blk
 
         read(fname) do |packet|
-          if block
+          if blk
             count += 1
             yield packet.data.to_s
           else
@@ -36,7 +51,25 @@ module PacketFu
           end
         end
 
-        block ? count : packets
+        blk ? count : packets
+      end
+
+      # Return an array of parsed packets.
+      # If a block is given, yield parsed packets from the given file.
+      def read_packets(fname, &blk)
+        count = 0
+        packets = [] unless blk
+
+        read_packet_bytes(fname) do |packet|
+          if blk
+            count += 1
+            yield Packet.parse(packet)
+          else
+            packets << Packet.parse(packet)
+          end
+        end
+
+        blk ? count : packets
       end
 
 
