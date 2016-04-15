@@ -8,6 +8,7 @@ module StructFu
     unless [:little, :big].include? e
       raise ArgumentError, "Unknown endianness for #{self.class}" 
     end
+    @int64 = e == :little ? Int64le : Int64be
     @int32 = e == :little ? Int32le : Int32be
     @int16 = e == :little ? Int16le : Int16be
     return e
