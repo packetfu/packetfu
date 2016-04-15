@@ -16,7 +16,6 @@ module PacketFu
           raise ArgumentError, "cannot read file #{fname}"
         end
 
-        has_section = false
         ::File.open(fname, 'rb') do |f|
           while !f.eof? do
             parse_section(f)
