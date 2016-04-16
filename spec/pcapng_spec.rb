@@ -162,21 +162,60 @@ module PacketFu
 
     describe File do
 
-      it 'reads a Pcap-NG file' do
-        pcapng = File.new
-        pcapng.read ::File.join(__dir__, '..', 'test', 'sample.pcapng')
-        expect(pcapng.sections.size).to eq(1)
+      before(:all) { @file = ::File.join(__dir__, '..', 'test', 'sample.pcapng') }
+      before(:each) { @pcapng = File.new }
 
-        expect(pcapng.sections.first.interfaces.size).to eq(1)
-        intf = pcapng.sections.first.interfaces.first
-        expect(intf.section).to eq(pcapng.sections.first)
+      context '#read' do
+        it 'reads a Pcap-NG file' do
+          @pcapng.read ::File.join(__dir__, '..', 'test', 'sample.pcapng')
+          expect(@pcapng.sections.size).to eq(1)
 
-        expect(intf.packets.size).to eq(11)
-        packet = intf.packets.first
-        expect(packet.interface).to eq(intf)
+          expect(@pcapng.sections.first.interfaces.size).to eq(1)
+          intf = @pcapng.sections.first.interfaces.first
+          expect(intf.section).to eq(@pcapng.sections.first)
+
+          expect(intf.packets.size).to eq(11)
+          packet = intf.packets.first
+          expect(packet.interface).to eq(intf)
+        end
+
+        it 'yields xPB object per read packet' do
+          idx = 0
+          @pcapng.read(@file) do |pkt|
+            expect(pkt).to be_a(@Pcapng::EPB)
+            idx += 1
+          end
+          expect(idx).to eq(11)
+        end
+      end
+
+      context '#read_packets' do
+        before(:all) do
+          @expected = [UDPPacket] * 2 + [ICMPPacket] * 3 + [ARPPacket] * 2 +
+            [TCPPacket] * 3 + [ICMPPacket]
+        end
+
+        it 'returns an array of Packets' do
+          packets = @pcapng.read_packets(@file)
+          expect(packets.map(&:class)).to eq(@expected)
+
+          icmp = packets[2]
+          expect(icmp.ip_saddr).to eq('192.168.1.105')
+          expect(icmp.ip_daddr).to eq('216.75.1.230')
+          expect(icmp.icmp_type).to eq(8)
+          expect(icmp.icmp_code).to eq(0)
+        end
+
+        it 'yields Packet object per read packet' do
+          idx = 0
+          @pcapng.read_packets(@file) do |pkt|
+            expect(pkt).to be_a(@expected[idx])
+            idx += 1
+          end
+          expect(idx).to eq(11)
+        end
       end
     end
 
   end
-
 end
