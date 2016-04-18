@@ -87,6 +87,14 @@ module PacketFu
         expect(@idb.block_len2).to eq(@idb.block_len)
       end
 
+      it 'should decode tsresol on demand from its options' do
+        @idb.options.read [9, 1, 4].pack('vvC')
+        expect(@idb.ts_resol).to eq(1E-4)
+
+        @idb.options.read [9, 1, 0x83].pack('vvC')
+        expect(@idb.ts_resol(true)).to eq(2**-3)
+      end
+
       context 'when reading' do
         it 'should accept a String' do
           str = ::File.read(::File.join(__dir__, '..', 'test', 'sample.pcapng'))[52, 32]
@@ -157,7 +165,35 @@ module PacketFu
           expect(@epb.orig_len.to_i).to eq(@epb.cap_len.to_i)
           expect(@epb.has_options?).to be(true)
         end
+
       end
+
+      it 'should decode packet timestamp with default resolution' do
+        ::File.open(::File.join(__dir__, '..', 'test', 'sample.pcapng')) do |f|
+          f.seek(84, :CUR)
+          @epb.read f
+        end
+
+        expect(@epb.timestamp.round).to eq(Time.new(2009, 10, 11, 21, 29, 6))
+      end
+
+      it 'should decode packet timestamp with interface resolution' do
+        ::File.open(::File.join(__dir__, '..', 'test', 'sample.pcapng')) do |f|
+          f.seek(84, :CUR)
+          @epb.read f
+        end
+
+        idb = IDB.new
+        ::File.open(::File.join(__dir__, '..', 'test', 'sample.pcapng')) do |f|
+          f.seek(52, :CUR)
+          idb.read f
+        end
+        idb << @epb
+        @epb.interface = idb
+
+        expect(@epb.timestamp.round).to eq(Time.new(2009, 10, 11, 21, 29, 6))
+      end
+
     end
 
     describe File do
