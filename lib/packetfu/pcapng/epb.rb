@@ -79,6 +79,22 @@ module PacketFu
         self
       end
 
+      # Return timestamp as a Time object
+      def timestamp
+        Time.at((self[:tsh].to_i << 32 | self[:tsl].to_i) * ts_resol)
+      end
+
+
+      private
+
+      def ts_resol
+        if @interface.nil?
+          1E-6
+        else
+          @interface.ts_resol
+        end
+      end
+
     end
 
   end
