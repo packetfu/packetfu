@@ -3,7 +3,7 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
-    # Pcapng::EPB represents a Section Header Block (EPB) of a pcapng file.
+    # Pcapng::EPB represents a Extended Packet Block (EPB) of a pcapng file.
     #
     # == Pcapng::EPB Definition
     #   Int32   :type           Default: 0x00000006

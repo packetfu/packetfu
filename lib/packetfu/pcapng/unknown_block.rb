@@ -3,6 +3,7 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
+    # Pcapng::UnknownBlock is used to handle unsupported blocks of a pcapng file.
     class UnknownBlock < Struct.new(:type, :block_len, :body, :block_len2)
       include StructFu
       attr_accessor :endian

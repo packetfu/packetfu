@@ -3,9 +3,9 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
-    # PcapngIDB represents a Section Header Block (IDB) of a pcapng file.
+    # Pcapng::IDB represents a Interface Description Block (IDB) of a pcapng file.
     #
-    # == PcapngIDB Definition
+    # == Pcapng::IDB Definition
     #   Int32   :type           Default: 0x00000001
     #   Int32   :block_len
     #   Int16   :link_type      Default: 1
