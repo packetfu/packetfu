@@ -68,7 +68,10 @@ module PacketFu
         self[:cap_len].read io.read(4)
         self[:orig_len].read io.read(4)
         self[:data].read io.read(self[:cap_len].to_i)
-        options_len = self[:block_len].to_i - self[:cap_len].to_i - MIN_SIZE
+        data_pad_len = (4 - (self[:cap_len].to_i % 4)) % 4
+        io.read data_pad_len
+        options_len = self[:block_len].to_i - self[:cap_len].to_i - data_pad_len
+        options_len -= MIN_SIZE
         self[:options].read io.read(options_len)
         self[:block_len2].read io.read(4)
 
