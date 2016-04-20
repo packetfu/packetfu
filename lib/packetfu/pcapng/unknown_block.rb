@@ -20,7 +20,7 @@ module PacketFu
       def init_fields(args={})
         args[:type]  = @int32.new(args[:type] || 0)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
-        args[:body] = StructFu::String.new(args[:options] || '')
+        args[:body] = StructFu::String.new(args[:body] || '')
         args[:block_len2] = @int32.new(args[:block_len2] || MIN_SIZE)
         args
       end

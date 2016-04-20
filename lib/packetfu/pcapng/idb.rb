@@ -34,7 +34,7 @@ module PacketFu
       def init_fields(args={})
         args[:type]  = @int32.new(args[:type] || PcapNG::IDB_TYPE.to_i)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
-        args[:link_type] = @int16.new(args[:ver_major] || 1)
+        args[:link_type] = @int16.new(args[:link_type] || 1)
         args[:reserved] = @int16.new(args[:reserved] || 0)
         args[:snaplen] = @int32.new(args[:snaplen] || 0)
         args[:options] = StructFu::String.new(args[:options] || '')
