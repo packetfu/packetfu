@@ -174,7 +174,7 @@ module PacketFu
           @epb.read f
         end
 
-        expect(@epb.timestamp.round).to eq(Time.new(2009, 10, 11, 21, 29, 6))
+        expect(@epb.timestamp.round).to eq(Time.utc(2009, 10, 11, 19, 29, 6))
       end
 
       it 'should decode packet timestamp with interface resolution' do
@@ -191,7 +191,7 @@ module PacketFu
         idb << @epb
         @epb.interface = idb
 
-        expect(@epb.timestamp.round).to eq(Time.new(2009, 10, 11, 21, 29, 6))
+        expect(@epb.timestamp.round).to eq(Time.utc(2009, 10, 11, 19, 29, 6))
       end
 
     end
