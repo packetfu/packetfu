@@ -3,9 +3,9 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
-    # PcapngIDB represents a Section Header Block (IDB) of a pcapng file.
+    # Pcapng::IDB represents a Interface Description Block (IDB) of a pcapng file.
     #
-    # == PcapngIDB Definition
+    # == Pcapng::IDB Definition
     #   Int32   :type           Default: 0x00000001
     #   Int32   :block_len
     #   Int16   :link_type      Default: 1
@@ -34,7 +34,7 @@ module PacketFu
       def init_fields(args={})
         args[:type]  = @int32.new(args[:type] || PcapNG::IDB_TYPE.to_i)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
-        args[:link_type] = @int16.new(args[:ver_major] || 1)
+        args[:link_type] = @int16.new(args[:link_type] || 1)
         args[:reserved] = @int16.new(args[:reserved] || 0)
         args[:snaplen] = @int32.new(args[:snaplen] || 0)
         args[:options] = StructFu::String.new(args[:options] || '')

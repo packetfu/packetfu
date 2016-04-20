@@ -3,7 +3,7 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
-    # Pcapng::EPB represents a Section Header Block (EPB) of a pcapng file.
+    # Pcapng::EPB represents a Extended Packet Block (EPB) of a pcapng file.
     #
     # == Pcapng::EPB Definition
     #   Int32   :type           Default: 0x00000006
@@ -36,12 +36,12 @@ module PacketFu
       def init_fields(args={})
         args[:type]  = @int32.new(args[:type] || PcapNG::EPB_TYPE.to_i)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
-        args[:interface_id] = @int32.new(args[:snaplen] || 0)
-        args[:tsh] = @int32.new(args[:snaplen] || 0)
-        args[:tsl] = @int32.new(args[:snaplen] || 0)
-        args[:cap_len] = @int32.new(args[:snaplen] || 0)
-        args[:orig_len] = @int32.new(args[:snaplen] || 0)
-        args[:data] = StructFu::String.new(args[:options] || '')
+        args[:interface_id] = @int32.new(args[:interface_id] || 0)
+        args[:tsh] = @int32.new(args[:tsh] || 0)
+        args[:tsl] = @int32.new(args[:tsl] || 0)
+        args[:cap_len] = @int32.new(args[:cap_len] || 0)
+        args[:orig_len] = @int32.new(args[:orig_len] || 0)
+        args[:data] = StructFu::String.new(args[:data] || '')
         args[:options] = StructFu::String.new(args[:options] || '')
         args[:block_len2] = @int32.new(args[:block_len2] || MIN_SIZE)
         args
@@ -68,7 +68,10 @@ module PacketFu
         self[:cap_len].read io.read(4)
         self[:orig_len].read io.read(4)
         self[:data].read io.read(self[:cap_len].to_i)
-        options_len = self[:block_len].to_i - self[:cap_len].to_i - MIN_SIZE
+        data_pad_len = (4 - (self[:cap_len].to_i % 4)) % 4
+        io.read data_pad_len
+        options_len = self[:block_len].to_i - self[:cap_len].to_i - data_pad_len
+        options_len -= MIN_SIZE
         self[:options].read io.read(options_len)
         self[:block_len2].read io.read(4)
 

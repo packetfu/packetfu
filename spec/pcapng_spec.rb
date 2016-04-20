@@ -140,7 +140,7 @@ module PacketFu
           expect(@epb.tsl.to_i).to eq(0xd392be6a)
           expect(@epb.cap_len.to_i).to eq(78)
           expect(@epb.orig_len.to_i).to eq(@epb.cap_len.to_i)
-          expect(@epb.has_options?).to be(true)
+          expect(@epb.has_options?).to be(false)
         end
 
         it 'should accept an IO' do
@@ -155,7 +155,7 @@ module PacketFu
           expect(@epb.tsl.to_i).to eq(0xd392be6a)
           expect(@epb.cap_len.to_i).to eq(78)
           expect(@epb.orig_len.to_i).to eq(@epb.cap_len.to_i)
-          expect(@epb.has_options?).to be(true)
+          expect(@epb.has_options?).to be(false)
         end
       end
     end

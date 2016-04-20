@@ -3,6 +3,7 @@ require 'stringio'
 module PacketFu
   module PcapNG
 
+    # Pcapng::UnknownBlock is used to handle unsupported blocks of a pcapng file.
     class UnknownBlock < Struct.new(:type, :block_len, :body, :block_len2)
       include StructFu
       attr_accessor :endian
@@ -19,7 +20,7 @@ module PacketFu
       def init_fields(args={})
         args[:type]  = @int32.new(args[:type] || 0)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
-        args[:body] = StructFu::String.new(args[:options] || '')
+        args[:body] = StructFu::String.new(args[:body] || '')
         args[:block_len2] = @int32.new(args[:block_len2] || MIN_SIZE)
         args
       end
