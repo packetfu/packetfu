@@ -22,9 +22,13 @@ module PacketFu
 
       MIN_SIZE     = 5*4
 
+      # Option code for if_tsresol option
+      OPTION_IF_TSRESOL = 9
+
       def initialize(args={})
         @endian = set_endianness(args[:endian] || :little)
         @packets = []
+        @options_decoded = false
         init_fields(args)
         super(args[:type], args[:block_len], args[:link_type], args[:reserved],
               args[:snaplen], args[:options], args[:block_len2])
@@ -73,6 +77,38 @@ module PacketFu
       # Add a xPB to this section
       def <<(xpb)
         @packets << xpb
+      end
+
+      # Give timestamp resolution for this interface
+      def ts_resol(force=false)
+        if @options_decoded and not force
+          @ts_resol
+        else
+          packstr = (@endian == :little) ? 'v' : 'n'
+          idx = 0
+          options = self[:options]
+          opt_code = opt_len = 0
+
+          while idx < options.length do
+            opt_code, opt_len = options[idx, 4].unpack("#{packstr}2")
+            if opt_code == OPTION_IF_TSRESOL and opt_len == 1
+              tsresol = options[idx+4, 1].unpack('C').first
+              if tsresol & 0x80 == 0
+                @ts_resol = 10 ** -tsresol
+              else
+                @ts_resol = 2 ** -(tsresol & 0x7f)
+              end
+
+              @options_decoded = true
+              return @ts_resol
+            else
+              idx += 4 + opt_len
+            end
+          end
+
+          @options_decoded = true
+          @ts_resol = 1E-6  # default value
+        end
       end
 
     end
