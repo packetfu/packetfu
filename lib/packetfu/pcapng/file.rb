@@ -128,9 +128,9 @@ module PacketFu
         when EPB
           shb.interfaces[block.interface_id.to_i] << block
           block.interface = shb.interfaces[block.interface_id.to_i]
-        #when SPB
-        #  shb.interfaces[0] << block
-        #  block.interface = shb.interfaces[0]
+        when SPB
+          shb.interfaces[0] << block
+          block.interface = shb.interfaces[0]
         end
       end
 
