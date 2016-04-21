@@ -76,49 +76,45 @@ module PacketFu
       private
 
       def parse_section(io)
-        endian = :little
-        type = StructFu::Int32.new(0, endian).read(io.read(4))
+        shb = SHB.new
+        type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
         io.seek(-4, :CUR)
-        shb = parse(type, io, endian)
+        shb = parse(type, io, shb)
         raise InvalidFileError, 'no Section header found' unless shb.is_a?(SHB)
-
-        @sections << shb
 
         if shb.section_len.to_i != 0xffffffffffffffff
           # Section length is defined
           section = StringIO.new(io.read(shb.section_len.to_i))
           while !section.eof? do
             shb = @sections.last
-            type = StructFu::Int32.new(0, endian).read(section.read(4))
+            type = StructFu::Int32.new(0, shb.endian).read(section.read(4))
             section.seek(-4, :CUR)
-            block = parse(type, section, shb.endian)
-
-            classify_block shb, block
+            block = parse(type, section, shb)
           end
         else
           # section length is undefined
           while !io.eof?
             shb = @sections.last
-            type = StructFu::Int32.new(0, endian).read(io.read(4))
+            type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
             io.seek(-4, :CUR)
-            block = parse(type, io, shb.endian)
-
-            classify_block shb, block
+            block = parse(type, io, shb)
           end
         end
       end
 
-      def parse(type, io, endian)
+      def parse(type, io, shb)
         types = PcapNG.constants(false).select { |c| c.to_s =~ /_TYPE/ }.
           map { |c| [PcapNG.const_get(c).to_i, c] }
         types = Hash[types]
 
         if types.has_key?(type.to_i)
           klass = PcapNG.const_get(types[type.to_i].to_s.gsub(/_TYPE/, '').to_sym)
-          block = klass.new(endian: endian)
+          block = klass.new(endian: shb.endian)
         else
-          block = UnknownBlock.new(endian: endian)
+          block = UnknownBlock.new(endian: shb.endian)
         end
+
+        classify_block shb, block
         block.read(io)
       end
 
@@ -132,9 +128,9 @@ module PacketFu
         when EPB
           shb.interfaces[block.interface_id.to_i] << block
           block.interface = shb.interfaces[block.interface_id.to_i]
-        #when SPB
-        #  shb.interfaces[0] << block
-        #  block.interface = shb.interfaces[0]
+        when SPB
+          shb.interfaces[0] << block
+          block.interface = shb.interfaces[0]
         end
       end
 
