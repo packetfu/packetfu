@@ -196,6 +196,44 @@ module PacketFu
 
     end
 
+    describe SPB do
+
+      before(:each) { @spb = SPB.new }
+
+      it 'should have correct initialization values' do
+        expect(@spb).to be_a(SPB)
+        expect(@spb.endian).to eq(:little)
+        expect(@spb.type.to_i).to eq(PcapNG::SPB_TYPE.to_i)
+        expect(@spb.orig_len.to_i).to eq(0)
+        expect(@spb.block_len.to_i).to eq(SPB::MIN_SIZE)
+        expect(@spb.block_len2).to eq(@spb.block_len)
+      end
+
+      context 'when reading' do
+        it 'should accept a String' do
+          str = ::File.read(::File.join(__dir__, '..', 'test',
+                                        'sample-spb.pcapng'))[128, 0x14c]
+          expect { @spb.read str }.to_not raise_error
+          expect(@spb.type.to_i).to eq(PcapNG::SPB_TYPE.to_i)
+          expect(@spb.block_len.to_i).to eq(0x14c)
+          expect(@spb.orig_len.to_i).to eq(0x13a)
+          expect(@spb.data.size).to eq(0x13a)
+        end
+
+        it 'should accept an IO' do
+          ::File.open(::File.join(__dir__, '..', 'test', 'sample-spb.pcapng')) do |f|
+            f.seek(128, :CUR)
+            @spb.read f
+          end
+          expect(@spb.type.to_i).to eq(PcapNG::SPB_TYPE.to_i)
+          expect(@spb.block_len.to_i).to eq(0x14c)
+          expect(@spb.orig_len.to_i).to eq(0x13a)
+          expect(@spb.data.size).to eq(0x13a)
+        end
+      end
+
+    end
+
     describe File do
 
       before(:all) { @file = ::File.join(__dir__, '..', 'test', 'sample.pcapng') }
@@ -213,6 +251,19 @@ module PacketFu
           expect(intf.packets.size).to eq(11)
           packet = intf.packets.first
           expect(packet.interface).to eq(intf)
+        end
+
+        it 'reads a Pcap-NG file with Simple Packet blocks' do
+          @pcapng.read ::File.join(__dir__, '..', 'test', 'sample-spb.pcapng')
+          expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.sections.first.interfaces.size).to eq(1)
+          intf = @pcapng.sections.first.interfaces.first
+          expect(intf.section).to eq(@pcapng.sections.first)
+          expect(intf.packets.size).to eq(4)
+          expect(intf.snaplen.to_i).to eq(0)
+          packet = intf.packets.first
+          expect(packet.interface).to eq(intf)
+          expect(packet.data.size).to eq(packet.orig_len.to_i)
         end
 
         it 'yields xPB object per read packet' do
