@@ -1,4 +1,5 @@
 # -*- coding: binary -*-
+require 'tempfile'
 require 'spec_helper'
 require 'packetfu'
 
@@ -96,6 +97,89 @@ module PacketFu
           @pcapng.read @write_file.path
           expect(@pcapng.sections.size).to eq(2)
           expect(@pcapng.sections[0].to_s).to eq(@pcapng.sections[1].to_s)
+        end
+      end
+
+      context '#array_to_file' do
+        before(:each) do
+          tmpfile = Tempfile.new('packetfu')
+          @tmpfilename = tmpfile.path
+          tmpfile.close
+          tmpfile.unlink
+        end
+        after(:each) { ::File.unlink @tmpfilename if ::File.exist? @tmpfilename }
+
+        it 'gets an array of Packet objects' do
+          packets = @pcapng.read_packets(@file)
+
+          @pcapng.clear
+          @pcapng.array_to_file(packets)
+          @pcapng.write @tmpfilename
+
+          @pcapng.clear
+          packets2 = @pcapng.read_packets(@tmpfilename)
+          expect(packets2.map(&:to_s).join).to eq(packets.map(&:to_s).join)
+        end
+
+        it 'gets a hash containing an array of Packet objects' do
+          packets = @pcapng.read_packets(@file)[0..1]
+
+          @pcapng.clear
+          @pcapng.array_to_file(:array => packets)
+          @pcapng.write @tmpfilename
+
+          @pcapng.clear
+          packets2 = @pcapng.read_packets(@tmpfilename)
+          expect(packets2.map(&:to_s).join).to eq(packets.map(&:to_s).join)
+        end
+
+        it 'gets a hash containing an array of Packet objects and a :timestamp key' do
+          packets = @pcapng.read_packets(@file)[0..1]
+
+          @pcapng.clear
+          @pcapng.array_to_file(:array => packets,
+                                :timestamp => Time.utc(2000, 1, 1),
+                                :ts_inc => 3600*24)
+          @pcapng.write @tmpfilename
+
+          @pcapng.clear
+          @pcapng.read(@tmpfilename)
+          @pcapng.sections[0].interfaces[0].packets.each_with_index do |pkt, i|
+            expect(pkt.data).to eq(packets[i].to_s)
+            expect(pkt.timestamp).to eq(Time.utc(2000, 1, 1+i))
+          end
+        end
+
+        it 'gets a hash containing couples of Time and Packet objects' do
+          packets = @pcapng.read_packets(@file)[0..3]
+          timestamp = Time.utc(2000, 1, 1)
+          ts_inc = 3600*24 * 2
+          array = []
+          packets.each_with_index do |pkt, i|
+            array << { (timestamp + ts_inc * i) => pkt }
+          end
+
+          @pcapng.clear
+          @pcapng.array_to_file(:array => array)
+          @pcapng.write @tmpfilename
+
+          @pcapng.clear
+          @pcapng.read(@tmpfilename)
+          @pcapng.sections[0].interfaces[0].packets.each_with_index do |pkt, i|
+            expect(pkt.data).to eq(packets[i].to_s)
+            expect(pkt.timestamp).to eq(Time.utc(2000, 1, 1+2*i))
+          end
+        end
+
+        it 'gets a hash containing a :filename key' do
+          packets = @pcapng.read_packets(@file)[0..2]
+
+          @pcapng.clear
+          @pcapng.array_to_file(:array => packets, :filename => @tmpfilename)
+
+          @pcapng.clear
+          packets2 = @pcapng.read_packets(@tmpfilename)
+          expect(packets2.map(&:to_s).join).to eq(packets.map(&:to_s).join)
         end
       end
 
