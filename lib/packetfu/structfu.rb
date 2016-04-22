@@ -165,6 +165,33 @@ module StructFu
     end
   end
 
+  # Int64 is a eight byte value.
+  class Int64 < Int
+    def initialize(v=nil, e=:big)
+      super(v, e, w=4)
+      @packstr = (self.e == :big) ? 'Q>' : 'Q<'
+    end
+
+    # Returns a eight byte value as a packed string.
+    def to_s
+      @packstr = (self.e == :big) ? 'Q>' : 'Q<'
+      [(self.v || self.d)].pack(@packstr)
+    end
+  end
+
+  # Int64be is a eight byte value in big-endian format. The endianness cannot be altered.
+  class Int64be < Int64
+    undef :endian=
+  end
+
+  # Int64le is a eight byte value in little-endian format. The endianness cannot be altered.
+  class Int64le < Int64
+    undef :endian=
+    def initialize(v=nil, e=:little)
+      super(v,e)
+    end
+  end
+
   # Strings are just like regular strings, except it comes with a read() function
   # so that it behaves like other StructFu elements.
   class String < ::String
