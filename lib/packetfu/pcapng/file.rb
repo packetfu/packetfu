@@ -14,7 +14,7 @@ module PacketFu
       # Read a given file and analyze it.
       # If given a block, it will yield PcapNG::EPB or PcapNG::SPB objects.
       # This is the only way to get packet timestamps.
-      def read(fname, &blk)
+      def readfile(fname, &blk)
         unless ::File.readable?(fname)
           raise ArgumentError, "cannot read file #{fname}"
         end
@@ -42,7 +42,7 @@ module PacketFu
         count = 0
         packets = [] unless blk
 
-        read(fname) do |packet|
+        readfile(fname) do |packet|
           if blk
             count += 1
             yield packet.data.to_s
