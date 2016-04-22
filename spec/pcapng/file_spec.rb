@@ -185,12 +185,12 @@ module PacketFu
 
       it '#to_s returns object as a String' do
         orig_str = PacketFu.force_binary(::File.read(@file))
-        @pcapng.read @file
+        @pcapng.read orig_str
         expect(@pcapng.to_s).to eq(orig_str)
 
         @pcapng.clear
         orig_str = PacketFu.force_binary(::File.read(@file_spb))
-        @pcapng.read @file_spb
+        @pcapng.read orig_str
         expect(@pcapng.to_s).to eq(orig_str)
       end
     end

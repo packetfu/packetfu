@@ -11,6 +11,24 @@ module PacketFu
         @sections = []
       end
 
+      # Read a string to populate the object. Note that this appends new blocks to
+      # the Pcapng::File object.
+      def read(str)
+        PacketFu.force_binary(str)
+        io = StringIO.new(str)
+        parse_section(io)
+        self
+      end
+
+      # Clear the contents of the Pcapng::File prior to reading in a new string.
+      # This string should contain a Section Header Block and a Interface Description
+      # Block to create a conform pcapng file.
+      def read!(str)
+        clear
+        PacketFu.force_binary(str)
+        read(str)
+      end
+
       # Read a given file and analyze it.
       # If given a block, it will yield PcapNG::EPB or PcapNG::SPB objects.
       # This is the only way to get packet timestamps.
@@ -201,7 +219,7 @@ module PacketFu
       def parse_section(io)
         shb = SHB.new
         type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
-        io.seek(-4, :CUR)
+        io.seek(-4, IO::SEEK_CUR)
         shb = parse(type, io, shb)
         raise InvalidFileError, 'no Section header found' unless shb.is_a?(SHB)
 
@@ -211,7 +229,7 @@ module PacketFu
           while !section.eof? do
             shb = @sections.last
             type = StructFu::Int32.new(0, shb.endian).read(section.read(4))
-            section.seek(-4, :CUR)
+            section.seek(-4, IO::SEEK_CUR)
             block = parse(type, section, shb)
           end
         else
@@ -219,7 +237,7 @@ module PacketFu
           while !io.eof?
             shb = @sections.last
             type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
-            io.seek(-4, :CUR)
+            io.seek(-4, IO::SEEK_CUR)
             block = parse(type, io, shb)
           end
         end
