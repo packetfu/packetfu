@@ -105,6 +105,28 @@ module PacketFu
 
       alias_method :to_f, :to_file
 
+      # Shorthand method for writing to a file. Can take either :file => 'name.pcapng'
+      # or simply 'name.pcapng'
+      def write(filename='out.pcapng')
+        if filename.kind_of?(Hash)
+          f = filename[:filename] || filename[:file] || 'out.pcapng'
+        else
+          f = filename.to_s
+        end
+        self.to_file(:filename => f.to_s, :append => false)
+      end
+
+      # Shorthand method for appendong to a file. Can take either
+      # :file => 'name.pcapng' or simply 'name.pcapng'
+      def append(filename='out.pcapng')
+        if filename.kind_of?(Hash)
+          f = filename[:filename] || filename[:file] || 'out.pcapng'
+        else
+          f = filename.to_s
+        end
+        self.to_file(:filename => f.to_s, :append => true)
+      end
+
 
       private
 
