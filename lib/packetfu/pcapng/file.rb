@@ -82,6 +82,29 @@ module PacketFu
         @sections.clear
       end
 
+      # Writes the Pcapng::File to a file. Takes the following arguments:
+      #   :filename # The file to write to.
+      #   :append   # If set to true, the packets are appended to the file, rather
+      #             # than overwriting.
+      def to_file(args={})
+        filename = args[:filename] || args[:file]
+        unless (!filename.nil? || filename.kind_of?(String))
+          raise ArgumentError, "Need a :filename for #{self.class}"
+        end
+
+        append = args[:append]
+        mode = ''
+        if append and ::File.exists? filename
+          mode = 'ab'
+        else
+          mode = 'wb'
+        end
+        ::File.open(filename,mode) {|f| f.write(self.to_s)}
+        [filename, self.to_s.size]
+      end
+
+      alias_method :to_f, :to_file
+
 
       private
 

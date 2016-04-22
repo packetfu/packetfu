@@ -75,6 +75,30 @@ module PacketFu
         end
       end
 
+      context '#to_file' do
+        before(:each) { @write_file = Tempfile.new('pcapng') }
+        after(:each) { @write_file.close; @write_file.unlink }
+
+        it 'creates a file and write self to it' do
+          @pcapng.read @file
+          @pcapng.to_file :filename => @write_file.path
+          @write_file.rewind
+          expect(@write_file.read).to eq(::File.read(@file))
+        end
+
+        it 'appends a section to an existing file' do
+          @pcapng.read @file
+          @pcapng.to_file :filename => @write_file.path
+
+          @pcapng.to_file :filename => @write_file.path, :append => true
+
+          @pcapng.clear
+          @pcapng.read @write_file.path
+          expect(@pcapng.sections.size).to eq(2)
+          expect(@pcapng.sections[0].to_s).to eq(@pcapng.sections[1].to_s)
+        end
+      end
+
       it '#to_s returns object as a String' do
         orig_str = PacketFu.force_binary(::File.read(@file))
         @pcapng.read @file
