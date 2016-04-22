@@ -16,6 +16,7 @@ module PacketFu
     class IDB < Struct.new(:type, :block_len, :link_type, :reserved,
                            :snaplen, :options, :block_len2)
       include StructFu
+      include Block
       attr_accessor :endian
       attr_accessor :section
       attr_accessor :packets
@@ -109,6 +110,13 @@ module PacketFu
           @options_decoded = true
           @ts_resol = 1E-6  # default value
         end
+      end
+
+      # Return the object as a String
+      def to_s
+        pad_field :options
+        recalc_block_len
+        to_a.map(&:to_s).join + @packets.map(&:to_s).join
       end
 
     end

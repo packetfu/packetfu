@@ -72,6 +72,16 @@ module PacketFu
         blk ? count : packets
       end
 
+      # Return the object as a String
+      def to_s
+        @sections.map { |section| section.to_s }.join
+      end
+
+      # Clear the contents of the Pcapng::File.
+      def clear
+        @sections.clear
+      end
+
 
       private
 

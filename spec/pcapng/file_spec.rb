@@ -5,12 +5,15 @@ require 'packetfu'
 module PacketFu
   module PcapNG
     describe File do
-      before(:all) { @file = ::File.join(__dir__, '../..', 'test', 'sample.pcapng') }
+      before(:all) do
+        @file = ::File.join(__dir__, '../..', 'test', 'sample.pcapng')
+        @file_spb = ::File.join(__dir__, '../..', 'test', 'sample-spb.pcapng')
+      end
       before(:each) { @pcapng = File.new }
 
       context '#read' do
         it 'reads a Pcap-NG file' do
-          @pcapng.read ::File.join(__dir__, '../..', 'test', 'sample.pcapng')
+          @pcapng.read @file
           expect(@pcapng.sections.size).to eq(1)
 
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
@@ -23,7 +26,7 @@ module PacketFu
         end
 
         it 'reads a Pcap-NG file with Simple Packet blocks' do
-          @pcapng.read ::File.join(__dir__, '../..', 'test', 'sample-spb.pcapng')
+          @pcapng.read @file_spb
           expect(@pcapng.sections.size).to eq(1)
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
           intf = @pcapng.sections.first.interfaces.first
@@ -70,6 +73,17 @@ module PacketFu
           end
           expect(idx).to eq(11)
         end
+      end
+
+      it '#to_s returns object as a String' do
+        orig_str = PacketFu.force_binary(::File.read(@file))
+        @pcapng.read @file
+        expect(@pcapng.to_s).to eq(orig_str)
+
+        @pcapng.clear
+        orig_str = PacketFu.force_binary(::File.read(@file_spb))
+        @pcapng.read @file_spb
+        expect(@pcapng.to_s).to eq(orig_str)
       end
     end
   end

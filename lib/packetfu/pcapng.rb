@@ -28,6 +28,7 @@ module PacketFu
 end
 
 
+require_relative 'pcapng/block.rb'
 require_relative 'pcapng/unknown_block.rb'
 require_relative 'pcapng/shb.rb'
 require_relative 'pcapng/idb.rb'
