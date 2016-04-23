@@ -100,6 +100,38 @@ module PacketFu
         @sections.clear
       end
 
+      # #file_to_array translates a Pcap-NG file into an array of packets.
+      # Note that this strips out timestamps -- if you'd like to retain
+      # timestamps and other pcapng file information, you will want to
+      # use #read instead.
+      #
+      # Valid arguments are:
+      #  * :filename           If given, object is cleared and filename is analyzed
+      #                        before generating array. Else, array is generated
+      #                        from self.
+      #  * :keep_timestamps    If true, generates an array of hashes, each one with
+      #                        timestamp as key and packet as value. There is one hash
+      #                        per packet.
+      def file_to_array(args={})
+        filename = args[:filename] || args[:file]
+        if filename
+          clear
+          readfile filename
+        end
+
+        ary = []
+        @sections.each do |section|
+          section.interfaces.each do |itf|
+            if args[:keep_timestamps] || args[:keep_ts]
+              ary.concat itf.packets.map { |pkt| { pkt.timestamp => pkt.data.to_s } }
+            else
+              ary.concat itf.packets.map { |pkt| pkt.data.to_s}
+            end
+          end
+        end
+        ary
+      end
+
       # Writes the Pcapng::File to a file. Takes the following arguments:
       #   :filename # The file to write to.
       #   :append   # If set to true, the packets are appended to the file, rather

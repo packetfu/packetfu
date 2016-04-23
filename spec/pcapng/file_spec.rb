@@ -76,6 +76,46 @@ module PacketFu
         end
       end
 
+      context '#file_to_array' do
+        it 'generates an array from object state' do
+          @pcapng.readfile @file
+          ary = @pcapng.file_to_array
+          expect(ary).to be_a(Array)
+          ary.each do |p|
+            expect(p).to be_a(String)
+          end
+          expect(ary[0]).to eq(@pcapng.sections[0].interfaces[0].packets[0].data)
+        end
+
+        it 'generates an array from given file, clearing object state' do
+          @pcapng.readfile @file
+          ary = @pcapng.file_to_array(filename: @file_spb)
+          expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.sections[0].interfaces[0].packets[0]).to be_a(SPB)
+
+          expect(ary).to be_a(Array)
+          ary.each do |p|
+            expect(p).to be_a(String)
+          end
+          expect(ary[0]).to eq(@pcapng.sections[0].interfaces[0].packets[0].data)
+        end
+
+        it 'generates an array with timestamps' do
+          @pcapng.readfile @file
+          ary = @pcapng.file_to_array(keep_timestamps: true)
+          expect(ary).to be_a(Array)
+          ary.each do |p|
+            expect(p).to be_a(Hash)
+            expect(p.keys.first).to be_a(Time)
+            expect(p.values.first).to be_a(String)
+          end
+
+          packet1 = @pcapng.sections[0].interfaces[0].packets[0]
+          expect(ary[0].keys.first).to eq(packet1.timestamp)
+          expect(ary[0].values.first).to eq(packet1.data)
+        end
+      end
+
       context '#to_file' do
         before(:each) { @write_file = Tempfile.new('pcapng') }
         after(:each) { @write_file.close; @write_file.unlink }
