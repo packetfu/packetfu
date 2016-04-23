@@ -19,6 +19,7 @@ module PacketFu
     class EPB < Struct.new(:type, :block_len, :interface_id, :tsh, :tsl,
                            :cap_len, :orig_len, :data, :options, :block_len2)
       include StructFu
+      include Block
       attr_accessor :endian
       attr_accessor :interface
 
@@ -85,6 +86,13 @@ module PacketFu
       # Return timestamp as a Time object
       def timestamp
         Time.at((self[:tsh].to_i << 32 | self[:tsl].to_i) * ts_resol)
+      end
+
+      # Return the object as a String
+      def to_s
+        pad_field :data, :options
+        recalc_block_len
+        to_a.map(&:to_s).join
       end
 
 

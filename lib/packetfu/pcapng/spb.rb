@@ -10,10 +10,10 @@ module PacketFu
     #   Int32   :block_len
     #   Int32   :orig_len
     #   String  :data
-    #   String  :options
     #   Int32   :block_len2
-    class SPB < Struct.new(:type, :block_len, :orig_len, :data, :options, :block_len2)
+    class SPB < Struct.new(:type, :block_len, :orig_len, :data, :block_len2)
       include StructFu
+      include Block
       attr_accessor :endian
       attr_accessor :interface
 
@@ -23,7 +23,7 @@ module PacketFu
         @endian = set_endianness(args[:endian] || :little)
         init_fields(args)
         super(args[:type], args[:block_len], args[:orig_len], args[:data],
-              args[:options], args[:block_len2])
+              args[:block_len2])
       end
 
       # Used by #initialize to set the initial fields
@@ -32,13 +32,12 @@ module PacketFu
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
         args[:orig_len] = @int32.new(args[:orig_len] || 0)
         args[:data] = StructFu::String.new(args[:data] || '')
-        args[:options] = StructFu::String.new(args[:options] || '')
         args[:block_len2] = @int32.new(args[:block_len2] || MIN_SIZE)
         args
       end
 
       def has_options?
-        self[:options].size > 0
+        false
       end
 
       def read(str_or_io)
@@ -69,6 +68,13 @@ module PacketFu
         end
 
         self
+      end
+
+      # Return the object as a String
+      def to_s
+        pad_field :data
+        recalc_block_len
+        to_a.map(&:to_s).join
       end
 
     end

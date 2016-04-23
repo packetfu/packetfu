@@ -15,7 +15,7 @@ module PacketFu
         expect(@shb.magic.to_s).to eq(SHB::MAGIC_LITTLE)
         expect(@shb.ver_major.to_i).to eq(1)
         expect(@shb.ver_minor.to_i).to eq(0)
-        expect(@shb.section_len.to_i).to eq(0)
+        expect(@shb.section_len.to_i).to eq(0xffffffff_ffffffff)
         expect(@shb.block_len2).to eq(@shb.block_len)
       end
 

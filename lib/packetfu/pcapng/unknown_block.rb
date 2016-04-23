@@ -6,6 +6,7 @@ module PacketFu
     # Pcapng::UnknownBlock is used to handle unsupported blocks of a pcapng file.
     class UnknownBlock < Struct.new(:type, :block_len, :body, :block_len2)
       include StructFu
+      include Block
       attr_accessor :endian
 
       MIN_SIZE     = 12
@@ -43,6 +44,13 @@ module PacketFu
         end
 
         self
+      end
+
+      # Return the object as a String
+      def to_s
+        pad_field :body
+        recalc_block_len
+        to_a.map(&:to_s).join
       end
 
     end

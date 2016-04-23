@@ -17,6 +17,7 @@ module PacketFu
     class SHB < Struct.new(:type, :block_len, :magic, :ver_major, :ver_minor,
                            :section_len, :options, :block_len2)
       include StructFu
+      include Block
       attr_accessor :endian
       attr_reader :interfaces
 
@@ -25,6 +26,7 @@ module PacketFu
       MAGIC_BIG    = [MAGIC_INT32].pack('N')
 
       MIN_SIZE     = 7*4
+      SECTION_LEN_UNDEFINED = 0xffffffff_ffffffff
 
       def initialize(args={})
         @endian = set_endianness(args[:endian] || :little)
@@ -41,7 +43,7 @@ module PacketFu
         args[:magic] = @int32.new(args[:magic] || MAGIC_INT32)
         args[:ver_major] = @int16.new(args[:ver_major] || 1)
         args[:ver_minor] = @int16.new(args[:ver_minor] || 0)
-        args[:section_len] = @int64.new(args[:section_len])
+        args[:section_len] = @int64.new(args[:section_len] || SECTION_LEN_UNDEFINED)
         args[:options] = StructFu::String.new(args[:options] || '')
         args[:block_len2] = @int32.new(args[:block_len2] || MIN_SIZE)
         args
@@ -109,6 +111,17 @@ module PacketFu
       # Add a IDB to this section
       def <<(idb)
         @interfaces << idb
+      end
+
+      # Return the object as a String
+      def to_s
+        body = @interfaces.map(&:to_s).join
+        unless self[:section_len].to_i == SECTION_LEN_UNDEFINED
+          self.section_len.value = body.size
+        end
+        pad_field :options
+        recalc_block_len
+        to_a.map(&:to_s).join + body
       end
 
     end
