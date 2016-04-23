@@ -2,6 +2,7 @@
 require 'spec_helper'
 require 'packetfu'
 require 'tempfile'
+require 'digest/md5'
 
 include PacketFu
 
@@ -159,6 +160,123 @@ describe PcapPackets do
   end
 end
 
-#TODO: PcapFile
-#TODO: Read
-#TODO: Write
+describe PcapFile do
+  before(:all) do
+    @file = File.open('test/sample.pcap') {|f| f.read}
+    @md5 = '1be3b5082bb135c6f22de8801feb3495'
+  end
+
+  context "when initializing" do
+    it "should have sane defaults" do
+      pcap_file = PcapFile.new()
+      expect(pcap_file.endian).to eql(nil)
+      expect(pcap_file.head).to eql(PcapHeader.new)
+      expect(pcap_file.body).to eql(PcapPackets.new)
+    end
+  end
+
+  context "when reading and writing" do
+    it "should read via #read and write via #f2a" do
+      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      pcap_file = PcapFile.new
+      pcap_file.read @file
+      pcap_file.to_file(:filename => 'out.pcap')
+      newfile = File.open('out.pcap') {|f| f.read(f.stat.size)}
+      newfile.force_encoding "binary" if newfile.respond_to? :force_encoding
+      expect(newfile).to eql(@file)
+      pcap_file.to_file(:filename => 'out.pcap', :append => true)
+      packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+      expect(packet_array.size).to eql(22)
+    end
+
+    it "should read via #file_to_array and write via #to_f" do
+      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      pcaps = PcapFile.new.file_to_array(:filename => 'test/sample.pcap')
+      pcaps.each {|pkt|
+        packet = Packet.parse pkt
+        packet.recalc
+        packet.to_f('out.pcap','a')
+      }
+      packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+      expect(packet_array.size).to eql(11)
+      File.unlink('out.pcap')
+    end
+
+    it "should read via #file_to_array and write via #a2f with timestamp changes" do
+      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      pcap_file = PcapFile.new
+      packet_array = pcap_file.file_to_array(:filename => 'test/sample.pcap')
+      expect(packet_array.size).to eql(11)
+
+      pcap_file = PcapFile.new
+      pcap_file.a2f(:array => packet_array, :f => 'out.pcap', :ts_inc => 4,
+             :timestamp => Time.now.to_i - 1_000_000)
+      diff_time = pcap_file.body[0].timestamp.sec.to_i - pcap_file.body[1].timestamp.sec.to_i
+      expect(diff_time).to eql(-4)
+      File.unlink('out.pcap')
+    end
+  end
+
+end
+
+describe Read do
+  context "when initializing" do
+    it "should have sane defaults" do
+      pcap_packets = Read.new()
+      expect(pcap_packets).to be_kind_of(Read)
+    end
+  end
+
+  context "when reading" do
+    it "should read from a string" do
+      pkts = Read.file_to_array(:file => 'test/sample.pcap')
+      expect(pkts).to be_kind_of(Array)
+      expect(pkts.size).to eql(11)
+
+      this_packet = Packet.parse pkts[0]
+      expect(this_packet).to be_kind_of(UDPPacket)
+
+      that_packet = Packet.parse pkts[3]
+      expect(that_packet).to be_kind_of(ICMPPacket)
+    end
+
+    it "should read from a hash" do
+      pkts = Read.file_to_array(:file => 'test/sample.pcap', :ts => true)
+      expect(pkts).to be_kind_of(Array)
+      expect(pkts.size).to eql(11)
+
+      this_packet = Packet.parse pkts[0].values.first
+      expect(this_packet).to be_kind_of(UDPPacket)
+
+      that_packet = Packet.parse pkts[3].values.first
+      expect(that_packet).to be_kind_of(ICMPPacket)
+    end
+  end
+end
+
+describe Write do
+  context "when initializing" do
+    it "should have sane defaults" do
+      pcap_packets = Write.new()
+      expect(pcap_packets).to be_kind_of(Write)
+    end
+  end
+
+  context "when writing" do
+    it "should read from a string" do
+      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      pkts = Read.file_to_array(:file => 'test/sample.pcap')
+      expect(pkts).to be_kind_of(Array)
+      expect(pkts.size).to eql(11)
+
+      Write.array_to_file(:array => pkts, :file => 'out.pcap')
+
+      pkts_new = Read.file_to_array(:file => 'out.pcap')
+      expect(pkts).to be_kind_of(Array)
+      expect(pkts.size).to eql(11)
+      expect(File.read('out.pcap').size).to eql(File.read('test/sample.pcap').size)
+
+      File.unlink('out.pcap') if File.exists? 'out.pcap'
+    end
+  end
+end
