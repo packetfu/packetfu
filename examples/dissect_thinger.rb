@@ -1,12 +1,18 @@
 #!/usr/bin/env ruby
 # -*- coding: binary -*-
 # This just allows you to eyeball the dissection stuff to make sure it's all right.
-# Some day, there will be a proper test for it.
 
-fname = ARGV[0] || "../test/sample.pcap"
+# Usage:
+# ruby examples/ethernet.rb
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
+require 'packetfu'
+include PacketFu
+
+fname = ARGV[0] || "test/sample.pcap"
 sleep_interval = ARGV[1] || 1
 
-require File.join("..","lib","packetfu")
 puts "Loaded: PacketFu v#{PacketFu.version}"
 
 packets = PacketFu::PcapFile.file_to_array fname
