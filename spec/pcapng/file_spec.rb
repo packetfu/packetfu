@@ -16,6 +16,7 @@ module PacketFu
         it 'reads a Pcap-NG file' do
           @pcapng.read @file
           expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.unknown_blocks.size).to eq(0)
 
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
           intf = @pcapng.sections.first.interfaces.first
@@ -29,6 +30,7 @@ module PacketFu
         it 'reads a Pcap-NG file with Simple Packet blocks' do
           @pcapng.read @file_spb
           expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.unknown_blocks.size).to eq(0)
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
           intf = @pcapng.sections.first.interfaces.first
           expect(intf.section).to eq(@pcapng.sections.first)
