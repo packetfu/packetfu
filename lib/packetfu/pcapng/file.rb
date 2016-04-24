@@ -14,10 +14,28 @@ module PacketFu
         @unknown_blocks = []
       end
 
+      # Read a string to populate the object. Note that this appends new blocks to
+      # the Pcapng::File object.
+      def read(str)
+        PacketFu.force_binary(str)
+        io = StringIO.new(str)
+        parse_section(io)
+        self
+      end
+
+      # Clear the contents of the Pcapng::File prior to reading in a new string.
+      # This string should contain a Section Header Block and a Interface Description
+      # Block to create a conform pcapng file.
+      def read!(str)
+        clear
+        PacketFu.force_binary(str)
+        read(str)
+      end
+
       # Read a given file and analyze it.
       # If given a block, it will yield PcapNG::EPB or PcapNG::SPB objects.
       # This is the only way to get packet timestamps.
-      def read(fname, &blk)
+      def readfile(fname, &blk)
         unless ::File.readable?(fname)
           raise ArgumentError, "cannot read file #{fname}"
         end
@@ -45,7 +63,7 @@ module PacketFu
         count = 0
         packets = [] unless blk
 
-        read(fname) do |packet|
+        readfile(fname) do |packet|
           if blk
             count += 1
             yield packet.data.to_s
@@ -83,6 +101,38 @@ module PacketFu
       # Clear the contents of the Pcapng::File.
       def clear
         @sections.clear
+      end
+
+      # #file_to_array translates a Pcap-NG file into an array of packets.
+      # Note that this strips out timestamps -- if you'd like to retain
+      # timestamps and other pcapng file information, you will want to
+      # use #read instead.
+      #
+      # Valid arguments are:
+      #  * :filename           If given, object is cleared and filename is analyzed
+      #                        before generating array. Else, array is generated
+      #                        from self.
+      #  * :keep_timestamps    If true, generates an array of hashes, each one with
+      #                        timestamp as key and packet as value. There is one hash
+      #                        per packet.
+      def file_to_array(args={})
+        filename = args[:filename] || args[:file]
+        if filename
+          clear
+          readfile filename
+        end
+
+        ary = []
+        @sections.each do |section|
+          section.interfaces.each do |itf|
+            if args[:keep_timestamps] || args[:keep_ts]
+              ary.concat itf.packets.map { |pkt| { pkt.timestamp => pkt.data.to_s } }
+            else
+              ary.concat itf.packets.map { |pkt| pkt.data.to_s}
+            end
+          end
+        end
+        ary
       end
 
       # Writes the Pcapng::File to a file. Takes the following arguments:
@@ -204,7 +254,7 @@ module PacketFu
       def parse_section(io)
         shb = SHB.new
         type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
-        io.seek(-4, :CUR)
+        io.seek(-4, IO::SEEK_CUR)
         shb = parse(type, io, shb)
         raise InvalidFileError, 'no Section header found' unless shb.is_a?(SHB)
 
@@ -214,7 +264,7 @@ module PacketFu
           while !section.eof? do
             shb = @sections.last
             type = StructFu::Int32.new(0, shb.endian).read(section.read(4))
-            section.seek(-4, :CUR)
+            section.seek(-4, IO::SEEK_CUR)
             block = parse(type, section, shb)
           end
         else
@@ -222,7 +272,7 @@ module PacketFu
           while !io.eof?
             shb = @sections.last
             type = StructFu::Int32.new(0, shb.endian).read(io.read(4))
-            io.seek(-4, :CUR)
+            io.seek(-4, IO::SEEK_CUR)
             block = parse(type, io, shb)
           end
         end
