@@ -8,6 +8,12 @@
 # forever. This still takes kinda forever, but at 5000 packets
 # every 11 seconds (my own benchmark) for this script, at least
 # it doesn't hog up all your memory.
+
+# Usage:
+# ruby examples/new-simple-stats.rb test/sample.pcap
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 
 def print_results(stats)

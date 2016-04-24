@@ -2,7 +2,11 @@
 # -*- coding: binary -*-
 
 # A simple local network fingerprinter. Uses the OUI list.
-# Usage: rvmsudo ./arphood.rb [iface] [network] <oui.txt>
+# Usage:
+# rvmsudo examples/arphood.rb [iface] [network] <oui.txt>
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 require 'open-uri'
 
