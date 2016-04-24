@@ -20,6 +20,8 @@ module PacketFu
       include Block
       attr_accessor :endian
       attr_reader :interfaces
+      # Get unsupported blocks given in pcapng file as raw data
+      attr_reader :unknown_blocks
 
       MAGIC_INT32  = 0x1A2B3C4D
       MAGIC_LITTLE = [MAGIC_INT32].pack('V')
@@ -31,6 +33,7 @@ module PacketFu
       def initialize(args={})
         @endian = set_endianness(args[:endian] || :little)
         @interfaces = []
+        @unknown_blocks = []
         init_fields(args)
         super(args[:type], args[:block_len], args[:magic], args[:ver_major],
               args[:ver_minor], args[:section_len], args[:options], args[:block_len2])

@@ -6,12 +6,9 @@ module PacketFu
     # PcapNG::File is a comple Pcap-NG file handler.
     class File
       attr_accessor :sections
-      # Get unsupported blocks given in pcapng file as raw data
-      attr_reader :unknown_blocks
 
       def initialize
         @sections = []
-        @unknown_blocks = []
       end
 
       # Read a string to populate the object. Note that this appends new blocks to
@@ -308,7 +305,8 @@ module PacketFu
           shb.interfaces[0] << block
           block.interface = shb.interfaces[0]
         else
-          @unknown_blocks << block
+          shb.unknown_blocks << block
+          block.section = shb
         end
       end
 
