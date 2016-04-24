@@ -8,6 +8,8 @@ raise RuntimeError, "Need a target" unless target
 action = ARGV[1]
 raise RuntimeError, "Need an action. Try file or your interface." unless action
 
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 include PacketFu
 
@@ -30,5 +32,3 @@ if action == 'file'.downcase
 else
   puts kill_packet.to_w(action.downcase)
 end
-
-
