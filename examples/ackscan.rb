@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 # -*- coding: binary -*-
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
+
 # Portscanning!
 # Run this on one machine
 #cap = Capture.new(:iface=>'wlan0') # or whatever your interface is
@@ -36,4 +40,3 @@ def gen_packets
 end
 
 do_scan
-
