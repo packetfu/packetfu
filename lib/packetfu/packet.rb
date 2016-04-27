@@ -89,7 +89,7 @@ module PacketFu
           accessor = header.class.to_s.sub(/PacketFu::(.*)Header/, '\1_header=').downcase.to_sym
           p.send(accessor, header)
         end
-        p.payload = my_packet
+        p.payload = my_packet if headers.last.respond_to? :body
         p
       else
         InvalidPacket.new.read(my_packet)
