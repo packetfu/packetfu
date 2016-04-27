@@ -24,6 +24,22 @@ module PacketFu
       str.force_encoding Encoding::BINARY if str.respond_to? :force_encoding
     end
 
+    # Bind upper layer to receiver class. This is used by a packet subclass to register
+    # itself to its sub layer to make Packet.parse work.
+    #
+    # Example:
+    #   EthPacket.bind_layer IPPacket, :eth_proto => 0x800
+    def self.bind_layer(klass, args={})
+      @known_layers ||= {}
+      basename = klass.to_s.sub(/PacketFu::(.*)Packet/, '\1')
+      @known_layers[args] = [basename, klass]
+    end
+
+    # Get registered layers.
+    def self.known_layers
+      @known_layers || {}
+    end
+
     # Parse() creates the correct packet type based on the data, and returns the apporpiate
     # Packet subclass object.
     #
