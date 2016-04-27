@@ -52,17 +52,48 @@ module PacketFu
     # It is no longer neccisary to manually add packet types here.
     def self.parse(packet=nil,args={})
       parse_app = true if(args[:parse_app].nil? or args[:parse_app])
-      force_binary(packet)
-      if parse_app
-        classes = PacketFu.packet_classes_by_layer
-      else
-        classes = PacketFu.packet_classes_by_layer_without_application
-      end
+      my_packet = packet.dup
+      force_binary(my_packet)
+      if EthPacket.can_parse?(my_packet)
+        headers = []
+        klass = EthPacket
+        header = EthHeader.new
+        header_sz = header.to_s.size
+        header.read(my_packet)
+        headers << header
+        my_packet = my_packet[header_sz..-1]
 
-      new_args = {}
-      new_args[:on_ipv6] = true if IPv6Packet.can_parse?(packet)
-      p = classes.detect { |pclass| pclass.can_parse?(packet) }.new(new_args)
-      parsed_packet = p.read(packet,args)
+        next_layer_found = true
+        while next_layer_found
+          next_layer_found = false
+          klass.known_layers.each do |selectors, ary|
+            if selectors.keys.all? { |k| header[k].to_i == selectors[k] }
+              header = PacketFu.const_get((ary[0] + 'Header').to_sym).new
+              header_sz = header.to_s.size
+              header.read(my_packet)
+              headers.last.body = header
+              headers << header
+              my_packet = my_packet[header_sz..-1]
+              klass = ary[1]
+              next_layer_found = true
+              break
+            else
+            end
+          end
+        end
+
+        ptype = headers.last.class.to_s.sub(/Header/, 'Packet')
+        p = PacketFu.const_get(ptype).new
+        p.headers = headers
+        headers.each do |header|
+          accessor = header.class.to_s.sub(/PacketFu::(.*)Header/, '\1_header=').downcase.to_sym
+          p.send(accessor, header)
+        end
+        p.payload = my_packet
+        p
+      else
+        InvalidPacket.new.read(my_packet)
+      end
     end
 
     def handle_is_identity(ptype)
