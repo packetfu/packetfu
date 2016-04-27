@@ -8,6 +8,7 @@ module PacketFu
       include StructFu
       include Block
       attr_accessor :endian
+      attr_accessor :section
 
       MIN_SIZE     = 12
 

@@ -2,6 +2,7 @@
 require 'tempfile'
 require 'spec_helper'
 require 'packetfu'
+require_relative 'file_spec_helper'
 
 module PacketFu
   module PcapNG
@@ -16,6 +17,7 @@ module PacketFu
         it 'reads a Pcap-NG file' do
           @pcapng.readfile @file
           expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.sections[0].unknown_blocks.size).to eq(0)
 
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
           intf = @pcapng.sections.first.interfaces.first
@@ -29,6 +31,7 @@ module PacketFu
         it 'reads a Pcap-NG file with Simple Packet blocks' do
           @pcapng.readfile @file_spb
           expect(@pcapng.sections.size).to eq(1)
+          expect(@pcapng.sections[0].unknown_blocks.size).to eq(0)
           expect(@pcapng.sections.first.interfaces.size).to eq(1)
           intf = @pcapng.sections.first.interfaces.first
           expect(intf.section).to eq(@pcapng.sections.first)
@@ -46,6 +49,60 @@ module PacketFu
             idx += 1
           end
           expect(idx).to eq(11)
+        end
+
+        it 'reads many kinds of pcapng file' do
+          [:little, :big].each do |endian|
+            base_dir = ::File.join(__dir__, '..', '..', 'test', 'pcapng-test',
+                                   endian == :little ? 'output_le' : 'output_be')
+            PCAPNG_TEST_FILES.each do |file, sections|
+              next if file == 'difficult/test202.pcapng'
+              @pcapng.clear
+              @pcapng.readfile ::File.join(base_dir, file)
+              expect(@pcapng.sections[0].endian).to eq(endian)
+              expect(@pcapng.sections.size).to eq(sections.size)
+              sections.each_with_index do |section, i|
+                expect(@pcapng.sections[i].unknown_blocks.size).to eq(section[:unknown])
+                expect(@pcapng.sections[i].interfaces.size).to eq(section[:idb])
+                packets = @pcapng.sections[i].interfaces.map(&:packets).flatten
+                expect(packets.grep(EPB).size).to eq(section[:epb])
+                expect(packets.grep(SPB).size).to eq(section[:spb])
+              end
+            end
+          end
+        end
+
+        it 'reads a file with different sections, with different endians' do
+          sections = PCAPNG_TEST_FILES['difficult/test202.pcapng']
+          [:little, :big].each do |endian|
+            other_endian = endian == :little ? :big : :little
+            base_dir = ::File.join(__dir__, '..', '..', 'test', 'pcapng-test',
+                                   endian == :little ? 'output_le' : 'output_be')
+
+            @pcapng.clear
+            @pcapng.readfile ::File.join(base_dir, 'difficult', 'test202.pcapng')
+
+            expect(@pcapng.sections.size).to eq(sections.size)
+            expect(@pcapng.sections[0].endian).to eq(endian)
+            expect(@pcapng.sections[1].endian).to eq(other_endian)
+            expect(@pcapng.sections[2].endian).to eq(endian)
+            sections.each_with_index do |section, i|
+              expect(@pcapng.sections[i].unknown_blocks.size).to eq(section[:unknown])
+              expect(@pcapng.sections[i].interfaces.size).to eq(section[:idb])
+              @pcapng.sections[i].unknown_blocks.each do |block|
+                expect(block.endian).to eq(@pcapng.sections[i].endian)
+              end
+              @pcapng.sections[i].interfaces.each do |interface|
+                expect(interface.endian).to eq(@pcapng.sections[i].endian)
+                interface.packets.each do |packet|
+                  expect(packet.endian).to eq(@pcapng.sections[i].endian)
+                end
+              end
+              packets = @pcapng.sections[i].interfaces.map(&:packets).flatten
+              expect(packets.grep(EPB).size).to eq(section[:epb])
+              expect(packets.grep(SPB).size).to eq(section[:spb])
+            end
+          end
         end
       end
 

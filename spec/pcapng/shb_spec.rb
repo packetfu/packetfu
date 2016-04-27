@@ -10,13 +10,15 @@ module PacketFu
       it 'should have correct initialization values' do
         expect(@shb).to be_a(SHB)
         expect(@shb.endian).to eq(:little)
-        expect(@shb.type).to eq(PcapNG::SHB_TYPE)
+        expect(@shb.type.to_i).to eq(PcapNG::SHB_TYPE.to_i)
         expect(@shb.block_len.to_i).to eq(SHB::MIN_SIZE)
         expect(@shb.magic.to_s).to eq(SHB::MAGIC_LITTLE)
         expect(@shb.ver_major.to_i).to eq(1)
         expect(@shb.ver_minor.to_i).to eq(0)
         expect(@shb.section_len.to_i).to eq(0xffffffff_ffffffff)
         expect(@shb.block_len2).to eq(@shb.block_len)
+        expect(@shb.interfaces).to eq([])
+        expect(@shb.unknown_blocks).to eq([])
       end
 
       context 'when reading' do

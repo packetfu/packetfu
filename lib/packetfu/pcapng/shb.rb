@@ -20,6 +20,8 @@ module PacketFu
       include Block
       attr_accessor :endian
       attr_reader :interfaces
+      # Get unsupported blocks given in pcapng file as raw data
+      attr_reader :unknown_blocks
 
       MAGIC_INT32  = 0x1A2B3C4D
       MAGIC_LITTLE = [MAGIC_INT32].pack('V')
@@ -31,6 +33,7 @@ module PacketFu
       def initialize(args={})
         @endian = set_endianness(args[:endian] || :little)
         @interfaces = []
+        @unknown_blocks = []
         init_fields(args)
         super(args[:type], args[:block_len], args[:magic], args[:ver_major],
               args[:ver_minor], args[:section_len], args[:options], args[:block_len2])
@@ -38,7 +41,7 @@ module PacketFu
 
       # Used by #initialize to set the initial fields
       def init_fields(args={})
-        args[:type]  = args[:type] ? @int32.new(args[:type]) : PcapNG::SHB_TYPE
+        args[:type]  = @int32.new(args[:type] || PcapNG::SHB_TYPE.to_i)
         args[:block_len] = @int32.new(args[:block_len] || MIN_SIZE)
         args[:magic] = @int32.new(args[:magic] || MAGIC_INT32)
         args[:ver_major] = @int16.new(args[:ver_major] || 1)
@@ -76,8 +79,7 @@ module PacketFu
           case magic_str
           when MAGIC_LITTLE
           when MAGIC_BIG
-            set_endianness :big
-            init_fields
+            force_endianness :big
           else
             raise InvalidFileError, 'Incorrect magic for Section Header Block'
           end
@@ -85,8 +87,7 @@ module PacketFu
           case magic_str
           when MAGIC_BIG
           when MAGIC_LITTLE
-            set_endianness :little
-            init_fields
+            force_endianness :little
           else
             raise InvalidFileError, 'Incorrect magic for Section Header Block'
           end
@@ -122,6 +123,21 @@ module PacketFu
         pad_field :options
         recalc_block_len
         to_a.map(&:to_s).join + body
+      end
+
+
+      private
+
+      def force_endianness(endian)
+        set_endianness endian
+        @endian = endian
+        self[:type]  = @int32.new(self[:type].to_i)
+        self[:block_len] = @int32.new(self[:block_len].to_i)
+        self[:magic] = @int32.new(self[:magic].to_i)
+        self[:ver_major] = @int16.new(self[:ver_major].to_i)
+        self[:ver_minor] = @int16.new(self[:ver_minor].to_i)
+        self[:section_len] = @int64.new(self[:section_len].to_i)
+        self[:block_len2] = @int32.new(self[:block_len2].to_i)
       end
 
     end

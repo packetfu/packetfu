@@ -304,6 +304,9 @@ module PacketFu
         when SPB
           shb.interfaces[0] << block
           block.interface = shb.interfaces[0]
+        else
+          shb.unknown_blocks << block
+          block.section = shb
         end
       end
 
