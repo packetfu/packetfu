@@ -5,8 +5,7 @@ require 'packetfu/protos/eth/mixin'
 require 'packetfu/protos/ip/header'
 require 'packetfu/protos/ip/mixin'
 
-require 'packetfu/protos/udp/header'
-require 'packetfu/protos/udp/mixin'
+require 'packetfu/protos/udp'
 
 require 'packetfu/protos/hsrp/header'
 require 'packetfu/protos/hsrp/mixin'
@@ -92,7 +91,7 @@ module PacketFu
 
   end
 
-  UDPPacket.bind_layer HSRPPacket, udp_sport: 1985, udp_dport: 1985
+  UDPPacket.bind_layer HSRPPacket, udp_src: 1985, udp_dst: 1985
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby
