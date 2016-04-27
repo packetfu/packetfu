@@ -6,6 +6,7 @@ require 'packetfu/protos/ip'
 require 'packetfu/protos/ipv6'
 require 'packetfu/protos/tcp'
 require 'packetfu/protos/icmp'
+require 'packetfu/protos/udp'
 require 'fake_packets'
 
 describe PacketFu::Packet, "abstract packet class behavior" do
