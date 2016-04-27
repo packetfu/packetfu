@@ -92,6 +92,7 @@ module PacketFu
 
   end
 
+  UDPPacket.bind_layer HSRPPacket, udp_sport: 1985, udp_dport: 1985
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

@@ -186,6 +186,9 @@ module PacketFu
 
   end
 
+  IPPacket.bind_layer UDPPacket, ip_proto: 17
+  IPv6Packet.bind_layer UDPPacket, ipv6_next: 17
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

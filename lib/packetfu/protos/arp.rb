@@ -111,6 +111,8 @@ module PacketFu
 
   end
 
+  EthPacket.bind_layer ARPPacket, eth_proto: 0x0806
+
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

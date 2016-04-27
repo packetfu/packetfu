@@ -90,4 +90,7 @@ module PacketFu
       peek_data.join
     end
   end
+
+  IPPacket.bind_layer ICMPPacket, ip_proto: 1
+
 end

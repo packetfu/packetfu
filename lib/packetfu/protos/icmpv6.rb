@@ -128,4 +128,6 @@ module PacketFu
 
   end
 
+  IPv6Packet.bind_layer ICMPv6Packet, ipv6_next: ICMPv6Header::PROTOCOL_NUMBER
+
 end
