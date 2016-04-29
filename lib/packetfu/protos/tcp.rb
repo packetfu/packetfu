@@ -54,15 +54,14 @@ module PacketFu
     end
 
     def read(str=nil, args={})
-      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
-      @eth_header.read(str)
-
+      super
       # Strip off any extra data, if we are asked to do so.
       if args[:strip]
         tcp_body_len = self.ip_len - self.ip_hlen - (self.tcp_hlen * 4)
         @tcp_header.body.read(@tcp_header.body.to_s[0,tcp_body_len])
+        tcp_calc_sum
+        @ip_header.ip_recalc
       end
-      super(args)
       self
     end
 
