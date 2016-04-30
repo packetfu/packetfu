@@ -146,7 +146,7 @@ describe TCPPacket do
       tcp.tcp_dst = 80
       tcp.payload = 'abcdefghijklmnopqrstuvwxyz'
       tcp.recalc
-      expect(tcp.peek).to match(/T  80\s+192.168.1.1:32756\s+->\s+192.168.1.254:80 \[\.{6,6}\] S:\d+|I:\d+/)
+      expect(tcp.peek).to match(/T  80\s+192.168.1.1:32756\s+->\s+192.168.1.254:80 \[\.{6,6}\] S:[a-f0-9]+|I:[a-f0-9]+/)
     end
   end
 end
