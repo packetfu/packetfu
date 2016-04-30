@@ -107,7 +107,7 @@ describe TCPPacket do
     context '(TCP over IPv4)' do
       before(:all) do
         @tcp4_packet = PcapFile.read_packets(File.join(__dir__, '..', 'test',
-                                                       'tcp_test.pcap')).first
+                                                       'sample2.pcap'))[5]
       end
 
       it 'should be recognize as a TCP packet' do
@@ -117,8 +117,8 @@ describe TCPPacket do
       end
 
       it 'should have the right port numbers' do
-        expect(@tcp4_packet.tcp_src).to eq(13013)
-        expect(@tcp4_packet.tcp_dst).to eq(80)
+        expect(@tcp4_packet.tcp_src).to eq(80)
+        expect(@tcp4_packet.tcp_dst).to eq(55954)
       end
 
       it 'should have the right length' do
@@ -126,7 +126,7 @@ describe TCPPacket do
       end
 
       it 'should have the right checksum' do
-        expect(@tcp4_packet.tcp_sum).to eq(0xc8df)
+        expect(@tcp4_packet.tcp_sum).to eq(0x243a)
       end
     end
 
