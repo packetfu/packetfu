@@ -272,8 +272,8 @@ describe Write do
       Write.array_to_file(:array => pkts, :file => 'out.pcap')
 
       pkts_new = Read.file_to_array(:file => 'out.pcap')
-      expect(pkts).to be_kind_of(Array)
-      expect(pkts.size).to eql(11)
+      expect(pkts_new).to be_kind_of(Array)
+      expect(pkts_new.size).to eql(11)
       expect(File.read('out.pcap').size).to eql(File.read('test/sample.pcap').size)
 
       File.unlink('out.pcap') if File.exists? 'out.pcap'
