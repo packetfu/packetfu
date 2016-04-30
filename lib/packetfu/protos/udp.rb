@@ -103,13 +103,8 @@ module PacketFu
     def udp_calc_sum
       # This is /not/ delegated down to @udp_header since we need info
       # from the IP header, too.
-      checksum = 0
       if @ipv6_header
-        [ipv6_src, ipv6_dst].each do |iaddr|
-          8.times do |i|
-            checksum += (iaddr >> (i * 16)) & 0xffff
-          end
-        end
+        checksum = ipv6_calc_sum_on_addr
       else
         checksum = ip_calc_sum_on_addr
       end
