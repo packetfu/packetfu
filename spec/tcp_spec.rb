@@ -129,6 +129,32 @@ describe TCPPacket do
         expect(@tcp4_packet.tcp_sum).to eq(0xc8df)
       end
     end
+
+    context '(TCP over IPv6)' do
+      before(:all) do
+        @tcp6_packet = PcapFile.read_packets(File.join(__dir__, '..', 'test',
+                                                       'sample-ipv6.pcap')).last
+      end
+
+      it 'should be recognize as a TCP packet' do
+        expect(@tcp6_packet).to be_a(TCPPacket)
+        expect(@tcp6_packet.is_tcp?).to be(true)
+        expect(@tcp6_packet.ipv6?).to be(true)
+      end
+
+      it 'should have the right port numbers' do
+        expect(@tcp6_packet.tcp_src).to eq(39278)
+        expect(@tcp6_packet.tcp_dst).to eq(443)
+      end
+
+      it 'should have the right length' do
+        expect(@tcp6_packet.tcp_hlen).to eq(8)
+      end
+
+      it 'should have the right checksum' do
+        expect(@tcp6_packet.tcp_sum).to eq(0xd8c9)
+      end
+    end
   end
 
   context "when initializing TCPPacket from scratch" do
@@ -136,6 +162,22 @@ describe TCPPacket do
       tcp = TCPPacket.new
       expect(tcp.ip_header).to be_a(IPHeader)
       expect(tcp.ipv6_header).to be_nil
+    end
+
+    it "should create TCP on IPv6 packets" do
+      tcp = TCPPacket.new(:on_ipv6 => true)
+      expect(tcp.ip_header).to be_nil
+      expect(tcp.ipv6_header).to be_a(IPv6Header)
+
+      tcp.ipv6_saddr = "::1"
+      tcp.ipv6_daddr = "::2"
+      tcp.tcp_src = 41000
+      tcp.tcp_dst = 42000
+      tcp.tcp_seq = 1
+      tcp.payload = "\0" * 16
+      tcp.recalc
+      expect(tcp.tcp_sum).to eq(0x2b98)
+      expect(tcp.tcp_hlen).to eq(5)
     end
 
     it 'should support peek functionnality (IPv4 case)' do
@@ -147,6 +189,17 @@ describe TCPPacket do
       tcp.payload = 'abcdefghijklmnopqrstuvwxyz'
       tcp.recalc
       expect(tcp.peek).to match(/T  80\s+192.168.1.1:32756\s+->\s+192.168.1.254:80 \[\.{6,6}\] S:[a-f0-9]+|I:[a-f0-9]+/)
+    end
+
+    it 'should support peek functionnality (IPv6 case)' do
+      tcp = TCPPacket.new(:on_ipv6 => true)
+      tcp.ipv6_saddr = '2000::1'
+      tcp.ipv6_daddr = '2001::1'
+      tcp.tcp_src = 32756
+      tcp.tcp_dst = 80
+      tcp.payload = 'abcdefghijklmnopqrstuvwxyz'
+      tcp.recalc
+      expect(tcp.peek).to match(/6T 100\s+2000::1:32756\s+->\s+2001::1:80 \[\.{6,6}\] S:[a-f0-9]+/)
     end
   end
 end
