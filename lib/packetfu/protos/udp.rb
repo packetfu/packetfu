@@ -111,11 +111,9 @@ module PacketFu
           end
         end
       else
-        checksum += (ip_src.to_i >> 16)
-        checksum += (ip_src.to_i & 0xffff)
-        checksum += (ip_dst.to_i >> 16)
-        checksum += (ip_dst.to_i & 0xffff)
+        checksum = ip_calc_sum_on_addr
       end
+
       checksum += 0x11
       checksum += udp_len.to_i
       checksum += udp_src.to_i

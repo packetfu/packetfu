@@ -40,5 +40,14 @@ module PacketFu
     def ip_ttl=(v); self.ip_header.ip_ttl= v; end
     def ip_v; self.ip_header.ip_v ; end
     def ip_v=(v); self.ip_header.ip_v= v; end
+
+    # Add method to each packet class on IP to ease checksum computation
+    def ip_calc_sum_on_addr(cksum=0)
+      checksum = cksum
+      checksum += (ip_src.to_i >> 16)
+      checksum += (ip_src.to_i & 0xffff)
+      checksum += (ip_dst.to_i >> 16)
+      checksum += (ip_dst.to_i & 0xffff)
+    end
   end
 end
