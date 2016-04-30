@@ -115,7 +115,7 @@ describe TCPPacket do
         expect(@tcp4_packet.is_tcp?).to be(true)
         expect(@tcp4_packet.ipv6?).to be(false)
       end
-      
+
       it 'should have the right port numbers' do
         expect(@tcp4_packet.tcp_src).to eq(13013)
         expect(@tcp4_packet.tcp_dst).to eq(80)
