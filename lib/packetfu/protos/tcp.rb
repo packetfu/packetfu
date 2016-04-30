@@ -8,6 +8,9 @@ require 'packetfu/protos/tcp/mixin'
 require 'packetfu/protos/ip/header'
 require 'packetfu/protos/ip/mixin'
 
+require 'packetfu/protos/ipv6/header'
+require 'packetfu/protos/ipv6/mixin'
+
 module PacketFu
   # TCPPacket is used to construct TCP packets. They contain an EthHeader, an IPHeader, and a TCPHeader.
   #
@@ -25,6 +28,16 @@ module PacketFu
   #    tcp_pkt.recalc
   #    tcp_pkt.to_f('/tmp/tcp.pcap')
   #
+  #    tcp6_pkt = PacketFu::TCPPacket.new(:on_ipv6 => true)
+  #    tcp6_pkt.tcp_flags.syn=1
+  #    tcp6_pkt.tcp_dst=80
+  #    tcp6_pkt.tcp_win=5840
+  #    tcp6_pkt.tcp_options="mss:1460,sack.ok,ts:#{rand(0xffffffff)};0,nop,ws:7"
+  #    tcp6_pkt.ipv6_saddr="4::1"
+  #    tcp6_pkt.ipv6_daddr="12:3::4567"
+  #    tcp6_pkt.recalc
+  #    tcp6_pkt.to_f('/tmp/udp.pcap')
+  #
   # == Parameters
   #  :eth
   #    A pre-generated EthHeader object.
@@ -41,16 +54,20 @@ module PacketFu
   class TCPPacket < Packet
     include ::PacketFu::EthHeaderMixin
     include ::PacketFu::IPHeaderMixin
+    include ::PacketFu::IPv6HeaderMixin
     include ::PacketFu::TCPHeaderMixin
 
-    attr_accessor :eth_header, :ip_header, :tcp_header
+    attr_accessor :eth_header, :ip_header, :ipv6_header, :tcp_header
 
     def self.can_parse?(str)
       return false unless str.size >= 54
       return false unless EthPacket.can_parse? str
-      return false unless IPPacket.can_parse? str
-      return false unless str[23,1] == "\x06"
-      return true
+      if IPPacket.can_parse? str
+        return true if str[23,1] == "\x06"
+      elsif IPv6Packet.can_parse? str
+        return true if str[20,1] == "\x06"
+      end
+      return false
     end
 
     def read(str=nil, args={})
@@ -67,16 +84,29 @@ module PacketFu
     end
 
     def initialize(args={})
-      @eth_header = 	(args[:eth] || EthHeader.new)
-      @ip_header 	= 	(args[:ip]	|| IPHeader.new)
-      @tcp_header = 	(args[:tcp] || TCPHeader.new)
+      if args[:on_ipv6] or args[:ipv6]
+        @eth_header = EthHeader.new(args.merge(:eth_proto => 0x86dd)).read(args[:eth])
+        @ipv6_header = IPv6Header.new(args).read(args[:ipv6])
+        @tcp_header = TCPHeader.new(args).read(args[:tcp])
+
+        @ipv6_header.body = @tcp_header
+        @eth_header.body = @ipv6_header
+        @headers = [@eth_header, @ipv6_header, @tcp_header]
+
+        @ipv6_header.ipv6_next = 0x06
+      else
+        @eth_header = EthHeader.new(args.merge(:eth_proto => 0x0800)).read(args[:eth])
+        @ip_header = IPHeader.new(args).read(args[:ipv6])
+        @tcp_header = TCPHeader.new(args).read(args[:tcp])
+
+        @ip_header.body = @tcp_header
+        @eth_header.body = @ip_header
+        @headers = [@eth_header, @ip_header, @tcp_header]
+
+        @ip_header.ip_proto = 0x06
+      end
       @tcp_header.flavor = args[:flavor].to_s.downcase
 
-      @ip_header.body = @tcp_header
-      @eth_header.body = @ip_header
-      @headers = [@eth_header, @ip_header, @tcp_header]
-
-      @ip_header.ip_proto=0x06
       super
       if args[:flavor]
         tcp_calc_flavor(@tcp_header.flavor)
@@ -118,10 +148,16 @@ module PacketFu
     # from the IP header, too.
     #++
     def tcp_calc_sum
-      checksum = ip_calc_sum_on_addr
+      if @ipv6_header
+        checksum = ipv6_calc_sum_on_addr
+        tcp_len = ipv6_len
+      else
+        checksum = ip_calc_sum_on_addr
+        tcp_len = ip_len.to_i - ((ip_hl.to_i) * 4)
+      end
 
       checksum += 0x06 # TCP Protocol.
-      checksum +=	(ip_len.to_i - ((ip_hl.to_i) * 4))
+      checksum += tcp_len
       checksum += tcp_src
       checksum += tcp_dst
       checksum += (tcp_seq.to_i >> 16)
@@ -138,8 +174,8 @@ module PacketFu
 
       chk_tcp_opts = (tcp_opts.to_s.size % 2 == 0 ? tcp_opts.to_s : tcp_opts.to_s + "\x00") 
       chk_tcp_opts.unpack("n*").each {|x| checksum = checksum + x }
-      if (ip_len - ((ip_hl + tcp_hlen) * 4)) >= 0
-        real_tcp_payload = payload[0,( ip_len - ((ip_hl + tcp_hlen) * 4) )] # Can't forget those pesky FCSes!
+      if (tcp_len - (tcp_hlen * 4)) >= 0
+        real_tcp_payload = payload[0, (tcp_len - (tcp_hlen * 4))] # Can't forget those pesky FCSes!
       else
         real_tcp_payload = payload # Something's amiss here so don't bother figuring out where the real payload is.
       end
@@ -179,19 +215,29 @@ module PacketFu
     # source and dest information, packet flags, sequence
     # number, and IPID.
     def peek_format
-      peek_data = ["T  "]
-      peek_data << "%-5d" % self.to_s.size
-      peek_data << "%-21s" % "#{self.ip_saddr}:#{self.tcp_src}"
-      peek_data << "->"
-      peek_data << "%21s" % "#{self.ip_daddr}:#{self.tcp_dst}"
+      if ipv6?
+        peek_data = ["6T "]
+        peek_data << "%-5d" % self.to_s.size
+        peek_data << "%-31s" % "#{self.ipv6_saddr}:#{self.tcp_src}"
+        peek_data << "->"
+        peek_data << "%31s" % "#{self.ipv6_daddr}:#{self.tcp_dst}"
+      else
+        peek_data = ["T  "]
+        peek_data << "%-5d" % self.to_s.size
+        peek_data << "%-21s" % "#{self.ip_saddr}:#{self.tcp_src}"
+        peek_data << "->"
+        peek_data << "%21s" % "#{self.ip_daddr}:#{self.tcp_dst}"
+      end
       flags = ' ['
       flags << self.tcp_flags_dotmap
       flags << '] '
       peek_data << flags
       peek_data << "S:"
       peek_data << "%08x" % self.tcp_seq
-      peek_data << "|I:"
-      peek_data << "%04x" % self.ip_id
+      unless ipv6?
+        peek_data << "|I:"
+        peek_data << "%04x" % self.ip_id
+      end
       peek_data.join
     end
 
