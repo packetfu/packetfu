@@ -118,10 +118,8 @@ module PacketFu
     # from the IP header, too.
     #++
     def tcp_calc_sum
-      checksum =  (ip_src.to_i >> 16)
-      checksum += (ip_src.to_i & 0xffff)
-      checksum += (ip_dst.to_i >> 16)
-      checksum += (ip_dst.to_i & 0xffff)
+      checksum = ip_calc_sum_on_addr
+
       checksum += 0x06 # TCP Protocol.
       checksum +=	(ip_len.to_i - ((ip_hl.to_i) * 4))
       checksum += tcp_src
