@@ -22,6 +22,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec-its', '~> 1.2')
   s.add_development_dependency('sdoc', '~> 0.4.1')
   s.add_development_dependency('pry')
+  s.add_development_dependency('coveralls')
+
 
   s.extra_rdoc_files  = %w[.document README.rdoc]
   s.test_files        = (s.files & (Dir['spec/**/*_spec.rb'] + Dir['test/test_*.rb']) )
