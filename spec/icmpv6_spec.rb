@@ -31,7 +31,7 @@ describe ICMPv6Packet, "when read from a pcap file" do
     expect(@icmpv6_packet.icmpv6_sum.to_s(16)).to eq(@icmpv6_packet.icmpv6_calc_sum.to_s(16))
   end
 
-  
+
   context "when initializing ICMPv6Header from scratch" do
     before :each do
       @icmpv6_header = ICMPv6Header.new
@@ -66,7 +66,10 @@ describe ICMPv6Packet, "when read from a pcap file" do
   context "when reading/writing ICMPv6Packet to disk" do
     before :each do
       @icmpv6_packet = ICMPv6Packet.new
+      @temp_file = Tempfile.new('icmpv6_pcap')
     end
+
+    after(:each) { @temp_file.close; @temp_file.unlink }
 
     it "should write a PCAP file to disk" do
       @icmpv6_packet.ipv6_saddr = "::1:1020:3040"
@@ -74,12 +77,11 @@ describe ICMPv6Packet, "when read from a pcap file" do
       @icmpv6_packet.payload = "abcdefghijklmnopqrstuvwxyz"
       @icmpv6_packet.recalc
 
-      icmpv6_pcap_file = Tempfile.new('icmpv6_pcap')
-      expect(icmpv6_pcap_file.read).to eql("")
+      expect(@temp_file.read).to eql("")
 
-      @icmpv6_packet.to_f(icmpv6_pcap_file, 'a')
-      expect(File.exists?('icmpv6_pcap'))
-      expect(icmpv6_pcap_file.read.size).to be >= 79
+      @icmpv6_packet.to_f(@temp_file.path, 'a')
+      expect(File.exists?(@temp_file.path))
+      expect(@temp_file.read.size).to be >= 79
     end
 
     it "should read a PCAP file from disk" do

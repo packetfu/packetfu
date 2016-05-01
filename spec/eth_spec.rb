@@ -2,6 +2,7 @@
 require 'spec_helper'
 require 'packetfu/protos/eth'
 require 'packetfu/protos/ip'
+require 'packetfu/protos/ipv6'
 require 'packetfu/protos/tcp'
 require 'packetfu/pcap'
 require 'tempfile'
@@ -114,6 +115,10 @@ describe EthPacket do
   end
 
   context "when reading/writing PCAP to file" do
+    before(:each) { @temp_file = Tempfile.new('arp_pcap') }
+    after(:each) { @temp_file.close; @temp_file.unlink }
+
+
     it "should write a pcap file to disk" do
       @eth_packet = EthPacket.new(
                       :eth_dst => "\x00\x03\x2f\x1a\x74\xde",
@@ -122,12 +127,11 @@ describe EthPacket do
                     )
 
       @eth_packet.recalc
-      eth_pcap_file = Tempfile.new('eth_pcap')
-      expect(eth_pcap_file.read).to eql("")
+      expect(@temp_file.read).to eql("")
 
-      @eth_packet.to_f(eth_pcap_file, 'a')
-      expect(File.exists?('eth_pcap'))
-      expect(eth_pcap_file.read.size).to be >= 30
+      @eth_packet.to_f(@temp_file.path, 'a')
+      expect(File.exists?(@temp_file.path))
+      expect(@temp_file.read.size).to be >= 30
     end
 
     it "should read a pcap file to create ethpacket" do
