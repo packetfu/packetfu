@@ -6,3 +6,4 @@ test/*test.pcap
 Gemfile.lock
 .ruby-gemset*
 .ruby-version*
+coverage

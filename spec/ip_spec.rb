@@ -63,19 +63,21 @@ describe IPPacket do
   context "when writing a PCAP file to disk" do
     before :each do
       @ip_packet = IPPacket.new
+      @temp_file = Tempfile.new('ip_pcap')
     end
+
+    after(:each) { @temp_file.close; @temp_file.unlink }
 
     it "should write a PCAP file to disk" do
       @ip_packet.ip_saddr = "10.20.30.40"
       @ip_packet.ip_daddr = "50.60.70.80"
       @ip_packet.recalc
 
-      ip_pcap_file = Tempfile.new('ip_pcap')
-      expect(ip_pcap_file.read).to eql("")
+      expect(@temp_file.read).to eql("")
 
-      @ip_packet.to_f(ip_pcap_file, 'a')
-      expect(File.exists?('ip_pcap'))
-      expect(ip_pcap_file.read.size).to be >= 49
+      @ip_packet.to_f(@temp_file.path, 'a')
+      expect(File.exists?(@temp_file.path))
+      expect(@temp_file.read.size).to be >= 49
     end
   end
 end
