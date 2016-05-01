@@ -115,7 +115,10 @@ describe EthPacket do
   end
 
   context "when reading/writing PCAP to file" do
-    before(:each) { @temp_file = Tempfile.new('arp_pcap') }
+    before(:each) {
+      @temp_file = Tempfile.new('arp_pcap')
+      @temp_file.force_encoding('binary')
+    }
     after(:each) { @temp_file.close; @temp_file.unlink }
 
 
