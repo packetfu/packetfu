@@ -268,20 +268,20 @@ describe Write do
   end
 
   context "when writing" do
+    before(:each) { @temp_file = Tempfile.new('write_pcap') }
+    after(:each) { @temp_file.close; @temp_file.unlink }
+
     it "should read from a string" do
-      File.unlink('out.pcap') if File.exists? 'out.pcap'
       pkts = Read.file_to_array(:file => 'test/sample.pcap')
       expect(pkts).to be_kind_of(Array)
       expect(pkts.size).to eql(11)
 
-      Write.array_to_file(:array => pkts, :file => 'out.pcap')
+      Write.array_to_file(:array => pkts, :file => @temp_file.path)
 
-      pkts_new = Read.file_to_array(:file => 'out.pcap')
+      pkts_new = Read.file_to_array(:file => @temp_file.path)
       expect(pkts).to be_kind_of(Array)
       expect(pkts.size).to eql(11)
-      expect(File.read('out.pcap').size).to eql(File.read('test/sample.pcap').size)
-
-      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      expect(File.read(@temp_file.path).size).to eql(File.read('test/sample.pcap').size)
     end
   end
 end
