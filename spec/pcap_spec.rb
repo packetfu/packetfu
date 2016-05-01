@@ -176,20 +176,24 @@ describe PcapFile do
   end
 
   context "when reading and writing" do
-    it "should read via #read and write via #f2a" do
-      File.unlink('out.pcap') if File.exists? 'out.pcap'
+    before(:each) { @temp_file = Tempfile.new('pcap_pcap') }
+    after(:each) { @temp_file.close; @temp_file.unlink }
+
+    it "should read via #read and write via #to_file" do
       pcap_file = PcapFile.new
       pcap_file.read @file
-      pcap_file.to_file(:filename => 'out.pcap')
-      newfile = File.open('out.pcap') {|f| f.read(f.stat.size)}
+      pcap_file.to_file(:filename => @temp_file.path)
+      newfile = File.open(@temp_file.path) {|f| f.read(f.stat.size)}
       newfile.force_encoding "binary" if newfile.respond_to? :force_encoding
       expect(newfile).to eql(@file)
-      pcap_file.to_file(:filename => 'out.pcap', :append => true)
-      packet_array = PcapFile.new.f2a(:filename => 'out.pcap')
+
+      pcap_file.to_file(:filename => @temp_file.path, :append => true)
+      packet_array = PcapFile.new.f2a(:filename => @temp_file.path)
       expect(packet_array.size).to eql(22)
     end
 
     it "should read via #file_to_array and write via #to_f" do
+      # TODO: Figure out why this is failing to write properly when converted to a Tempfile
       File.unlink('out.pcap') if File.exists? 'out.pcap'
       pcaps = PcapFile.new.file_to_array(:filename => 'test/sample.pcap')
       pcaps.each {|pkt|
@@ -203,17 +207,18 @@ describe PcapFile do
     end
 
     it "should read via #file_to_array and write via #a2f with timestamp changes" do
-      File.unlink('out.pcap') if File.exists? 'out.pcap'
       pcap_file = PcapFile.new
       packet_array = pcap_file.file_to_array(:filename => 'test/sample.pcap')
       expect(packet_array.size).to eql(11)
 
       pcap_file = PcapFile.new
-      pcap_file.a2f(:array => packet_array, :f => 'out.pcap', :ts_inc => 4,
+      pcap_file.a2f(:array => packet_array, :f => @temp_file.path, :ts_inc => 4,
              :timestamp => Time.now.to_i - 1_000_000)
       diff_time = pcap_file.body[0].timestamp.sec.to_i - pcap_file.body[1].timestamp.sec.to_i
       expect(diff_time).to eql(-4)
-      File.unlink('out.pcap')
+
+      packet_array_2 = pcap_file.file_to_array(:filename => @temp_file.path)
+      expect(packet_array_2.size).to eql(11)
     end
   end
 

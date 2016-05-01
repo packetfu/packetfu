@@ -2,6 +2,7 @@
 require 'spec_helper'
 require 'packetfu/protos/eth'
 require 'packetfu/protos/ip'
+require 'packetfu/protos/ipv6'
 require 'packetfu/protos/icmp'
 require 'packetfu/pcap'
 require 'tempfile'
@@ -72,7 +73,10 @@ describe ICMPPacket, "when read from a pcap file" do
   context "when reading/writing ICMPPacket to disk" do
     before :each do
       @icmp_packet = ICMPPacket.new
+      @temp_file = Tempfile.new('icmp_pcap')
     end
+
+    after(:each) { @temp_file.close; @temp_file.unlink }
 
     it "should write a PCAP file to disk" do
       @icmp_packet.ip_saddr = "10.20.30.40"
@@ -80,12 +84,11 @@ describe ICMPPacket, "when read from a pcap file" do
       @icmp_packet.payload = "abcdefghijklmnopqrstuvwxyz"
       @icmp_packet.recalc
 
-      icmp_pcap_file = Tempfile.new('icmp_pcap')
-      expect(icmp_pcap_file.read).to eql("")
+      expect(@temp_file.read).to eql("")
 
-      @icmp_packet.to_f(icmp_pcap_file, 'a')
-      expect(File.exists?('icmp_pcap'))
-      expect(icmp_pcap_file.read.size).to be >= 79
+      @icmp_packet.to_f(@temp_file.path, 'a')
+      expect(File.exists?(@temp_file.path))
+      expect(@temp_file.read.size).to be >= 79
     end
 
     it "should read a PCAP file from disk" do

@@ -180,16 +180,18 @@ describe ARPPacket do
   context "when writing ARPPacket to PCAP" do
     before :each do
       @arp_packet = ARPPacket.new
+      @temp_file = Tempfile.new('arp_pcap')
     end
+
+    after(:each) { @temp_file.close; @temp_file.unlink }
 
     it "should write a PCAP file to disk" do
       @arp_packet.recalc
-      arp_pcap_file = Tempfile.new('arp_pcap')
-      expect(arp_pcap_file.read).to eql("")
+      expect(@temp_file.read).to eql("")
 
-      @arp_packet.to_f(arp_pcap_file, 'a')
-      expect(File.exists?('arp_pcap'))
-      expect(arp_pcap_file.read.size).to be >= 76
+      @arp_packet.to_f(@temp_file.path, 'a')
+      expect(File.exists?(@temp_file.path)).to be(true)
+      expect(@temp_file.read.size).to be >= 76
     end
   end
 end
