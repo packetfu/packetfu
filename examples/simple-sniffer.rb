@@ -1,10 +1,16 @@
 #!/usr/bin/env ruby
 # -*- coding: binary -*-
+
+# Usage:
+# rvmsudo ruby examples/simple-sniffer.rb
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 
 puts "Simple sniffer for PacketFu #{PacketFu.version}"
 include PacketFu
-iface = ARGV[0] || "eth0"
+iface = ARGV[0] || PacketFu::Utils.default_int
 
 def sniff(iface)
   cap = Capture.new(:iface => iface, :start => true)

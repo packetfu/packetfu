@@ -4,6 +4,9 @@
 # It's contrived because this is really how PacketFu::Utils got born; something similiar
 # (and a wee bit cleaner) is already available as Packet::Utils::arp, since knowing the
 # MAC address of a target IP turns out to be pretty useful day-to-day.
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 
 def usage

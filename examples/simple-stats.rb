@@ -9,6 +9,12 @@
 #
 # See new-simple-stats.rb for an example of the streaming
 # parsing method.
+
+# Usage:
+# ruby examples/simple-stats.rb test/sample.pcap
+
+# Path setting slight of hand:
+$: << File.expand_path("../../lib", __FILE__)
 require 'packetfu'
 
 # Takes a file name, parses the packets, and records the packet

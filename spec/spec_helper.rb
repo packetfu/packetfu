@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 puts "rspec #{RSpec::Core::Version::STRING}"
 if RSpec::Core::Version::STRING[0] == '3'
   require 'rspec/its'
@@ -10,3 +13,4 @@ if RSpec::Core::Version::STRING[0] == '3'
 end
 
 require 'packetfu/common'
+
