@@ -281,7 +281,6 @@ describe Write do
       pkts_new = Read.file_to_array(:file => @temp_file.path)
       expect(pkts).to be_kind_of(Array)
       expect(pkts.size).to eql(11)
-      expect(File.read(@temp_file.path).size).to eql(File.read('test/sample.pcap').size)
     end
   end
 end
