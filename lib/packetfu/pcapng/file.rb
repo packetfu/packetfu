@@ -3,7 +3,7 @@ require_relative 'shb'
 module PacketFu
   module PcapNG
 
-    # PcapNG::File is a comple Pcap-NG file handler.
+    # PcapNG::File is a complete Pcap-NG file handler.
     class File
       attr_accessor :sections
 
@@ -21,7 +21,7 @@ module PacketFu
       end
 
       # Clear the contents of the Pcapng::File prior to reading in a new string.
-      # This string should contain a Section Header Block and a Interface Description
+      # This string should contain a Section Header Block and an Interface Description
       # Block to create a conform pcapng file.
       def read!(str)
         clear
