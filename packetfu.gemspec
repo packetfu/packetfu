@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('coveralls')
 
 
-  s.extra_rdoc_files  = %w[.document README.rdoc]
+  s.extra_rdoc_files  = %w[.document README.md]
   s.test_files        = (s.files & (Dir['spec/**/*_spec.rb'] + Dir['test/test_*.rb']) )
   s.rubyforge_project = 'packetfu'
 
