@@ -63,5 +63,7 @@ module PacketFu
     end
 
   end
+
+  EthPacket.bind_layer IPv6Packet, eth_proto: 0x86dd
   
 end

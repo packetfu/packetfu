@@ -199,4 +199,6 @@ module PacketFu
 
   end
 
+  IPPacket.bind_layer TCPPacket, ip_proto: 6
+
 end

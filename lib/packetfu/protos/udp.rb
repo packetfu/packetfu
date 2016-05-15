@@ -2,11 +2,8 @@
 require 'packetfu/protos/eth/header'
 require 'packetfu/protos/eth/mixin'
 
-require 'packetfu/protos/ip/header'
-require 'packetfu/protos/ip/mixin'
-
-require 'packetfu/protos/ipv6/header'
-require 'packetfu/protos/ipv6/mixin'
+require 'packetfu/protos/ip'
+require 'packetfu/protos/ipv6'
 
 require 'packetfu/protos/udp/header'
 require 'packetfu/protos/udp/mixin'
@@ -185,6 +182,9 @@ module PacketFu
     end
 
   end
+
+  IPPacket.bind_layer UDPPacket, ip_proto: 17
+  IPv6Packet.bind_layer UDPPacket, ipv6_next: 17
 
 end
 

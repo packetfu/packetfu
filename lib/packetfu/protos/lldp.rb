@@ -56,6 +56,8 @@ module PacketFu
       @headers[0].inspect
     end
   end
+
+  EthPacket.bind_layer LLDPPacket, eth_proto: 0x88cc
 end
 
 # vim: nowrap sw=2 sts=0 ts=2 ff=unix ft=ruby

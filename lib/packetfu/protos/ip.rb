@@ -1,6 +1,5 @@
 # -*- coding: binary -*-
-require 'packetfu/protos/eth/header'
-require 'packetfu/protos/eth/mixin'
+require 'packetfu/protos/eth'
 require 'packetfu/protos/ip/header'
 require 'packetfu/protos/ip/mixin'
 
@@ -84,6 +83,8 @@ module PacketFu
     end
 
   end
+
+  EthPacket.bind_layer IPPacket, eth_proto: 0x0800
 
 end
 
