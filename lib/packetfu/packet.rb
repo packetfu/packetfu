@@ -44,7 +44,7 @@ module PacketFu
       end
 
       new_args = {}
-      new_args[:on_ipv6] = true if IPv6Packet.can_parse?(packet)
+      new_args[:on_ipv6] = true if PacketFu::IPv6Packet.can_parse?(packet)
       p = classes.detect { |pclass| pclass.can_parse?(packet) }.new(new_args)
       parsed_packet = p.read(packet,args)
     end
