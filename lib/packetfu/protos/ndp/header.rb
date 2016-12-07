@@ -10,6 +10,7 @@ module PacketFu
   #   Int8      :ndp_type                        # Type
   #   Int8      :ndp_code                        # Code
   #   Int16     :ndp_sum    Default: calculated  # Checksum
+  #   Int32     :ndp_res    Default: 0x0         # Reserved
   #
   class NDPHeader < Struct.new(:ndp_type, :ndp_code, :ndp_sum, :ndp_reserved, :body)
     include StructFu
@@ -23,6 +24,7 @@ module PacketFu
         Int8.new(args[:ndp_type]),
         Int8.new(args[:ndp_code]),
         Int16.new(args[:ndp_sum]),
+        Int32.new(args[:ndp_reserved])
       )
     end
 
@@ -38,6 +40,7 @@ module PacketFu
       self[:ndp_type].read(str[0,1])
       self[:ndp_code].read(str[1,1])
       self[:ndp_sum].read(str[2,2])
+      self[:ndp_reserved].read(str[4,4])
       self
     end
 
@@ -54,6 +57,10 @@ module PacketFu
     def ndp_sum=(i); typecast i; end
     # Getter for the checksum.
     def ndp_sum; self[:ndp_sum].to_i; end
+    # Setter for the reserved.
+    def ndp_reserved=(i); typecast i; end
+    # Getter for the reserved.
+    def ndp_reserved; self[:ndp_reserved].to_i; end
 
     def ndp_sum_readable
       "0x%04x" % ndp_sum

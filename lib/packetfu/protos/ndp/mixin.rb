@@ -10,5 +10,7 @@ module PacketFu
     def ndp_sum=(v); self.ndp_header.ndp_sum= v; end
     def ndp_sum; self.ndp_header.ndp_sum; end
     def ndp_sum_readable; self.ndp_header.ndp_sum_readable; end
+    def ndp_reserved=(v); self.ndp_header.ndp_reserved= v; end
+    def ndp_reserved; self.ndp_header.ndp_reserved; end
   end
 end
