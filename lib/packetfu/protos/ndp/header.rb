@@ -13,7 +13,7 @@ module PacketFu
   #   Int32     :ndp_res    Default: 0x0         # Reserved
   #
   class NDPHeader < Struct.new(:ndp_type, :ndp_code, :ndp_sum, :ndp_reserved,
-                                :ndp_tgt, :body)
+                                :ndp_tgt, :ndp_opt_type, :body)
     include StructFu
 
     PROTOCOL_NUMBER = 58
@@ -26,7 +26,8 @@ module PacketFu
         Int8.new(args[:ndp_code]),
         Int16.new(args[:ndp_sum]),
         Int32.new(args[:ndp_reserved]),
-        AddrIpv6.new.read(args[:ndp_tgt] || ("\x00" * 16))
+        AddrIpv6.new.read(args[:ndp_tgt] || ("\x00" * 16)),
+        Int8.new(args[:ndp_opt_type])
       )
     end
 
@@ -44,6 +45,7 @@ module PacketFu
       self[:ndp_sum].read(str[2,2])
       self[:ndp_reserved].read(str[4,4])
       self[:ndp_tgt].read(str[8,16])
+      self[:ndp_opt_type].read(str[24,1])
       self
     end
 
@@ -69,6 +71,9 @@ module PacketFu
     # Getter for the target address.
     def ndp_tgt; self[:ndp_tgt].to_i; end
     # Setter for the options type field.
+    def ndp_opt_type=(i); typecast i; end
+    # Getter for the options type field.
+    def ndp_opt_type; self[:ndp_opt_type].to_i; end
 
     # Get target address in a more readable form.
     def ndp_taddr

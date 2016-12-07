@@ -17,5 +17,7 @@ module PacketFu
     def ndp_taddr=(v); self.ndp_header.ndp_taddr= v; end
     def ndp_taddr; self.ndp_header.ndp_taddr; end
     def ndp_tgt_readable; self.ndp_header.ndp_tgt_readable; end
+    def ndp_opt_type=(v); self.ndp_header.ndp_opt_type= v; end
+    def ndp_opt_type; self.ndp_header.ndp_opt_type; end
   end
 end
