@@ -26,5 +26,6 @@ module PacketFu
     def ndp_laddr=(v); self.ndp_header.ndp_laddr= v; end
     def ndp_laddr; self.ndp_header.ndp_laddr; end
     def ndp_lla_readable; self.ndp_header.ndp_lla_readable; end
+    def ndp_set_flags=(v); self.ndp_header.ndp_set_flags= v; end
   end
 end

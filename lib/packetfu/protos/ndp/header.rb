@@ -114,6 +114,28 @@ module PacketFu
       "0x%04x" % ndp_sum
     end
 
+    # Set flag bits (First three are flag bits, the rest are reserved).
+    def ndp_set_flags=(bits)
+        case bits
+        when "000"
+            self.ndp_reserved = 0x00000000
+        when "001"
+            self.ndp_reserved = 0x20000000
+        when "010"
+            self.ndp_reserved = 0x40000000
+        when "011"
+            self.ndp_reserved = 0x60000000
+        when "100"
+            self.ndp_reserved = 0x80000000
+        when "101"
+            self.ndp_reserved = 0xa0000000
+        when "110"
+            self.ndp_reserved = 0xc0000000
+        when "111"
+            self.ndp_reserved = 0xe0000000
+        end
+    end
+
     alias :ndp_tgt_readable :ndp_taddr
     alias :ndp_lla_readable :ndp_lladdr
 
