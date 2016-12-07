@@ -21,5 +21,10 @@ module PacketFu
     def ndp_opt_type; self.ndp_header.ndp_opt_type; end
     def ndp_opt_len=(v); self.ndp_header.ndp_opt_len=v; end
     def ndp_opt_len;self.ndp_header.ndp_opt_len; end
+    def ndp_lla=(v); self.ndp_header.ndp_lla=v; end
+    def ndp_lla; self.ndp_header.ndp_lla; end
+    def ndp_laddr=(v); self.ndp_header.ndp_laddr= v; end
+    def ndp_laddr; self.ndp_header.ndp_laddr; end
+    def ndp_lla_readable; self.ndp_header.ndp_lla_readable; end
   end
 end

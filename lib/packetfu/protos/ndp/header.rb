@@ -12,8 +12,9 @@ module PacketFu
   #   Int16     :ndp_sum    Default: calculated  # Checksum
   #   Int32     :ndp_res    Default: 0x0         # Reserved
   #
-  class NDPHeader < Struct.new(:ndp_type, :ndp_code, :ndp_sum, :ndp_reserved,
-                                :ndp_tgt, :ndp_opt_type, :ndp_opt_len, :body)
+  class NDPHeader < Struct.new(:ndp_type, :ndp_code, :ndp_sum,
+                                :ndp_reserved, :ndp_tgt, :ndp_opt_type,
+                                :ndp_opt_len, :ndp_lla, :body)
     include StructFu
 
     PROTOCOL_NUMBER = 58
@@ -28,7 +29,8 @@ module PacketFu
         Int32.new(args[:ndp_reserved]),
         AddrIpv6.new.read(args[:ndp_tgt] || ("\x00" * 16)),
         Int8.new(args[:ndp_opt_type]),
-        Int8.new(args[:ndp_opt_len])
+        Int8.new(args[:ndp_opt_len]),
+        EthMac.new.read(args[:ndp_lla])
       )
     end
 
@@ -48,6 +50,7 @@ module PacketFu
       self[:ndp_tgt].read(str[8,16])
       self[:ndp_opt_type].read(str[24,1])
       self[:ndp_opt_len].read(str[25,1])
+      self[:ndp_lla].read(str[26,str.size])
       self
     end
 
@@ -80,6 +83,10 @@ module PacketFu
     def ndp_opt_len=(i); typecast i; end
     # Getter for the options length.
     def ndp_opt_len; self[:ndp_opt_len].to_i; end
+    # Setter for the link layer address.
+    def ndp_lla=(i); typecast i; end
+    # Getter for the link layer address.
+    def ndp_lla; self[:ndp_lla].to_s; end
 
     # Get target address in a more readable form.
     def ndp_taddr
@@ -91,11 +98,24 @@ module PacketFu
         self[:ndp_tgt].read_x(str)
     end
 
+    # Sets the link layer address in a more readable way.
+    def ndp_lladdr=(mac)
+        mac = EthHeader.mac2str(mac)
+        self[:ndp_lla].read mac
+        self[:ndp_lla]
+    end
+
+    # Gets the link layer address in a more readable way.
+    def ndp_lladdr
+        EthHeader.str2mac(self[:ndp_lla].to_s)
+    end
+
     def ndp_sum_readable
       "0x%04x" % ndp_sum
     end
 
     alias :ndp_tgt_readable :ndp_taddr
+    alias :ndp_lla_readable :ndp_lladdr
 
   end
 end
