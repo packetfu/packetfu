@@ -19,5 +19,7 @@ module PacketFu
     def ndp_tgt_readable; self.ndp_header.ndp_tgt_readable; end
     def ndp_opt_type=(v); self.ndp_header.ndp_opt_type= v; end
     def ndp_opt_type; self.ndp_header.ndp_opt_type; end
+    def ndp_opt_len=(v); self.ndp_header.ndp_opt_len=v; end
+    def ndp_opt_len;self.ndp_header.ndp_opt_len; end
   end
 end
