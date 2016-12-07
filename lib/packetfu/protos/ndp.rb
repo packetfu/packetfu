@@ -11,16 +11,21 @@ require 'packetfu/protos/ndp/mixin'
 module PacketFu
 
   # NDPPacket is used to construct NDP Packets. They contain an EthHeader,
-  # an IPv6Header, and a ICMPv6Header.
+  # an IPv6Header, and a NDPHeader.
   #
   # == Example
   #
-  #  ndp_pkt.new
+  #  ndp_pkt = NDPPacket.new
   #  ndp_pkt.ndp_type = 136
   #  ndp_pkt.ndp_code = 0
+  #  ndp_pkt.ndp_opt_type = 2
+  #  ndp_pkt.ndp_opt_len = 1
+  #  ndp_pkt.ndp_taddr = "2000::1234"
   #
   #  ndp_pkt.ipv6_saddr="2000::1234"
   #  ndp_pkt.ipv6_daddr="2000::5678"
+  #
+  #  ndp_pkt.ndp_recalc
   #
   # == Parameters
   #
