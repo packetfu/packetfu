@@ -11,7 +11,17 @@ module PacketFu
   #   Int8      :ndp_code                        # Code
   #   Int16     :ndp_sum    Default: calculated  # Checksum
   #   Int32     :ndp_res    Default: 0x0         # Reserved
+  #   AddrIpv6  :ndp_tgt                         # Target Address
   #
+  # ==== Possible Options
+  #
+  #   Int8      :ndp_opt_type                    # Option Type
+  #   Int8      :ndp_opt_len                     # Option Length
+  #   EthMac    :ndp_lla                         # Option Link-layer Address
+  #
+  #
+  # Reserved field encloses RSO flags for Neighbor Advertisment Packets.
+  # Set them with ndp_set_flags.
   class NDPHeader < Struct.new(:ndp_type, :ndp_code, :ndp_sum,
                                 :ndp_reserved, :ndp_tgt, :ndp_opt_type,
                                 :ndp_opt_len, :ndp_lla, :body)
