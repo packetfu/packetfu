@@ -1,9 +1,9 @@
 # -*- coding: binary -*-
 # StructFu, a nifty way to leverage Ruby's built in Struct class
-# to create meaningful binary data. 
+# to create meaningful binary data.
 
 module StructFu
-  
+
   # Normally, self.size and self.length will refer to the Struct
   # size as an array. It's a hassle to redefine, so this introduces some
   # shorthand to get at the size of the resultant string.
@@ -15,7 +15,7 @@ module StructFu
 
   # Typecast is used mostly by packet header classes, such as IPHeader,
   # TCPHeader, and the like. It takes an argument, and casts it to the
-  # expected type for that element. 
+  # expected type for that element.
   def typecast(i)
     c = caller[0].match(/.*`([^']+)='/)[1]
     self[c.intern].read i
@@ -45,7 +45,7 @@ module StructFu
 
   # Ints all have a value, an endianness, and a default value.
   # Note that the signedness of Int values are implicit as
-  # far as the subclasses are concerned; to_i and to_f will 
+  # far as the subclasses are concerned; to_i and to_f will
   # return Integer/Float versions of the input value, instead
   # of attempting to unpack the pack value. (This can be a useful
   # hint to other functions).
@@ -80,7 +80,7 @@ module StructFu
     def to_f
       (self.v || self.d).to_f
     end
-    
+
     def initialize(value=nil, endian=nil, width=nil, default=nil)
       super(value,endian,width,default=0)
     end
@@ -122,7 +122,7 @@ module StructFu
      end
 
   end
-  
+
   # Int16be is a two byte value in big-endian format. The endianness cannot be altered.
   class Int16be < Int16
     undef :endian=
@@ -204,7 +204,7 @@ module StructFu
 
   # Provides a primitive for creating strings, preceeded by
   # an Int type of length. By default, a string of length zero with
-  # a one-byte length is presumed.  
+  # a one-byte length is presumed.
   #
   # Note that IntStrings aren't used for much, but it seemed like a good idea at the time.
   class IntString < Struct.new(:int, :string, :mode)
@@ -240,7 +240,7 @@ module StructFu
     # is calculated upon assignment. If you'd prefer to have
     # an incorrect value, use the syntax, obj[:string]="value"
     # instead. Note, by using the alternate form, you must
-    # #calc before you can trust the int's value. Think of the = 
+    # #calc before you can trust the int's value. Think of the =
     # assignment as "set to equal," while the []= assignment
     # as "boxing in" the value. Maybe.
     def string=(s)
@@ -277,10 +277,10 @@ module StructFu
     # based on the declared length, or the actual length. Which strategy
     # is used is dependant on which :mode is set (with self.mode).
     #
-    # :parse : Read the length, and then read in that many bytes of the string. 
+    # :parse : Read the length, and then read in that many bytes of the string.
     # The string may be truncated or padded out with nulls, as dictated by the value.
     #
-    # :fix   : Skip the length, read the rest of the string, then set the length 
+    # :fix   : Skip the length, read the rest of the string, then set the length
     # to what it ought to be.
     #
     # else   : If neither of these modes are set, just perfom a normal read().
@@ -289,7 +289,7 @@ module StructFu
       unless s[0,int.width].size == int.width
         raise StandardError, "String is too short for type #{int.class}"
       else
-        case mode 
+        case mode
         when :parse
           int.read(s[0,int.width])
           self[:string] = s[int.width,int.value]

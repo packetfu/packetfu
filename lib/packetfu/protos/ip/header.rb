@@ -10,7 +10,7 @@ module PacketFu
   class Octets < Struct.new(:ip_addr)
     include StructFu
 
-    IPV4_RE = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/                                                                                                                                                                                        
+    IPV4_RE = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/
     def initialize(args={})
       super(
       Int32.new(args[:ip_addr]))
@@ -46,7 +46,7 @@ module PacketFu
       match = IPV4_RE.match(str)
       if match.nil?
         raise ArgumentError.new("str is not a valid IPV4 address")
-      end 
+      end
         a = match[1].to_i
         b = match[2].to_i
         c = match[3].to_i
@@ -57,7 +57,7 @@ module PacketFu
               d >= 0 && d <= 255)
         raise ArgumentError.new("str is not a valid IPV4 address")
       end
-      
+
       self[:ip_addr].value = (a<<24) + (b<<16) + (c<<8) + d
       self
     end
@@ -65,7 +65,7 @@ module PacketFu
     # Returns the IP address as 4 octets
     def octets
       addr = self.to_i
-      [ 
+      [
         ((addr >> 24) & 0xff),
         ((addr >> 16) & 0xff),
         ((addr >> 8) & 0xff),
@@ -104,18 +104,18 @@ module PacketFu
   #   Integer (4 bits) :ip_v,     Default: 4
   #   Integer (4 bits) :ip_hl,    Default: 5
   #   Int8             :ip_tos,   Default: 0           # TODO: Break out the bits
-  #   Int16            :ip_len,   Default: calculated 
-  #   Int16            :ip_id,    Default: calculated  # IRL, hardly random. 
+  #   Int16            :ip_len,   Default: calculated
+  #   Int16            :ip_id,    Default: calculated  # IRL, hardly random.
   #   Int16            :ip_frag,  Default: 0           # TODO: Break out the bits
   #   Int8             :ip_ttl,   Default: 0xff        # Changes per flavor
   #   Int8             :ip_proto, Default: 0x01        # TCP: 0x06, UDP 0x11, ICMP 0x01
-  #   Int16            :ip_sum,   Default: calculated 
-  #   Octets           :ip_src                       
-  #   Octets           :ip_dst                      
+  #   Int16            :ip_sum,   Default: calculated
+  #   Octets           :ip_src
+  #   Octets           :ip_dst
   #   String           :body
   #
-  # Note that IPPackets will always be somewhat incorrect upon initalization, 
-  # and want an IPHeader#recalc() to become correct before a 
+  # Note that IPPackets will always be somewhat incorrect upon initalization,
+  # and want an IPHeader#recalc() to become correct before a
   # Packet#to_f or Packet#to_w.
   class IPHeader < Struct.new(:ip_v, :ip_hl, :ip_tos, :ip_len,
                               :ip_id, :ip_frag, :ip_ttl, :ip_proto,
@@ -233,7 +233,7 @@ module PacketFu
       (ip_hl * 4) + body.to_s.length
     end
 
-    # Return the claimed header length 
+    # Return the claimed header length
     def ip_hlen
       (ip_hl * 4)
     end
@@ -250,7 +250,7 @@ module PacketFu
       checksum += (self.ip_src & 0xffff)
       checksum += (self.ip_dst >> 16)
       checksum += (self.ip_dst & 0xffff)
-      checksum = checksum % 0xffff 
+      checksum = checksum % 0xffff
       checksum = 0xffff - checksum
       checksum == 0 ? 0xffff : checksum
     end
@@ -260,14 +260,14 @@ module PacketFu
       @random_id
     end
 
-    # Sets a more readable IP address. If you wants to manipulate individual octets, 
-    # (eg, for host scanning in one network), it would be better use ip_src.o1 through 
-    # ip_src.o4 instead. 
+    # Sets a more readable IP address. If you wants to manipulate individual octets,
+    # (eg, for host scanning in one network), it would be better use ip_src.o1 through
+    # ip_src.o4 instead.
     def ip_saddr=(addr)
       self[:ip_src].read_quad(addr)
     end
 
-    # Returns a more readable IP source address. 
+    # Returns a more readable IP source address.
     def ip_saddr
       self[:ip_src].to_x
     end
@@ -296,9 +296,9 @@ module PacketFu
     end
 
     # Recalculate the calculated IP fields. Valid arguments are:
-    #   :all 
-    #   :ip_len 
-    #   :ip_sum 
+    #   :all
+    #   :ip_len
+    #   :ip_sum
     #   :ip_id
     def ip_recalc(arg=:all)
       case arg
