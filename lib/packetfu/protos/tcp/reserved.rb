@@ -5,9 +5,9 @@ module PacketFu
   # ==== Header Definition
   #
   #
-  #  Fixnum (1 bit)  :r1
-  #  Fixnum (1 bit)  :r2
-  #  Fixnum (1 bit)  :r3
+  #  Integer(1 bit)  :r1
+  #  Integer(1 bit)  :r2
+  #  Integer(1 bit)  :r3
   class TcpReserved < Struct.new(:r1, :r2, :r3)
 
     include StructFu

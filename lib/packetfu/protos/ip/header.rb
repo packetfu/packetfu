@@ -101,8 +101,8 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #   Fixnum (4 bits)  :ip_v,     Default: 4
-  #   Fixnum (4 bits)  :ip_hl,    Default: 5
+  #   Integer (4 bits) :ip_v,     Default: 4
+  #   Integer (4 bits) :ip_hl,    Default: 5
   #   Int8             :ip_tos,   Default: 0           # TODO: Break out the bits
   #   Int16            :ip_len,   Default: calculated 
   #   Int16            :ip_id,    Default: calculated  # IRL, hardly random. 
@@ -286,11 +286,9 @@ module PacketFu
     def self.octet_array(addr)
       if addr.class == String
         oa = addr.split('.').collect {|x| x.to_i}
-      elsif addr.class == Fixnum
+      elsif addr.kind_of? Integer
         oa = IPAddr.new(addr, Socket::AF_INET).to_s.split('.')
-      elsif addr.class == Bignum
-        oa = IPAddr.new(addr, Socket::AF_INET).to_s.split('.')
-      elsif addr.class == Array
+      elsif addr.kind_of? Array
         oa = addr
       else
         raise ArgumentError, "IP Address should be a dotted quad string, an array of ints, or a bignum"

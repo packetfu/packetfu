@@ -6,14 +6,14 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum   :b0
-  #  Fixnum   :b1
-  #  Fixnum   :b2
-  #  Fixnum   :b3
-  #  Fixnum   :b4
-  #  Fixnum   :b5
-  #  Fixnum   :local
-  #  Fixnum   :multicast
+  #  Integer  :b0
+  #  Integer  :b1
+  #  Integer  :b2
+  #  Integer  :b3
+  #  Integer  :b4
+  #  Integer  :b5
+  #  Integer  :local
+  #  Integer  :multicast
   #  Int16    :oui,       Default: 0x1ac5 :)
   class EthOui < Struct.new(:b5, :b4, :b3, :b2, :b1, :b0, :local, :multicast, :oui)
 
@@ -68,9 +68,9 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum :n1
-  #  Fixnum :n2
-  #  Fixnum :n3
+  #  Integer:n1
+  #  Integer:n2
+  #  Integer:n3
   #
   class EthNic < Struct.new(:n0, :n1, :n2)
 

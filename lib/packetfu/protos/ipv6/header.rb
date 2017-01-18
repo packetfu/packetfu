@@ -64,9 +64,9 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum (4 bits)   :ipv6_v      Default: 6     # Versiom
-  #  Fixnum (8 bits)   :ipv6_class  Defualt: 0     # Class
-  #  Fixnum (20 bits)  :ipv6_label  Defualt: 0     # Label
+  #  Integer(4 bits)   :ipv6_v      Default: 6     # Versiom
+  #  Integer(8 bits)   :ipv6_class  Defualt: 0     # Class
+  #  Integer(20 bits)  :ipv6_label  Defualt: 0     # Label
   #  Int16             :ipv6_len    Default: calc  # Payload length
   #  Int8              :ipv6_next                  # Next Header
   #  Int8              :ipv6_hop    Default: 0xff  # Hop limit

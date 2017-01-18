@@ -68,8 +68,8 @@ Here's an example of creating a TCPPacket and sending it out on the wire:
   eth_src      ac:bc:32:85:47:3f PacketFu::EthMac     
   eth_proto    0x0800            StructFu::Int16      
 --IPHeader--------------------------------------------
-  ip_v         4                 Fixnum               
-  ip_hl        5                 Fixnum               
+  ip_v         4                 Integer
+  ip_hl        5                 Integer
   ip_tos       0                 StructFu::Int8       
   ip_len       20                StructFu::Int16      
   ip_id        0x77e4            StructFu::Int16      

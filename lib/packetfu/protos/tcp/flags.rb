@@ -4,12 +4,12 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum (1 bit)  :urg
-  #  Fixnum (1 bit)  :ack
-  #  Fixnum (1 bit)  :psh
-  #  Fixnum (1 bit)  :rst
-  #  Fixnum (1 bit)  :syn
-  #  Fixnum (1 bit)  :fin
+  #  Integer(1 bit)  :urg
+  #  Integer(1 bit)  :ack
+  #  Integer(1 bit)  :psh
+  #  Integer(1 bit)  :rst
+  #  Integer(1 bit)  :syn
+  #  Integer(1 bit)  :fin
   #
   # Flags can typically be set by setting them either to 1 or 0, or to true or false.
   class TcpFlags < Struct.new(:urg, :ack, :psh, :rst, :syn, :fin)

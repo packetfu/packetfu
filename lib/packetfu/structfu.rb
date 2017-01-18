@@ -52,10 +52,10 @@ module StructFu
   #
   # ==== Header Definition
   #
-  #   Fixnum  :value
+  #   Integer :value
   #   Symbol  :endian
-  #   Fixnum  :width
-  #   Fixnum  :default
+  #   Integer :width
+  #   Integer :default
   class Int < Struct.new(:value, :endian, :width, :default)
     alias :v= :value=
     alias :v :value
