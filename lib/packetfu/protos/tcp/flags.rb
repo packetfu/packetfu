@@ -4,12 +4,12 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum (1 bit)  :urg
-  #  Fixnum (1 bit)  :ack
-  #  Fixnum (1 bit)  :psh
-  #  Fixnum (1 bit)  :rst
-  #  Fixnum (1 bit)  :syn
-  #  Fixnum (1 bit)  :fin
+  #  Integer(1 bit)  :urg
+  #  Integer(1 bit)  :ack
+  #  Integer(1 bit)  :psh
+  #  Integer(1 bit)  :rst
+  #  Integer(1 bit)  :syn
+  #  Integer(1 bit)  :fin
   #
   # Flags can typically be set by setting them either to 1 or 0, or to true or false.
   class TcpFlags < Struct.new(:urg, :ack, :psh, :rst, :syn, :fin)
@@ -23,11 +23,11 @@ module PacketFu
         super( 0, 0, 0, 0, 0, 0)
       else
         super(
-          (args[:urg] ? 1 : 0), 
-          (args[:ack] ? 1 : 0), 
-          (args[:psh] ? 1 : 0), 
-          (args[:rst] ? 1 : 0), 
-          (args[:syn] ? 1 : 0), 
+          (args[:urg] ? 1 : 0),
+          (args[:ack] ? 1 : 0),
+          (args[:psh] ? 1 : 0),
+          (args[:rst] ? 1 : 0),
+          (args[:syn] ? 1 : 0),
           (args[:fin] ? 1 : 0)
         )
       end
@@ -36,7 +36,7 @@ module PacketFu
     # Returns the TcpFlags as an integer.
     # Also not a great candidate for to_s due to the short bitspace.
     def to_i
-      (urg.to_i << 5) + (ack.to_i << 4) + (psh.to_i << 3) + 
+      (urg.to_i << 5) + (ack.to_i << 4) + (psh.to_i << 3) +
       (rst.to_i << 2) + (syn.to_i << 1) + fin.to_i
     end
 

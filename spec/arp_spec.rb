@@ -17,7 +17,7 @@ describe ARPHeader do
     it "should have the correct classes for initialization values" do
       expect(@arp_header).to be_kind_of(ARPHeader)
       expect(@arp_header[:arp_hw]).to be_kind_of(StructFu::Int16)
-      expect(@arp_header.arp_hw).to be_kind_of(Fixnum)
+      expect(@arp_header.arp_hw).to be_kind_of(Integer)
       expect(@arp_header[:arp_src_ip]).to be_kind_of(Octets)
       expect(@arp_header.arp_src_ip).to be_kind_of(String)
       expect(@arp_header[:arp_dst_mac]).to be_kind_of(EthMac)

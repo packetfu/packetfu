@@ -6,24 +6,24 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum   :b0
-  #  Fixnum   :b1
-  #  Fixnum   :b2
-  #  Fixnum   :b3
-  #  Fixnum   :b4
-  #  Fixnum   :b5
-  #  Fixnum   :local
-  #  Fixnum   :multicast
+  #  Integer  :b0
+  #  Integer  :b1
+  #  Integer  :b2
+  #  Integer  :b3
+  #  Integer  :b4
+  #  Integer  :b5
+  #  Integer  :local
+  #  Integer  :multicast
   #  Int16    :oui,       Default: 0x1ac5 :)
   class EthOui < Struct.new(:b5, :b4, :b3, :b2, :b1, :b0, :local, :multicast, :oui)
 
     # EthOui is unusual in that the bit values do not enjoy StructFu typing.
     def initialize(args={})
-      args[:local] ||= 0 
+      args[:local] ||= 0
       args[:oui] ||= 0x1ac # :)
-      args.each_pair {|k,v| args[k] = 0 unless v} 
-      super(args[:b5], args[:b4], args[:b3], args[:b2], 
-            args[:b1], args[:b0], args[:local], args[:multicast], 
+      args.each_pair {|k,v| args[k] = 0 unless v}
+      super(args[:b5], args[:b4], args[:b3], args[:b2],
+            args[:b1], args[:b0], args[:local], args[:multicast],
             args[:oui])
     end
 
@@ -68,15 +68,15 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #  Fixnum :n1
-  #  Fixnum :n2
-  #  Fixnum :n3
+  #  Integer:n1
+  #  Integer:n2
+  #  Integer:n3
   #
   class EthNic < Struct.new(:n0, :n1, :n2)
 
     # EthNic does not enjoy StructFu typing.
     def initialize(args={})
-      args.each_pair {|k,v| args[k] = 0 unless v} 
+      args.each_pair {|k,v| args[k] = 0 unless v}
       super(args[:n0], args[:n1], args[:n2])
     end
 
@@ -84,7 +84,7 @@ module PacketFu
     def to_s
       [n0,n1,n2].map {|x| x.to_i}.pack("C3")
     end
-    
+
     # Reads a string to populate the object.
     def read(str)
       force_binary(str)
@@ -125,11 +125,11 @@ module PacketFu
 
   end
 
-  # EthHeader is a complete Ethernet struct, used in EthPacket. 
-  # It's the base header for all other protocols, such as IPHeader, 
-  # TCPHeader, etc. 
+  # EthHeader is a complete Ethernet struct, used in EthPacket.
+  # It's the base header for all other protocols, such as IPHeader,
+  # TCPHeader, etc.
   #
-  # For more on the construction on MAC addresses, see 
+  # For more on the construction on MAC addresses, see
   # http://en.wikipedia.org/wiki/MAC_address
   #
   # TODO: Need to come up with a good way of dealing with vlan
@@ -185,7 +185,7 @@ module PacketFu
       self
     end
 
-    # Converts a readable MAC (11:22:33:44:55:66) to a binary string. 
+    # Converts a readable MAC (11:22:33:44:55:66) to a binary string.
     # Readable MAC's may be split on colons, dots, spaces, or underscores.
     #
     # irb> PacketFu::EthHeader.mac2str("11:22:33:44:55:66")
@@ -200,7 +200,7 @@ module PacketFu
       return ret
     end
 
-    # Converts a binary string to a readable MAC (11:22:33:44:55:66). 
+    # Converts a binary string to a readable MAC (11:22:33:44:55:66).
     #
     # irb> PacketFu::EthHeader.str2mac("\x11\x22\x33\x44\x55\x66")
     #
@@ -218,7 +218,7 @@ module PacketFu
       self[:eth_src]
     end
 
-    # Gets the source MAC address in a more readable way. 
+    # Gets the source MAC address in a more readable way.
     def eth_saddr
       EthHeader.str2mac(self[:eth_src].to_s)
     end
@@ -230,7 +230,7 @@ module PacketFu
       self[:eth_dst]
     end
 
-    # Gets the destination MAC address in a more readable way. 
+    # Gets the destination MAC address in a more readable way.
     def eth_daddr
       EthHeader.str2mac(self[:eth_dst].to_s)
     end

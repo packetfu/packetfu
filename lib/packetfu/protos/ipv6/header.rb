@@ -32,7 +32,7 @@ module PacketFu
       (a1.to_i << 96) + (a2.to_i << 64) + (a3.to_i << 32) + a4.to_i
     end
 
-    # Returns the address as a colon-delimited hex string. 
+    # Returns the address as a colon-delimited hex string.
     def to_x
       IPAddr.new(self.to_i, Socket::AF_INET6).to_s
     end
@@ -60,13 +60,13 @@ module PacketFu
 
   end
 
-  # IPv6Header is complete IPv6 struct, used in IPv6Packet. 
+  # IPv6Header is complete IPv6 struct, used in IPv6Packet.
   #
   # ==== Header Definition
   #
-  #  Fixnum (4 bits)   :ipv6_v      Default: 6     # Versiom
-  #  Fixnum (8 bits)   :ipv6_class  Defualt: 0     # Class
-  #  Fixnum (20 bits)  :ipv6_label  Defualt: 0     # Label
+  #  Integer(4 bits)   :ipv6_v      Default: 6     # Versiom
+  #  Integer(8 bits)   :ipv6_class  Defualt: 0     # Class
+  #  Integer(20 bits)  :ipv6_label  Defualt: 0     # Label
   #  Int16             :ipv6_len    Default: calc  # Payload length
   #  Int8              :ipv6_next                  # Next Header
   #  Int8              :ipv6_hop    Default: 0xff  # Hop limit
@@ -116,9 +116,9 @@ module PacketFu
       self
     end
 
-    # Setter for the version (usually, 6). 
+    # Setter for the version (usually, 6).
     def ipv6_v=(i); self[:ip_v] = i.to_i; end
-    # Getter for the version (usually, 6). 
+    # Getter for the version (usually, 6).
     def ipv6_v; self[:ipv6_v].to_i; end
     # Setter for the traffic class.
     def ipv6_class=(i); self[:ip_class] = i.to_i; end
@@ -164,22 +164,22 @@ module PacketFu
       end
     end
 
-    # Get the source address in a more readable form. 
+    # Get the source address in a more readable form.
     def ipv6_saddr
       self[:ipv6_src].to_x
     end
 
-    # Set the source address in a more readable form. 
+    # Set the source address in a more readable form.
     def ipv6_saddr=(str)
       self[:ipv6_src].read_x(str)
     end
 
-    # Get the destination address in a more readable form. 
+    # Get the destination address in a more readable form.
     def ipv6_daddr
       self[:ipv6_dst].to_x
     end
 
-    # Set the destination address in a more readable form. 
+    # Set the destination address in a more readable form.
     def ipv6_daddr=(str)
       self[:ipv6_dst].read_x(str)
     end

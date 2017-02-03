@@ -4,7 +4,7 @@ module PacketFu
   #
   # ==== Header Definition
   #
-  #   Fixnum (4 bits)  :hlen
+  #   Integer(4 bits)  :hlen
   class TcpHlen < Struct.new(:hlen)
     
     include StructFu

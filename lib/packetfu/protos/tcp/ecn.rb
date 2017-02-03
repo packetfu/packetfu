@@ -5,9 +5,9 @@ module PacketFu
   # ==== Header Definition
   #
   #
-  #  Fixnum (1 bit)  :n
-  #  Fixnum (1 bit)  :c
-  #  Fixnum (1 bit)  :e
+  #  Integer(1 bit)  :n
+  #  Integer(1 bit)  :c
+  #  Integer(1 bit)  :e
   class TcpEcn < Struct.new(:n, :c, :e)
 
     include StructFu
