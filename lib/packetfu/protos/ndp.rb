@@ -112,6 +112,24 @@ module PacketFu
       end
     end
 
+    # Peek provides summary data on packet contents.
+    def peek_format
+      peek_data = ["ND "]
+      peek_data << "%-5d" % self.to_s.size
+      type = case self.ndp_type.to_i
+             when 135
+               "ping"
+             when 136
+               "pong"
+             else
+               "%02x-%02x" % [self.ndp_type, self.ndp_code]
+             end
+      peek_data << "%-21s" % "#{self.ipv6_saddr}:#{type}"
+      peek_data << "->"
+      peek_data << "%21s" % "#{self.ipv6_daddr}"
+      peek_data.join
+    end
+
   end
 
 end
