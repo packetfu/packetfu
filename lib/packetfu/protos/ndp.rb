@@ -66,6 +66,13 @@ module PacketFu
       return true
     end
 
+    def read(str=nil, args={})
+      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
+      @eth_header.read(str)
+      super(args)
+      self
+    end
+
     # Calculates the checksum for the object.
     def ndp_calc_sum
       checksum = 0
