@@ -56,6 +56,16 @@ module PacketFu
       ndp_calc_sum
     end
 
+    def self.can_parse?(str)
+      return false unless str.size >= 82
+      return false unless EthPacket.can_parse? str
+      return false unless IPv6Packet.can_parse? str
+      return false unless str[20,1] == [PacketFu::ICMPv6Header::PROTOCOL_NUMBER].pack('C')
+      return false unless ((str[54,1] == [PacketFu::NDPHeader::NEIGHBOR_SOLICITATION_CODE].pack('C')) or
+                           (str[54,1] == [PacketFu::NDPHeader::NEIGHBOR_ADVERTISEMENT_CODE].pack('C')))
+      return true
+    end
+
     # Calculates the checksum for the object.
     def ndp_calc_sum
       checksum = 0
