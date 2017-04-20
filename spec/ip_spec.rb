@@ -23,6 +23,7 @@ describe IPHeader do
       expect(@ip_header.ip_sum).to eql(65535)
       expect(@ip_header.ip_src).to eql(0)
       expect(@ip_header.ip_dst).to eql(0)
+      expect(@ip_header.ip_dst.class).to be_kind_of(PacketFu::Octets)
       expect(@ip_header.body).to eql("")
     end
   end
