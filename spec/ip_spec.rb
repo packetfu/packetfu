@@ -23,9 +23,14 @@ describe IPHeader do
       expect(@ip_header.ip_sum).to eql(65535)
       expect(@ip_header.ip_src).to eql(0)
       expect(@ip_header.ip_dst).to eql(0)
-      expect(@ip_header.ip_dst.class).to be_kind_of(PacketFu::Octets)
+      expect(@ip_header.ip_dst.class).to be_kind_of(Fixnum)
       expect(@ip_header.body).to eql("")
     end
+
+    it "should parse a raw IPHeader" do
+      # Add examples here
+    end
+
   end
 end
 
@@ -46,6 +51,7 @@ describe IPPacket do
       expect(@ip_packet.ip_sum).to eql(65535)
       expect(@ip_packet.ip_src).to eql(0)
       expect(@ip_packet.ip_dst).to eql(0)
+      expect(@ip_header.ip_dst.class).to be_kind_of(Fixnum)
       expect(@ip_packet.payload).to eql("")
       expect(@ip_packet.is_ip?).to be true
     end
