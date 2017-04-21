@@ -28,5 +28,17 @@ module PacketFu
     def ipv6_daddr=(v); self.ipv6_header.ipv6_daddr= v; end
     def ipv6_src_readable; self.ipv6_header.ipv6_src_readable; end
     def ipv6_dst_readable; self.ipv6_header.ipv6_dst_readable; end
+    def ipv6?; not self.ipv6_header.nil?; end
+
+    # Add method to each packet class on IPv6 to ease checksum computation
+    def ipv6_calc_sum_on_addr(cksum=0)
+      checksum = cksum
+      [ipv6_src, ipv6_dst].each do |iaddr|
+        8.times do |i|
+          checksum += (iaddr >> (i * 16)) & 0xffff
+        end
+      end
+      checksum
+    end
   end
 end
