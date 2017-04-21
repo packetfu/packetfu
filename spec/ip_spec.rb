@@ -23,8 +23,30 @@ describe IPHeader do
       expect(@ip_header.ip_sum).to eql(65535)
       expect(@ip_header.ip_src).to eql(0)
       expect(@ip_header.ip_dst).to eql(0)
+      expect(@ip_header.ip_src).to be_a(Integer) 
+      expect(@ip_header.ip_dst).to be_a(Integer) 
       expect(@ip_header.body).to eql("")
     end
+
+    it "should parse a raw IPHeader" do
+      raw_header = "\x45\x10\x00\x4f\x16\xa9\x40\x00\x40\x06\xa2\x9c\xc0\xa8\x00\x02\xc0\xa8\x00\x01"
+      @ip_header.read(raw_header)
+     
+      expect(@ip_header.ip_v).to eql(4)
+      expect(@ip_header.ip_hl).to eql(5)
+      expect(@ip_header.ip_tos).to eql(16)
+      expect(@ip_header.ip_len).to eql(79)
+      expect(@ip_header.ip_id).to be_kind_of(Integer)
+      expect(@ip_header.ip_frag).to eql(16384)
+      expect(@ip_header.ip_proto).to eql(6)
+      expect(@ip_header.ip_sum).to eql(41628)
+      expect(@ip_header.ip_src).to eql(3232235522)
+      expect(@ip_header.ip_dst).to eql(3232235521)
+      expect(@ip_header.ip_src).to be_a(Integer) 
+      expect(@ip_header.ip_dst).to be_a(Integer) 
+      expect(@ip_header.body).to eql("")
+    end
+
   end
 end
 
