@@ -22,13 +22,6 @@ module PacketFu
       true
     end
 
-    def read(str=nil,args={})
-      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
-      @eth_header.read(str)
-      super(args)
-      self
-    end
-
     def initialize(args={})
       @eth_header = EthHeader.new(args).read(args[:eth])
       @lldp_header = LLDPHeader.new(args).read(args[:lldp])

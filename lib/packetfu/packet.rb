@@ -163,12 +163,15 @@ module PacketFu
     # to be transmuted into a packet, as well as args. This superclass method is merely
     # concerned with handling args common to many packet formats (namely, fixing packets
     # on the fly)
-    def read(args={})
+    def read(str=nil, args={})
+      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
+      @eth_header.read(str)
       if args[:fix] || args[:recalc]
         ip_recalc(:ip_sum) if self.is_ip?
         recalc(:tcp) if self.is_tcp?
         recalc(:udp) if self.is_udp?
       end
+      self
     end
 
     # Packets are bundles of lots of objects, so copying them

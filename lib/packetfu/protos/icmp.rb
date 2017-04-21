@@ -50,13 +50,6 @@ module PacketFu
       return true
     end
 
-    def read(str=nil, args={})
-      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
-      @eth_header.read(str)
-      super(args)
-      self
-    end
-
     def initialize(args={})
       @eth_header = EthHeader.new(args).read(args[:eth])
       @ip_header = IPHeader.new(args).read(args[:ip])
