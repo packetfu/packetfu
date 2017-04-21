@@ -4,6 +4,8 @@
 [![Code Climate](https://codeclimate.com/github/packetfu/packetfu.png)](https://codeclimate.com/github/packetfu/packetfu)
 [![Coverage Status](https://coveralls.io/repos/github/packetfu/packetfu/badge.svg?branch=master)](https://coveralls.io/github/packetfu/packetfu?branch=master)
 
+Some changes to trigger coveralls code against master
+
 A library for reading and writing packets to an interface or to a
 libpcap-formatted file.
 
