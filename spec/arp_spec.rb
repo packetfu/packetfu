@@ -181,6 +181,7 @@ describe ARPPacket do
     before :each do
       @arp_packet = ARPPacket.new
       @temp_file = Tempfile.new('arp_pcap')
+      @temp_file.force_encoding('binary')
     end
 
     after(:each) { @temp_file.close; @temp_file.unlink }

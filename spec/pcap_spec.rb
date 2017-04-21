@@ -268,7 +268,10 @@ describe Write do
   end
 
   context "when writing" do
-    before(:each) { @temp_file = Tempfile.new('write_pcap') }
+    before(:each) {
+      @temp_file = Tempfile.new('write_pcap')
+      @temp_file.force_encoding("binary")
+    }
     after(:each) { @temp_file.close; @temp_file.unlink }
 
     it "should read from a string" do
