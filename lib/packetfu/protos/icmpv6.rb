@@ -72,12 +72,7 @@ module PacketFu
 
     # Calculates the checksum for the object.
     def icmpv6_calc_sum
-      checksum = 0
-
-      # Compute sum on pseudo-header
-      [ipv6_src, ipv6_dst].each do |iaddr|
-        8.times { |i| checksum += (iaddr >> (i*16)) & 0xffff }
-      end
+      checksum = ipv6_calc_sum_on_addr
       checksum += PacketFu::ICMPv6Header::PROTOCOL_NUMBER
       checksum += ipv6_len
       # Then compute it on ICMPv6 header + payload
