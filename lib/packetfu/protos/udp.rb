@@ -64,13 +64,13 @@ module PacketFu
     end
 
     def read(str=nil, args={})
-      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
-      @eth_header.read(str)
+      super
       if args[:strip]
         udp_body_len = self.ip_len - self.ip_hlen - 8
         @udp_header.body.read(@udp_header.body.to_s[0,udp_body_len])
+        udp_calc_sum
+        @ip_header.ip_recalc unless ipv6?
       end
-      super(args)
       self
     end
 

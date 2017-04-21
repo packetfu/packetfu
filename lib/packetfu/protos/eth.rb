@@ -29,13 +29,6 @@ module PacketFu
       true
     end
 
-    def read(str=nil,args={})
-      raise "Cannot parse `#{str}'" unless self.class.can_parse?(str)
-      @eth_header.read(str)
-      super(args)
-      return self
-    end
-
     # Does nothing, really, since there's no length or
     # checksum to calculate for a straight Ethernet packet.
     def recalc(args={})
