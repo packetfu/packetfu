@@ -31,12 +31,13 @@ def gen_packets
   pkt.tcp_dst=81
   pkt_array = []
   256.times do |i|
-   pkt.ip_dst.o4=i
-   pkt.tcp_src = rand(5000 - 1025) + 1025
- 	 pkt.recalc
- 	 pkt_array << pkt.to_s
- 	end
- 	pkt_array
+    oa = PacketFu::IPHeader.octet_array(pkt.ip_dst)[0,3] + ["#{i}"]
+    pkt.ip_dst = IPAddr.new(oa.join '.').to_i
+    pkt.tcp_src = rand(5000 - 1025) + 1025
+    pkt.recalc
+    pkt_array << pkt.to_s
+  end
+  pkt_array
 end
 
 do_scan
