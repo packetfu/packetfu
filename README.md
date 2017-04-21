@@ -113,9 +113,10 @@ Capture from an interface with show_live or whatever.
 
 This project is integrated with travis-ci and is regularly tested to work with the following rubies:
 
-- 2.1.6
-- 2.2.3
-- 2.3.0
+- 2.2.7
+- 2.3.4
+- 2.4.0
+- 2.4.1
 
 To checkout the current build status for these rubies, click [here](https://travis-ci.org/packetfu/packetfu).
 
