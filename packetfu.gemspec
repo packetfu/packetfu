@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.license     = 'BSD-3-Clause'
   s.required_ruby_version = '>= 2.1.0'
   s.add_dependency('pcaprub', '~> 0.12')
-  s.add_development_dependency('rake', '~> 10.3')
+  s.add_development_dependency('rake', '~> 12.0')
   s.add_development_dependency('rspec', '~> 3.0')
   s.add_development_dependency('rspec-its', '~> 1.2')
   s.add_development_dependency('sdoc', '~> 0.4')
