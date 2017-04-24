@@ -1,8 +1,37 @@
 language: ruby
 before_install:
  - sudo apt-get install libpcap-dev -qq
-rvm:
-  - 2.2.7
-  - 2.3.4
-  - 2.4.0
-  - 2.4.1
+matrix:
+  include:
+  - rvm: 2.4.1 
+    env: 
+      - LABEL=unit_tests_non_root
+    script: 'rake'
+  - rvm: 2.4.0 
+    env: 
+      - LABEL=unit_tests_non_root
+    script: 'rake'
+  - rvm: 2.3.4
+    env: 
+      - LABEL=unit_tests_non_root
+    script: 'rake'
+  - rvm: 2.2.7
+    env:
+      - LABEL=unit_tests_non_root
+    script: 'rake'
+  - rvm: 2.4.1
+    env:
+      - LABEL=unit_tests_root
+    script: 'rvmsudo rake'
+  - rvm: 2.4.0
+    env:
+      - LABEL=unit_tests_root
+    script: 'rvmsudo rake'
+  - rvm: 2.3.4
+    env:
+      - LABEL=unit_tests_root
+    script: 'rvmsudo rake' 
+ - rvm: 2.2.7
+    env:
+      - LABEL=unit_tests_root
+    script: 'rvmsudo rake'
