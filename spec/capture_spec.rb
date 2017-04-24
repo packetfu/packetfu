@@ -120,7 +120,7 @@ describe Capture do
             ### do nothing, we need to wait for the timeout anyways
           end
 
-          if count == 1 && valid_icmp == true
+          if count == 1 && valid_icmp == true && invalid_icmp == false
             return true
           else
             return false
