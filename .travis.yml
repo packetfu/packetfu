@@ -4,6 +4,10 @@ before_install:
 matrix:
   include:
   - rvm: 2.4.1
+    script: rvmsudo rake
   - rvm: 2.4.0
+    script: rvmsudo rake
   - rvm: 2.3.4
+    script: rvmsudo rake
   - rvm: 2.2.7
+    script: rvmsudo rake
