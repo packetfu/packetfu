@@ -107,7 +107,7 @@ module PacketFu
   #   Int16            :ip_len,   Default: calculated
   #   Int16            :ip_id,    Default: calculated  # IRL, hardly random.
   #   Int16            :ip_frag,  Default: 0           # TODO: Break out the bits
-  #   Int8             :ip_ttl,   Default: 0xff        # Changes per flavor
+  #   Int8             :ip_ttl,   Default: 64          # https://www.iana.org/assignments/ip-parameters/ip-parameters.xml
   #   Int8             :ip_proto, Default: 0x01        # TCP: 0x06, UDP 0x11, ICMP 0x01
   #   Int16            :ip_sum,   Default: calculated
   #   Octets           :ip_src
@@ -131,7 +131,7 @@ module PacketFu
         Int16.new(args[:ip_len] || 20),
         Int16.new(args[:ip_id] || ip_calc_id),
         Int16.new(args[:ip_frag]),
-        Int8.new(args[:ip_ttl] || 32),
+        Int8.new(args[:ip_ttl] || 64),
         Int8.new(args[:ip_proto]),
         Int16.new(args[:ip_sum] || ip_calc_sum),
         Octets.new.read(args[:ip_src] || "\x00\x00\x00\x00"),
