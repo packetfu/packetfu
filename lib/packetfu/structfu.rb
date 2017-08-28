@@ -18,7 +18,7 @@ module StructFu
   # expected type for that element.
   def typecast(i)
     c = caller[0].match(/.*`([^']+)='/)[1]
-    self[c.intern].read i
+    self[c.to_sym].read i
   end
 
   # Used like typecast(), but specifically for casting Strings to StructFu::Strings.

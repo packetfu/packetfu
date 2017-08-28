@@ -70,8 +70,8 @@ module PacketFu
     end
 
     # Recalculates the calculatable fields for ICMP.
-    def icmp_recalc(arg=:all)
-      arg = arg.intern
+    def icmp_recalc(arg = :all)
+      arg = arg.to_sym
       case arg
       when :icmp_sum
         self.icmp_sum=icmp_calc_sum

@@ -84,8 +84,8 @@ module PacketFu
     end
 
     # Recalculates the calculatable fields for ICMPv6.
-    def icmpv6_recalc(arg=:all)
-      arg = arg.intern
+    def icmpv6_recalc(arg = :all)
+      arg = arg.to_sym
       case arg
       when :icmpv6_sum
         self.icmpv6_sum = icmpv6_calc_sum
