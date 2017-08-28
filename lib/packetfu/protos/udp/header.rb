@@ -67,8 +67,7 @@ module PacketFu
 
     # Recalculates calculated fields for UDP.
     def udp_recalc(arg = :all)
-      arg = arg.to_sym
-      case arg
+      case arg.to_sym
       when :udp_len
         self.udp_len = udp_calc_len
       when :all
