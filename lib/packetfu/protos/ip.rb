@@ -16,7 +16,6 @@ module PacketFu
   #   ip_pkt.ip_saddr="10.20.30.40"
   #   ip_pkt.ip_daddr="192.168.1.1"
   #   ip_pkt.ip_proto=1
-  #   ip_pkt.ip_ttl=64
   #   ip_pkt.ip_payload="\x00\x00\x12\x34\x00\x01\x00\x01"+
   #     "Lovingly hand-crafted echo responses delivered directly to your door."
   #   ip_pkt.recalc
