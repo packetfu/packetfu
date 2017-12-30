@@ -23,7 +23,7 @@ module PacketFu
   #  icmpv6_pkt.ipv6_saddr="2000::1234"
   #  icmpv6_pkt.ipv6_daddr="2000::5678"
   #
-  #  icmpv6_pkt.recalc	
+  #  icmpv6_pkt.recalc
   #  icmpv6_pkt.to_f('/tmp/icmpv6.pcap')
   #
   # == Parameters
@@ -84,9 +84,8 @@ module PacketFu
     end
 
     # Recalculates the calculatable fields for ICMPv6.
-    def icmpv6_recalc(arg=:all)
-      arg = arg.intern if arg.respond_to? :intern
-      case arg
+    def icmpv6_recalc(arg = :all)
+      case arg.to_sym
       when :icmpv6_sum
         self.icmpv6_sum = icmpv6_calc_sum
       when :all
