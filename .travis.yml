@@ -1,21 +1,27 @@
 language: ruby
-before_install:
- - sudo apt-get install libpcap-dev -qq
 matrix:
   include:
   - os: linux
     rvm: 2.4.1
-  - os: osx
-    rvm: 2.4.1
+    before_install:
+      - sudo apt-get install libpcap-dev -qq
   - os: linux
     rvm: 2.4.0
-  - os: osx
-    rvm: 2.4.0
+    before_install:
+      - sudo apt-get install libpcap-dev -qq
   - os: linux
     rvm: 2.3.4
-  - os: osx
-    rvm: 2.3.4
+    before_install:
+      - sudo apt-get install libpcap-dev -qq
   - os: linux
     rvm: 2.2.7
+    before_install:
+      - sudo apt-get install libpcap-dev -qq
+  - os: osx
+    rvm: 2.4.1
+  - os: osx
+    rvm: 2.4.0
+  - os: osx
+    rvm: 2.3.4
   - os: osx
     rvm: 2.2.7
