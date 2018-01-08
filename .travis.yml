@@ -3,7 +3,19 @@ before_install:
  - sudo apt-get install libpcap-dev -qq
 matrix:
   include:
-  - rvm: 2.4.1
-  - rvm: 2.4.0
-  - rvm: 2.3.4
-  - rvm: 2.2.7
+  - os: linux
+    rvm: 2.4.1
+  - os: osx
+    rvm: 2.4.1
+  - os: linux
+    rvm: 2.4.0
+  - os: osx
+    rvm: 2.4.0
+  - os: linux
+    rvm: 2.3.4
+  - os: osx
+    rvm: 2.3.4
+  - os: linux
+    rvm: 2.2.7
+  - os: osx
+    rvm: 2.2.7
