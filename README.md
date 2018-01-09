@@ -115,7 +115,11 @@ This project is integrated with travis-ci and is regularly tested to work with t
 
 To checkout the current build status and what rubies we're currently supporting, click [here](https://travis-ci.org/packetfu/packetfu).
 
-## Author
+## Supported OSs
+
+This project is designed for use on Linux (Ubuntu|RHEL|BSD primarily) and OSX platforms and it is the intention of the PacketFu team to support those OSs to ensure PacketFu runs on them.  That said, PacketFu can and has been known to run on Windows as well as other unix-style platforms, but it's not actively supported in the sense that we may help from the community to help fill that gap.  If that is something you are interested in helping with, we welcome your support.
+
+## Authors
 
 PacketFu is maintained primarily by Tod Beardsley todb@packetfu.com and
 Jonathan Claudius claudijd@yahoo.com, with help from Open Source Land.
