@@ -95,7 +95,7 @@ module PacketFu
         @ipv6_header.ipv6_next = 0x06
       else
         @eth_header = EthHeader.new(args.merge(:eth_proto => 0x0800)).read(args[:eth])
-        @ip_header = IPHeader.new(args).read(args[:ipv6])
+        @ip_header = IPHeader.new(args).read(args[:ip])
         @tcp_header = TCPHeader.new(args).read(args[:tcp])
 
         @ip_header.body = @tcp_header
