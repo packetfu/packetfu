@@ -93,7 +93,7 @@ Here's an example of creating a TCPPacket and sending it out on the wire:
   tcp_urg      0                 StructFu::Int16
   tcp_opts                       PacketFu::TcpOptions
 
-2.3.0 :003 > packet.ip_dst = "8.8.8.8"
+2.3.0 :003 > packet.ip_daddr = "8.8.8.8"
  => "8.8.8.8"
 2.3.0 :004 > packet.tcp_dst = 53
  => 53
