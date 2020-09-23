@@ -19,9 +19,9 @@ What happens instead?
 
 ### Versions
 
-- [ ] Ruby Version (ruby -v): FILL_ME_IN
-- [ ] PacketFu Version (gem list|grep packetfu -or- git log -1): FILL_ME_IN
-- [ ] OS Version: FILL_ME_IN 
+- Ruby Version (ruby -v): FILL_ME_IN
+- PacketFu Version (gem list|grep packetfu -or- git log -1): FILL_ME_IN
+- OS Version: FILL_ME_IN
 
 ### I installed PacketFu from:
 - [ ] Git Source
