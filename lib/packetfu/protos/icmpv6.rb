@@ -46,6 +46,8 @@ module PacketFu
       return false unless EthPacket.can_parse? str
       return false unless IPv6Packet.can_parse? str
       return false unless str[20,1] == [PacketFu::ICMPv6Header::PROTOCOL_NUMBER].pack('C')
+      return false if ((str[54,1] == [PacketFu::NDPHeader::NEIGHBOR_SOLICITATION_CODE].pack('C')) or
+                       (str[54,1] == [PacketFu::NDPHeader::NEIGHBOR_ADVERTISEMENT_CODE].pack('C')))
       return true
     end
 
