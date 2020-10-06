@@ -193,7 +193,7 @@ module PacketFu
       ip = default_ip
 
       Socket.getifaddrs.each do |ifaddr|
-        next unless ifaddr.addr.ip?
+        next unless ifaddr.addr&.ip?
 
         return ifaddr.name if ifaddr.addr.ip_address == ip
       end
