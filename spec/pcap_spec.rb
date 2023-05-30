@@ -194,7 +194,7 @@ describe PcapFile do
 
     it "should read via #file_to_array and write via #to_f" do
       # TODO: Figure out why this is failing to write properly when converted to a Tempfile
-      File.unlink('out.pcap') if File.exists? 'out.pcap'
+      File.unlink('out.pcap') if File.exist? 'out.pcap'
       pcaps = PcapFile.new.file_to_array(:filename => 'test/sample.pcap')
       pcaps.each {|pkt|
         packet = Packet.parse pkt

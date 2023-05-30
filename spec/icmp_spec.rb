@@ -87,7 +87,7 @@ describe ICMPPacket, "when read from a pcap file" do
       expect(@temp_file.read).to eql("")
 
       @icmp_packet.to_f(@temp_file.path, 'a')
-      expect(File.exists?(@temp_file.path))
+      expect(File.exist?(@temp_file.path))
       expect(@temp_file.read.size).to be >= 79
     end
 

@@ -130,7 +130,7 @@ describe EthPacket do
       expect(@temp_file.read).to eql("")
 
       @eth_packet.to_f(@temp_file.path, 'a')
-      expect(File.exists?(@temp_file.path))
+      expect(File.exist?(@temp_file.path))
       expect(@temp_file.read.size).to be >= 30
     end
 

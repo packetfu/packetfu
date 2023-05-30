@@ -190,7 +190,7 @@ describe ARPPacket do
       expect(@temp_file.read).to eql("")
 
       @arp_packet.to_f(@temp_file.path, 'a')
-      expect(File.exists?(@temp_file.path)).to be(true)
+      expect(File.exist?(@temp_file.path)).to be(true)
       expect(@temp_file.read.size).to be >= 76
     end
   end

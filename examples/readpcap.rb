@@ -10,7 +10,7 @@ include PacketFu
 
 pcap_filename = ARGV[0] || 'test/sample.pcap'
 
-unless File.exists?(pcap_filename)
+unless File.exist?(pcap_filename)
   puts "PCAP input file '#{pcap_filename}' could not be found"
   exit 1
 end

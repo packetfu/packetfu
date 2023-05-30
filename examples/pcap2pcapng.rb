@@ -9,11 +9,11 @@ require 'packetfu'
 pcap_filename = ARGV[0].chomp
 pcapng_filename = ARGV[1].chomp
 
-unless File.exists?(pcap_filename)
+unless File.exist?(pcap_filename)
   puts "PCAP input file #{pcap_filename} could not be found"
 end
 
-if File.exists?(pcapng_filename)
+if File.exist?(pcapng_filename)
   puts "PCAP-NG output file #{pcap_filename} already exists"
   puts "Do you wish to overwrite the file? (Y/N, Default = N)"
   STDOUT.flush

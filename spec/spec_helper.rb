@@ -1,5 +1,7 @@
-require 'coveralls'
-Coveralls.wear!
+unless ENV['SKIP_COVERALLS']
+  require 'coveralls'
+  Coveralls.wear!
+end
 
 puts "rspec #{RSpec::Core::Version::STRING}"
 if RSpec::Core::Version::STRING[0] == '3'

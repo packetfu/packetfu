@@ -8,7 +8,7 @@ require 'packetfu/protos/lldp/mixin'
 module PacketFu
 
   class LLDPPacket < Packet
-    MAGIC = Regexp.new("^\x01\x80\xc2\x00\x00[\x0e\x03\x00]", nil, "n")
+    MAGIC = Regexp.new("^\x01\x80\xc2\x00\x00[\x0e\x03\x00]".force_encoding('ASCII-8BIT'), Regexp::NOENCODING)
     include ::PacketFu::EthHeaderMixin
     include ::PacketFu::LLDPHeaderMixin
 

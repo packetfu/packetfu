@@ -6,7 +6,7 @@ module StructFu
   # Set the endianness for the various Int classes. Takes either :little or :big.
   def set_endianness(e=nil)
     unless [:little, :big].include? e
-      raise ArgumentError, "Unknown endianness for #{self.class}" 
+      raise ArgumentError, "Unknown endianness for #{self.class}"
     end
     @int64 = e == :little ? Int64le : Int64be
     @int32 = e == :little ? Int32le : Int32be
@@ -26,11 +26,11 @@ end
 module PacketFu
 
   # PcapHeader represents the header portion of a libpcap file (the packets
-  # themselves are in the PcapPackets array). See 
+  # themselves are in the PcapPackets array). See
   # http://wiki.wireshark.org/Development/LibpcapFileFormat for details.
   #
   # Depending on the endianness (set with :endian), elements are either
-  # :little endian or :big endian. 
+  # :little endian or :big endian.
   #
   # ==== PcapHeader Definition
   #
@@ -52,13 +52,13 @@ module PacketFu
 
     def initialize(args={})
       set_endianness(args[:endian] ||= :little)
-      init_fields(args) 
-      super(args[:endian], args[:magic], args[:ver_major], 
-            args[:ver_minor], args[:thiszone], args[:sigfigs], 
+      init_fields(args)
+      super(args[:endian], args[:magic], args[:ver_major],
+            args[:ver_minor], args[:thiszone], args[:sigfigs],
             args[:snaplen], args[:network])
     end
-    
-    # Called by initialize to set the initial fields. 
+
+    # Called by initialize to set the initial fields.
     def init_fields(args={})
       args[:magic] = @int32.new(args[:magic] || PcapHeader::MAGIC_INT32)
       args[:ver_major] = @int16.new(args[:ver_major] || 2)
@@ -82,7 +82,7 @@ module PacketFu
       force_binary(str)
       return self if str.nil?
       str.force_encoding(Encoding::BINARY) if str.respond_to? :force_encoding
-      if str[0,4] == self[:magic].to_s 
+      if str[0,4] == self[:magic].to_s
         self[:magic].read str[0,4]
         self[:ver_major].read str[4,2]
         self[:ver_minor].read str[6,2]
@@ -114,7 +114,7 @@ module PacketFu
       super(args[:endian], args[:sec], args[:usec])
     end
 
-    # Called by initialize to set the initial fields. 
+    # Called by initialize to set the initial fields.
     def init_fields(args={})
       args[:sec] = @int32.new(args[:sec])
       args[:usec] = @int32.new(args[:usec])
@@ -156,7 +156,7 @@ module PacketFu
            args[:orig_len], args[:data])
     end
 
-    # Called by initialize to set the initial fields. 
+    # Called by initialize to set the initial fields.
     def init_fields(args={})
       args[:timestamp] = Timestamp.new(:endian => args[:endian]).read(args[:timestamp])
       args[:incl_len] = args[:incl_len].nil? ? @int32.new(args[:data].to_s.size) : @int32.new(args[:incl_len])
@@ -197,8 +197,8 @@ module PacketFu
       str.force_encoding Encoding::BINARY if str.respond_to? :force_encoding
     end
 
-    # Reads a string to populate the object. Note, this read takes in the 
-    # whole pcap file, since we need to see the magic to know what 
+    # Reads a string to populate the object. Note, this read takes in the
+    # whole pcap file, since we need to see the magic to know what
     # endianness we're dealing with.
     def read(str)
       force_binary(str)
@@ -226,7 +226,7 @@ module PacketFu
 
   end
 
-  # PcapFile is a complete libpcap file struct, made up of two elements, a 
+  # PcapFile is a complete libpcap file struct, made up of two elements, a
   # PcapHeader and PcapPackets.
   #
   # See http://wiki.wireshark.org/Development/LibpcapFileFormat
@@ -240,7 +240,7 @@ module PacketFu
 
     class << self
 
-      # Takes a given file and returns an array of the packet bytes. Here 
+      # Takes a given file and returns an array of the packet bytes. Here
       # for backwards compatibilty.
       def file_to_array(fname)
         PcapFile.new.file_to_array(:f => fname)
@@ -248,9 +248,9 @@ module PacketFu
 
       # Takes a given file name, and reads out the packets. If given a block,
       # it will yield back a PcapPacket object per packet found.
-      def read(fname,&block) 
+      def read(fname,&block)
         file_header = PcapHeader.new
-        pcap_packets = PcapPackets.new 
+        pcap_packets = PcapPackets.new
         unless File.readable? fname
           raise ArgumentError, "Cannot read file `#{fname}'"
         end
@@ -279,13 +279,13 @@ module PacketFu
         block ? packet_count : pcap_packets
       end
 
-      # Takes a filename, and an optional block. If a block is given, 
+      # Takes a filename, and an optional block. If a block is given,
       # yield back the raw packet data from the given file. Otherwise,
       # return an array of parsed packets.
       def read_packet_bytes(fname,&block)
         count = 0
         packets = [] unless block
-        read(fname) do |packet| 
+        read(fname) do |packet|
           if block
             count += 1
             yield packet.data.to_s
@@ -296,7 +296,7 @@ module PacketFu
         block ? count : packets
       end
 
-      alias :file_to_array :read_packet_bytes 
+      alias :file_to_array :read_packet_bytes
 
       # Takes a filename, and an optional block. If a block is given,
       # yield back parsed packets from the given file. Otherwise, return
@@ -307,7 +307,7 @@ module PacketFu
       def read_packets(fname,&block)
         count = 0
         packets = [] unless block
-        read_packet_bytes(fname) do |packet| 
+        read_packet_bytes(fname) do |packet|
           if block
             count += 1
             yield Packet.parse(packet)
@@ -326,7 +326,7 @@ module PacketFu
       super(args[:endian], args[:head], args[:body])
     end
 
-    # Called by initialize to set the initial fields. 
+    # Called by initialize to set the initial fields.
     def init_fields(args={})
       args[:head] = PcapHeader.new(:endian => args[:endian]).read(args[:head])
       args[:body] = PcapPackets.new(:endian => args[:endian]).read(args[:body])
@@ -354,7 +354,7 @@ module PacketFu
 
     # Clears the contents of the PcapFile prior to reading in a new string.
     def read!(str)
-      clear	
+      clear
       force_binary(str)
       self.read str
     end
@@ -381,7 +381,7 @@ module PacketFu
 
     # file_to_array() translates a libpcap file into an array of packets.
     # Note that this strips out pcap timestamps -- if you'd like to retain
-    # timestamps and other libpcap file information, you will want to 
+    # timestamps and other libpcap file information, you will want to
     # use read() instead.
     def file_to_array(args={})
       filename = args[:filename] || args[:file] || args[:f]
@@ -469,7 +469,7 @@ module PacketFu
       end
       append = args[:append]
       if append
-        if File.exists? filename
+        if File.exist? filename
           File.open(filename,'ab') {|file| file.write(self.body.to_s)}
         else
           File.open(filename,'wb') {|file| file.write(self.to_s)}

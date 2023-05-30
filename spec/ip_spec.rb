@@ -23,15 +23,15 @@ describe IPHeader do
       expect(@ip_header.ip_sum).to eql(65535)
       expect(@ip_header.ip_src).to eql(0)
       expect(@ip_header.ip_dst).to eql(0)
-      expect(@ip_header.ip_src).to be_a(Integer) 
-      expect(@ip_header.ip_dst).to be_a(Integer) 
+      expect(@ip_header.ip_src).to be_a(Integer)
+      expect(@ip_header.ip_dst).to be_a(Integer)
       expect(@ip_header.body).to eql("")
     end
 
     it "should parse a raw IPHeader" do
       raw_header = "\x45\x10\x00\x4f\x16\xa9\x40\x00\x40\x06\xa2\x9c\xc0\xa8\x00\x02\xc0\xa8\x00\x01"
       @ip_header.read(raw_header)
-     
+
       expect(@ip_header.ip_v).to eql(4)
       expect(@ip_header.ip_hl).to eql(5)
       expect(@ip_header.ip_tos).to eql(16)
@@ -42,8 +42,8 @@ describe IPHeader do
       expect(@ip_header.ip_sum).to eql(41628)
       expect(@ip_header.ip_src).to eql(3232235522)
       expect(@ip_header.ip_dst).to eql(3232235521)
-      expect(@ip_header.ip_src).to be_a(Integer) 
-      expect(@ip_header.ip_dst).to be_a(Integer) 
+      expect(@ip_header.ip_src).to be_a(Integer)
+      expect(@ip_header.ip_dst).to be_a(Integer)
       expect(@ip_header.body).to eql("")
     end
 
@@ -98,7 +98,7 @@ describe IPPacket do
       expect(@temp_file.read).to eql("")
 
       @ip_packet.to_f(@temp_file.path, 'a')
-      expect(File.exists?(@temp_file.path))
+      expect(File.exist?(@temp_file.path))
       expect(@temp_file.read.size).to be >= 49
     end
   end
