@@ -5,7 +5,7 @@
 # reading and writing packets to and from pcap files.
 
 # Usage:
-# ruby examples/100kpackets.rb 
+# ruby examples/100kpackets.rb
 
 # Path setting slight of hand:
 $: << File.expand_path("../../lib", __FILE__)
@@ -13,7 +13,7 @@ require 'packetfu'
 
 puts "Generating packets... (#{Time.now.utc})"
 
-File.unlink("/tmp/out.pcap") if File.exists? "/tmp/out.pcap"
+File.unlink("/tmp/out.pcap") if File.exist? "/tmp/out.pcap"
 start_time = Time.now.utc
 count = 0
 

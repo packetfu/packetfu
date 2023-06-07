@@ -95,7 +95,7 @@ module PacketFu
       filename ||= 'out.pcap'
       mode = mode.to_s[0,1] + "b"
       raise ArgumentError, "Unknown mode: #{mode.to_s}" unless mode =~ /^[wa]/
-      if(mode == 'w' || !(File.exists?(filename)))
+      if(mode == 'w' || !(File.exist?(filename)))
         data = [PcapHeader.new, self.to_pcap].map {|x| x.to_s}.join
       else
         data = self.to_pcap
@@ -297,7 +297,7 @@ module PacketFu
     def hexify(str)
       str.force_encoding(Encoding::BINARY) if str.respond_to? :force_encoding
       hexascii_lines = str.to_s.unpack("H*")[0].scan(/.{1,32}/)
-      regex = Regexp.new('[\x00-\x1f\x7f-\xff]', nil, 'n')
+      regex = Regexp.new('[\x00-\x1f\x7f-\xff]'.force_encoding('ASCII-8BIT'), Regexp::NOENCODING)
       chars = str.to_s.gsub(regex,'.')
       chars_lines = chars.scan(/.{1,16}/)
       ret = []

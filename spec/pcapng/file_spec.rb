@@ -45,7 +45,7 @@ module PacketFu
         it 'yields xPB object per read packet' do
           idx = 0
           @pcapng.readfile(@file) do |pkt|
-            expect(pkt).to be_a(@Pcapng::EPB)
+            expect(pkt).to be_a(PcapNG::EPB)
             idx += 1
           end
           expect(idx).to eq(11)

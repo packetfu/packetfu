@@ -144,7 +144,7 @@ module PacketFu
 
         append = args[:append]
         mode = ''
-        if append and ::File.exists? filename
+        if append and ::File.exist? filename
           mode = 'ab'
         else
           mode = 'wb'
