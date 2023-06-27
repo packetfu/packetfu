@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   }
   s.files       = `git ls-files`.split($/)
   s.license     = 'BSD-3-Clause'
-  s.required_ruby_version = '>= 3.2.0' # Might be a little aggressive.
+  s.required_ruby_version = '>= 2.7.0'
   s.add_dependency('pcaprub', '~> 0.13.1')
   s.add_development_dependency('rake')
   s.add_development_dependency('rspec', '~> 3.0')
