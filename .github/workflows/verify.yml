@@ -50,6 +50,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
+          fetch-depth: 10
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Install system dependencies (Linux)
