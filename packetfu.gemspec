@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   }
   s.files       = `git ls-files`.split($/)
   s.license     = 'BSD-3-Clause'
-  s.required_ruby_version = '>= 2.1.0'
+  s.required_ruby_version = '>= 2.7.0'
   s.add_dependency('pcaprub', '~> 0.13.1')
   s.add_development_dependency('rake')
   s.add_development_dependency('rspec', '~> 3.0')
@@ -25,13 +25,7 @@ Gem::Specification.new do |s|
 
   s.extra_rdoc_files  = %w[.document README.md]
   s.test_files        = (s.files & (Dir['spec/**/*_spec.rb'] + Dir['test/test_*.rb']) )
-  s.rubyforge_project = 'packetfu'
 
-  cert = File.expand_path("~/.ssh/gem-private_key_todb.pem")
-
-  if File.exist?(cert) and File.readable?(cert)
-    s.signing_key = cert
-    s.cert_chain = ['gem-public_cert.pem']
-  end
-
+  s.cert_chain = ['certs/todb.pem']
+  s.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
 end
